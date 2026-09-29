@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CurveballNext · Rally laboratory</title></head>
+  <body>
+    <main>
+      <header><div><p class="eyebrow">M1 / OFFLINE PROTOTYPE</p><h1>Curveball<span>Next</span></h1></div><span class="badge">30 Hz simulation</span></header>
+      <div class="intro"><h2>Rally laboratory</h2><p>Move to meet the ball. Sweep the paddle to create curve.</p></div>
+      <div class="workspace">
+        <section class="play-area" aria-label="Rally court">
+          <div class="court-top"><span id="phase">Waiting for serve</span><span id="view-label">Reference view</span></div>
+          <div class="canvas-wrap"><canvas id="court" width="700" height="500" tabindex="0" aria-label="Mouse-controlled rally court. Click overlapping ball and paddle to serve."></canvas></div>
+          <div class="court-bottom"><span class="dot"></span><span id="instruction">Move over the ball and press the primary mouse button to serve.</span></div>
+          <div class="controls"><button id="pause">Pause</button><button id="step" disabled>Step one tick</button><button id="retry">Retry rally <kbd>R</kbd></button><button id="reset">Reset trial</button></div>
+        </section>
+        <aside>
+          <section class="panel"><p class="eyebrow">TRIAL SETTINGS</p><label for="difficulty">Recovered difficulty</label><select id="difficulty" aria-label="Recovered difficulty"></select><p id="parameters" class="muted"></p><div class="separator"></div><p class="eyebrow">DIAGNOSTICS · NOT SCORE / LIVES</p><div class="metric"><span>Rally returns</span><strong id="returns">0</strong></div><div class="metric small"><span>Trial returns</span><b id="total">0</b></div><div class="metric small"><span>Player misses</span><b id="player-misses">0</b></div><div class="metric small"><span>Enemy misses</span><b id="enemy-misses">0</b></div><p id="last-event" class="event">Ready for first serve</p></section>
+          <section class="panel views"><p class="eyebrow">OBSERVATION</p><label><input id="native" type="checkbox"> Native 350 × 250 view</label><label><input id="smooth" type="checkbox"> Smooth view (delayed interpolation)</label><label><input id="debug" type="checkbox"> Debug state & collision boxes</label><button id="export">Export last 600 ticks</button><p class="muted">A local JSON capture for deterministic replay.</p></section>
+        </aside>
+      </div>
+      <section id="debug-panel" class="panel" hidden><h2>Simulation state</h2><pre id="state"></pre></section>
+      <footer><span>m1-provisional-01</span><p>Provisional compatibility; native Flash parity unverified.</p><p>Independent code and newly drawn geometry. Mouse only · Esc to pause · Resume after switching windows.</p></footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

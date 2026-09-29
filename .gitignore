@@ -1,5 +1,8 @@
 reference-local/
 node_modules/
 dist/
+coverage/
+test-results/
+captures-local/
 .env
 .env.*
