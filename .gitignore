@@ -1,0 +1,5 @@
+reference-local/
+node_modules/
+dist/
+.env
+.env.*
