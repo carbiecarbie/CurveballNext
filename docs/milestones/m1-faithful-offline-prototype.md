@@ -2,7 +2,7 @@
 
 **Project:** CurveballNext  
 **Document date:** 29 September 2026  
-**Status:** Implementation plan ready for review and handoff; implementation has not started.  
+**Status at planning time:** Implementation plan ready for review and handoff; implementation had not started.\
 **Requested baseline:** `main`, commit `862cece` — `Initialize CurveballNext research baseline`  
 **Compatibility profile:** `m1-provisional-01`  
 **Contract status:** An explicit provisional implementation target, **not** a runtime-verified Curveball Simulation Contract v1.
@@ -48,7 +48,7 @@ Acceptance has two independent parts: mathematical/architectural conformance and
 
 ## 3. Starting repository state
 
-The supplied baseline is `D:\Projetos\CurveballNext`, branch `main`, short commit `862cece`, with a clean working tree. This is user-provided state, **not a live checkout verification performed here**.
+The supplied baseline is the local repository checkout, branch `main`, short commit `862cece`, with a clean working tree. This is user-provided state, **not a live checkout verification performed here**.
 
 Existing expected files are `README.md`, `.gitignore`, and the three documents under `docs/`. `reference-local/curveball.swf` is a private, Git-ignored reference. Empty `src/` and `tests/` directories need not be tracked by Git.
 
@@ -536,12 +536,11 @@ Keep core/compat imports DOM-free. Pure projection/constants/types may be shared
 
 ## 18. Build and development workflow
 
-### Read-only preflight in the actual Windows checkout
+### Read-only preflight from the repository root
 
 The following commands are instructions for the implementing agent, not commands executed by this planning pass:
 
 ```powershell
-Set-Location 'D:\Projetos\CurveballNext'
 git branch --show-current
 git rev-parse HEAD
 git rev-parse '862cece^{commit}'

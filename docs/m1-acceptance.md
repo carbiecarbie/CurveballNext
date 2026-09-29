@@ -1,12 +1,12 @@
 # M1 implementation candidate — evidence and remaining acceptance
 
-Date: 29 September 2026. **Status: implementation candidate; M1 acceptance pending.** This is independent prototype evidence, not Flash/Ruffle runtime verification. The historical M0/M0.5 documents are unchanged.
+Date: 29 September 2026. **Status at time of evidence: implementation candidate; M1 acceptance pending.** This historical record describes the uncommitted candidate before the M1 implementation commit. It is independent prototype evidence, not Flash/Ruffle runtime verification. The historical M0/M0.5 documents are unchanged.
 
 ## Baseline and tools
 
 - Verified branch `main`, HEAD `862cece771dc73d176888b9af4ffb76c04c7bad7`, initially clean working tree and empty index. No tracked reference-local files; its ignore rule was active.
 - Candidate is the uncommitted working tree based on that commit; no candidate commit exists. Nothing was staged, committed, pushed or publicly deployed.
-- Node **24.21.0**, npm **11.19.0**. Official Windows x64 distribution installed in `C:\Users\carbo\AppData\Local\CurveballNextToolchain\node-v24.21.0-win-x64`, outside the repository. Downloaded ZIP SHA-256: `158f7685b44de51f6c0df1d153526cbcd3e1bc739a8dfc607721cef75de9e541`, checked against the official Node manifest.
+- Node **24.21.0**, npm **11.19.0**. Official Windows x64 distribution installed locally outside the repository. Downloaded ZIP SHA-256: `158f7685b44de51f6c0df1d153526cbcd3e1bc739a8dfc607721cef75de9e541`, checked against the official Node manifest.
 - Reconfirmed versions and clean working tree before creating any M1 package files. npm itself is not a project dependency. No toolchain payload was placed in the repository.
 - Pinned dev dependencies: TypeScript **7.0.2**, Vite **8.3.1**, Vitest **5.0.2**, @types/node **26.6.3**. Node requirements and Vite peer compatibility were checked against registry metadata; package-lock records exact resolution.
 
@@ -51,7 +51,7 @@ The first Edge capture replayed exactly in Edge. Strict replay under Node 24.21.
 
 Project boundaries were reread. Implementation was independently written from behavioral rules in the supplied plan and repository research. No SWF inspection, conversion, emulator or original-art extraction was performed. Canvas geometry, styles and interface are new; fonts are system fonts and no audio is included.
 
-Reviewed core and compatibility modules, host input/clock, presentation, trace/replay, tests, package/config and untracked candidate files. Runtime module graph contains only independent TypeScript/CSS. `publicDir` is false. Vite retains strict filesystem access and default sensitive-file exclusions plus explicit reference/SWF denies. Both `/reference-local/curveball.swf` and `/@fs/D:/Projetos/CurveballNext/reference-local/curveball.swf` returned HTTP 403 in development.
+Reviewed core and compatibility modules, host input/clock, presentation, trace/replay, tests, package/config and untracked candidate files. Runtime module graph contains only independent TypeScript/CSS. `publicDir` is false. Vite retains strict filesystem access and default sensitive-file exclusions plus explicit reference/SWF denies. Both the repository-relative `/reference-local/curveball.swf` request and a direct `/@fs/` request to the same local reference file returned HTTP 403 in development.
 
 Build output consists solely of generated `index.html` and two independent application assets. No original content is imported, loaded or bundled; the production request log has no reference asset or external dependency. The private original file was not opened to perform this audit. Research metadata and behavioral equations remain documentation, not executable/art assets.
 
