@@ -33,4 +33,16 @@ export function draw(canvas: HTMLCanvasElement, current: State, previous: State,
   paddle(p.player,'#79eacb');
   if(debug){ctx.strokeStyle='#f791cb';ctx.lineWidth=0.4;for(const box of [current.ball.box,current.player.box,current.enemy.box])ctx.strokeRect(box.left,box.top,box.width,box.height);}
   ctx.font='5px monospace';ctx.fillStyle='#719199';ctx.fillText('NEAR / 0',25,237);ctx.textAlign='right';ctx.fillText('FAR / 75',326,237);ctx.textAlign='left';
+  if (current.phase === 'LevelIntro' || current.phase === 'GameOver' || current.phase === 'ContentComplete') {
+    ctx.fillStyle='rgba(7,19,27,0.84)';ctx.fillRect(0,0,350,250);
+    ctx.textAlign='center';ctx.fillStyle='#dcf5ed';ctx.font='bold 13px Segoe UI, sans-serif';
+    const heading=current.phase==='LevelIntro'?`LEVEL ${current.level}`:current.phase==='GameOver'?'GAME OVER':'DEFINED ORIGINAL LEVEL DATA COMPLETE';
+    if(current.phase==='ContentComplete')ctx.font='bold 8px Segoe UI, sans-serif';
+    ctx.fillText(heading,175,115);
+    if(current.phase!=='LevelIntro'){
+      ctx.font='7px Segoe UI, sans-serif';ctx.fillText(`Score ${current.score} · Level ${current.level} · Player lives ${current.playerLives}`,175,134);
+      ctx.fillText('Select New Game to restart',175,151);
+    }
+    ctx.textAlign='left';
+  }
 }

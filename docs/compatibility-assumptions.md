@@ -28,7 +28,7 @@ Profile: **m1-provisional-01**. All U01–U05 remain unverified in native Flash.
 | Trial identifier | Preserve | Increment |
 | Rally identifier within trial | Increment | Start at 1 |
 
-Retry is a dispatch operation, with no extra actor update. Automatic retry occurs at the start of missTick+19. Player/enemy handlers continue during MissHold; ball updates stop after the miss callback completes its late projection/publication. Serve attempts during MissHold are guarded deliberately under the M1 U07 policy.
+Retry is a dispatch operation, with no extra actor update. In M2, Retry during MissHold is allowed only while both sides have lives remaining; a depleted side reserves the pending miss for resolution at missTick+19. That resolution retries, completes the level (enemy first), or enters Game Over as appropriate. Player/enemy handlers continue during MissHold; ball updates stop after the miss callback completes its late projection/publication. Serve attempts during MissHold are guarded deliberately under the M1 U07 policy.
 
 ## Host and numerical policy
 
@@ -40,6 +40,12 @@ JavaScript binary64 arithmetic retains the stored decimals and degree-form proje
 
 Interpolation, canvas size, DPR, recording and debug cannot write core state. There is one production compatibility profile, not an unresolved-behavior settings menu.
 
+## M2 compatibility containment
+
+The recovered original has ten defined difficulty tuples. On a level-10 enemy depletion it increments toward an undefined eleventh entry, with no verified final-victory branch. M2 awards the remaining level bonus once and enters `ContentComplete` at level 10 without indexing level 11. This is a **CurveballNext compatibility containment policy**, not recovered original behavior. `Winner` in the original belongs to historical high-score qualification. A future R12 runtime observation may replace this policy. The old M1 capture schema is rejected explicitly; M2 uses `curveball-m2-trace-2` with score, lives, award buckets, bonus and lifecycle state.
+
+Debug level selection and forced misses are labeled developer fixtures. They use the original difficulty tuples and ordinary miss-resolution logic; normal New Game always starts at level 1. The original scoring and bonus resets follow `docs/original-behavior.md`. U01–U05 and the `m1-provisional-01` physics profile remain unchanged.
+
 ## Deferred questions
 
-U06: post-level-10 behavior; U07: original stopped-miss click reachability; U08: historical high-score service; U09: original audiovisual timing. None is resolved by omission. Scoring/lives/campaign and native R10 are deferred beyond M1. No recovered coefficient was tuned for subjective feel.
+U06: native post-level-10 behavior remains unknown under the M2 containment policy. U07: original stopped-miss click reachability; U08: historical high-score service; U09: original audiovisual timing. None is resolved by omission. Native R10 scoring/bonus persistence is still unverified; M2 implements the M0 recovered rules. No recovered coefficient was tuned for subjective feel.

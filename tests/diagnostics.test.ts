@@ -20,8 +20,9 @@ describe('contact trace generation provenance', () => {
     expect(contact.oldBallBox.generation).toBe(1);
     expect(result.state.ball.generation).toBe(2);
     expect(contact.newBallBox).toBeUndefined();
-    // The serve was superseded by retry: diagnostics must not change that state.
-    expect(result.state).toEqual(tick(initial, commands(initial, [{ type: 'retry' }])).state);
+    // Retry replaces the ball but retains a completed serve's score and buckets.
+    const retryOnly = tick(initial, commands(initial, [{ type: 'retry' }])).state;
+    expect(result.state).toEqual({ ...retryOnly, score: 100, accuracyBonus: 90 });
   });
 
   test('multiple retries/resets in a tick keep every contact within its own generation', () => {

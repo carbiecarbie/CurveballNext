@@ -1,4 +1,6 @@
-# M1 implementation candidate — evidence and remaining acceptance
+# M1 implementation evidence and acceptance
+
+**Accepted:** M1 was accepted and closed at `59cdbb9e3f232cf07a24c6c304ac43c851a64db4` (`Implement M1 faithful offline prototype`). The accepted baseline had **105 passing tests**, typecheck, production build, deterministic replay, Edge smoke, and no remaining review finding. The later `d4a61a9049545110a235e6dacb6e73c8c7183d4a` commit cleaned up public documentation and is the authorized M2 baseline. The evidence below records the earlier pre-acceptance candidate and its then-pending checks; those historical observations and counts are retained as such.
 
 Date: 29 September 2026. **Status at time of evidence: implementation candidate; M1 acceptance pending.** This historical record describes the uncommitted candidate before the M1 implementation commit. It is independent prototype evidence, not Flash/Ruffle runtime verification. The historical M0/M0.5 documents are unchanged.
 
@@ -55,7 +57,7 @@ Reviewed core and compatibility modules, host input/clock, presentation, trace/r
 
 Build output consists solely of generated `index.html` and two independent application assets. No original content is imported, loaded or bundled; the production request log has no reference asset or external dependency. The private original file was not opened to perform this audit. Research metadata and behavioral equations remain documentation, not executable/art assets.
 
-## Remaining acceptance
+## Items pending at the time of this candidate snapshot
 
 No known mathematical or same-engine deterministic correctness defect remains from the executed checks. This is not a declaration that all required browser checks passed.
 
@@ -63,4 +65,4 @@ No known mathematical or same-engine deterministic correctness defect remains fr
 2. Record actual desktop window/tab focus transitions, zoom/alignment, available physical refresh behavior and manual play at 1/5/10.
 3. Maintainer feel assessment: **not yet provided**. Record paddle response, visible curvature, readable depth, wall behavior and opponent responsiveness. Distinguish defects from compatibility assumptions and deferred presentation; do not tune recovered constants.
 
-U01–U05 remain open and M0.5 remains incomplete. No original-runtime parity claim or frozen simulation contract is made. M1 can be marked accepted only after the remaining browser/manual evidence is recorded.
+U01–U05 remain open and M0.5 remains incomplete. No original-runtime parity claim or frozen simulation contract is made. The remaining items above describe this earlier candidate snapshot; the accepted M1 decision and its later 105-test baseline are recorded at the top of this document.

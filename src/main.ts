@@ -1,5 +1,6 @@
 import './styles.css';
 import { difficulty } from './core/constants';
+import { canRetry } from './core/lifecycle';
 import { createState } from './core/state';
 import { tick } from './core/tick';
 import type { Action, Command, Event } from './core/types';
@@ -18,23 +19,30 @@ for(let level=1;level<=10;level++){const option=document.createElement('option')
 function advance(commands:Command[]) {
   previous=state;const result=tick(state,commands);state=result.state;clock.advance();recorder.record(commands,result);
   discontinuity=result.events.some(e=>e.type!=='serve-rejected');
-  const event=result.events.filter(e=>!['auto-retry','retry','reset'].includes(e.type)).at(-1);if(event)lastEvent=event;
-  if(result.events.some(e=>e.type==='reset'))lastEvent=null;
+  const event=result.events.filter(e=>!['auto-retry','retry','reset','new-game','debug-inject'].includes(e.type)).at(-1);if(event)lastEvent=event;
+  if(result.events.some(e=>e.type==='reset'||e.type==='new-game'))lastEvent=null;
   if(debug.checked)element('state').textContent=JSON.stringify({state,lastEvent,audit:result.audit},null,2);
 }
 function suspend(reason:string){clock.suspend(performance.now(),reason);input.clear();update();}
 function update(){
   const d=difficulty(state.level);levelSelect.value=String(state.level);
   element('parameters').textContent=`Speed ${d.speed} · Curve divisor ${d.curve} · AI divisor ${d.ai}`;
-  element('phase').textContent=clock.paused?`Paused · ${clock.reason}`:state.phase==='ServeWaiting'?'Waiting for serve':state.phase==='Rally'?'Rally in progress':'Miss · retrying shortly';
-  element('instruction').textContent=clock.paused?'Press Resume to continue. Step advances one ordinary tick.':state.phase==='ServeWaiting'?'Move over the ball and press the primary mouse button to serve.':state.phase==='MissHold'?'Ball stopped at the miss. Paddles continue; a fresh ball follows.':'Track the ball as it approaches. Paddle motion creates curve.';
+  const phaseText={ServeWaiting:'Waiting for serve',Rally:'Rally in progress',MissHold:'Miss · resolving shortly',LevelIntro:`LEVEL ${state.level}`,GameOver:'GAME OVER',ContentComplete:'DEFINED ORIGINAL LEVEL DATA COMPLETE'};
+  element('phase').textContent=clock.paused?`Paused · ${clock.reason}`:phaseText[state.phase];
+  const instruction={ServeWaiting:'Move over the ball and press the primary mouse button to serve.',Rally:'Track the ball as it approaches. Paddle motion creates curve.',MissHold:'Ball stopped at the miss. The result follows after the hold.',LevelIntro:`Level ${state.level} begins shortly.`,GameOver:`GAME OVER · Final score ${state.score} · Level ${state.level}. Select New Game to restart.`,ContentComplete:`Defined original level data complete · Score ${state.score} · Player lives ${state.playerLives}. Select New Game to restart.`};
+  element('instruction').textContent=clock.paused?'Press Resume to continue. Step advances one ordinary tick.':instruction[state.phase];
+  element('score').textContent=String(state.score);element('level').textContent=String(state.level);
+  element('player-lives').textContent=String(state.playerLives);element('enemy-lives').textContent=String(state.enemyLives);
+  element('level-bonus').textContent=String(state.remainingBonus);
   element('returns').textContent=String(state.diagnostics.rallyReturns);element('total').textContent=String(state.diagnostics.returns);
   element('player-misses').textContent=String(state.diagnostics.playerMisses);element('enemy-misses').textContent=String(state.diagnostics.enemyMisses);
   element('last-event').textContent=lastEvent?[lastEvent.type,lastEvent.side,lastEvent.reason,lastEvent.curve,lastEvent.accurate===undefined?'':lastEvent.accurate?'accurate':'off-center'].filter(Boolean).join(' · '):'Ready for first serve';
   pauseButton.textContent=clock.paused?'Resume':'Pause';stepButton.disabled=!clock.paused;
-  for(const id of ['retry','reset'])element<HTMLButtonElement>(id).disabled=clock.paused;
+  element<HTMLButtonElement>('retry').disabled=clock.paused||!canRetry(state);
+  for(const id of ['force-player-miss','force-enemy-miss'])element<HTMLButtonElement>(id).disabled=clock.paused||state.phase==='LevelIntro'||state.phase==='GameOver'||state.phase==='ContentComplete';
   levelSelect.disabled=clock.paused;document.body.classList.toggle('paused',clock.paused);
   element('debug-panel').hidden=!debug.checked;
+  element('debug-tools').hidden=!debug.checked;
   element('view-label').textContent=smooth.checked?'Smooth · delayed interpolation':'Reference view · no interpolation';
 }
 function enqueue(action:Action){input.enqueue(action,performance.now());}
@@ -44,7 +52,9 @@ pauseButton.addEventListener('click',()=>{
 });
 stepButton.addEventListener('click',()=>{if(clock.paused){advance([]);discontinuity=true;update();}});
 element('retry').addEventListener('click',()=>enqueue({type:'retry'}));
-element('reset').addEventListener('click',()=>enqueue({type:'reset',level:state.level}));
+element('new-game').addEventListener('click',()=>{if(clock.paused){clock.resume(performance.now());input.clear();}enqueue({type:'new-game'});update();});
+element('force-player-miss').addEventListener('click',()=>enqueue({type:'debug-miss',side:'player'}));
+element('force-enemy-miss').addEventListener('click',()=>enqueue({type:'debug-miss',side:'enemy'}));
 levelSelect.addEventListener('change',()=>enqueue({type:'reset',level:Number(levelSelect.value)}));
 element<HTMLInputElement>('native').addEventListener('change',e=>{document.querySelector('.canvas-wrap')!.classList.toggle('native',(e.target as HTMLInputElement).checked);});
 debug.addEventListener('change',()=>{element('state').textContent=JSON.stringify({state,lastEvent},null,2);update();});smooth.addEventListener('change',update);
@@ -70,12 +80,12 @@ window.addEventListener('keydown',event=>{
   if(event.repeat){if(event.target===stepButton)event.preventDefault();return;}
   if((event.target as HTMLElement)?.closest('input,select,textarea,button,[contenteditable="true"]'))return;
   if(event.key==='Escape'&&!clock.paused){event.preventDefault();suspend('keyboard');}
-  if(event.key.toLowerCase()==='r'&&!clock.paused){event.preventDefault();enqueue({type:'retry'});}
+  if(event.key.toLowerCase()==='r'&&!clock.paused&&debug.checked&&canRetry(state)){event.preventDefault();enqueue({type:'retry'});}
 });
 element('export').addEventListener('click',()=>{
   const capture=recorder.export({suspensions:clock.history,userAgent:navigator.userAgent});
   const url=URL.createObjectURL(new Blob([JSON.stringify(capture)],{type:'application/json'}));
-  const link=document.createElement('a');link.href=url;link.download=`curveball-m1-${state.tick}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const link=document.createElement('a');link.href=url;link.download=`curveball-m2-${state.tick}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
 function frame(now:number){
   const wasPaused=clock.paused,due=clock.due(now);if(!wasPaused&&clock.paused)input.clear();
