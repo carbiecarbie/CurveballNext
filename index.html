@@ -1,25 +1,78 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CurveballNext · Offline game</title></head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050506">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23190a0c' stroke='%23ffb143' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23fff0cc'/%3E%3C/svg%3E">
+    <title>CurveballNext · Offline arcade</title>
+  </head>
   <body>
     <main>
-      <header><div><p class="eyebrow">M2 / OFFLINE SINGLE PLAYER</p><h1>Curveball<span>Next</span></h1></div><span class="badge">30 Hz simulation</span></header>
-      <div class="intro"><h2>Single-player game</h2><p>Move to meet the ball. Sweep the paddle to create curve.</p></div>
-      <div class="workspace">
-        <section class="play-area" aria-label="Rally court">
-          <div class="court-top"><span id="phase">Waiting for serve</span><span id="view-label">Reference view</span></div>
-          <div class="canvas-wrap"><canvas id="court" width="700" height="500" tabindex="0" aria-label="Mouse-controlled rally court. Click overlapping ball and paddle to serve."></canvas></div>
-          <div class="court-bottom"><span class="dot"></span><span id="instruction">Move over the ball and press the primary mouse button to serve.</span></div>
-          <div class="controls"><button id="pause">Pause</button><button id="step" disabled>Step one tick</button><button id="new-game">New Game</button></div>
-        </section>
-        <aside>
-          <section class="panel"><p class="eyebrow">GAME</p><div class="metric"><span>Score</span><strong id="score">0</strong></div><div class="metric"><span>Level</span><b id="level">1</b></div><div class="metric"><span>Player Lives</span><b id="player-lives">5</b></div><div class="metric"><span>Enemy Lives</span><b id="enemy-lives">3</b></div><div class="metric"><span>Level Bonus</span><b id="level-bonus">3000</b></div><p id="last-event" class="event">Ready for first serve</p></section>
-          <section class="panel views"><p class="eyebrow">OBSERVATION</p><label><input id="native" type="checkbox"> Native 350 × 250 view</label><label><input id="smooth" type="checkbox"> Smooth view (delayed interpolation)</label><label><input id="debug" type="checkbox"> Debug state & collision boxes</label><button id="export">Export last 600 ticks</button><p class="muted">A local JSON capture for deterministic replay.</p></section>
-          <section id="debug-tools" class="panel" hidden><p class="eyebrow">DEBUG / TESTING ONLY</p><label for="difficulty">Start directly at recovered level</label><select id="difficulty" aria-label="Debug starting level"></select><p id="parameters" class="muted"></p><div class="controls"><button id="retry">Debug retry rally <kbd>R</kbd></button><button id="force-player-miss">Force player miss</button><button id="force-enemy-miss">Force enemy miss</button></div><div class="separator"></div><p class="eyebrow">DIAGNOSTICS · NOT SCORE</p><div class="metric small"><span>Rally returns</span><b id="returns">0</b></div><div class="metric small"><span>Level returns</span><b id="total">0</b></div><div class="metric small"><span>Player misses</span><b id="player-misses">0</b></div><div class="metric small"><span>Enemy misses</span><b id="enemy-misses">0</b></div></section>
-        </aside>
+      <header>
+        <a class="wordmark" href="#" aria-label="CurveballNext">CURVEBALL<span>NEXT</span></a>
+        <span class="edition">OFFLINE ARCADE <i></i> SINGLE PLAYER</span>
+      </header>
+      <section class="arcade" aria-label="Curveball single-player game">
+        <div class="hud hud-top" aria-label="Game status">
+          <div class="score-cell"><span class="hud-label">SCORE</span><strong id="score">0</strong></div>
+          <div class="level-cell"><span class="hud-label">LEVEL</span><strong id="level">01</strong><span class="level-total">/ 10</span></div>
+          <div class="bonus-cell"><span class="hud-label">LEVEL BONUS</span><strong id="level-bonus">3000</strong></div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="court" width="1050" height="750" tabindex="0" aria-label="Mouse-controlled court. Move over the ball and press the primary mouse button to serve."></canvas>
+          <section id="screen" class="screen" aria-labelledby="screen-title">
+            <div class="screen-card">
+              <p id="screen-kicker" class="eyebrow">ENTER THE CIRCUIT</p>
+              <h1 id="screen-title">CURVEBALL<span>NEXT</span></h1>
+              <p id="screen-copy">Meet the ball. Bend the rally.</p>
+              <p id="screen-stats" class="screen-stats" hidden></p>
+              <div id="intro-progress" class="intro-progress" hidden><span></span></div>
+              <div class="screen-actions">
+                <button id="new-game" class="primary">New Game <span aria-hidden="true">↗</span></button>
+                <button id="resume" class="primary" hidden>Resume <span aria-hidden="true">↗</span></button>
+              </div>
+              <p id="screen-note" class="screen-note">Mouse to move · Click to serve · Esc to pause</p>
+            </div>
+          </section>
+        </div>
+        <div class="hud hud-bottom">
+          <div class="life-cell player"><span class="hud-label">PLAYER</span><span id="player-life-bars" class="life-bars" aria-hidden="true"></span><b id="player-lives" aria-label="Player lives">5</b></div>
+          <div class="rally-status"><span id="bonus-notice" class="bonus-notice" role="status" hidden></span><span id="phase" class="phase">Ready</span></div>
+          <div class="life-cell enemy"><b id="enemy-lives" aria-label="Enemy lives">3</b><span id="enemy-life-bars" class="life-bars" aria-hidden="true"></span><span class="hud-label">ENEMY</span></div>
+        </div>
+      </section>
+      <div class="play-controls">
+        <p id="instruction">Move to meet the ball. Sweep the paddle to create curve.</p>
+        <div class="controls"><button id="pause" disabled>Pause <kbd>Esc</kbd></button><button id="restart" disabled>New Game</button><button id="sound" aria-pressed="true">Sound on</button></div>
       </div>
-      <section id="debug-panel" class="panel" hidden><h2>Simulation state</h2><pre id="state"></pre></section>
-      <footer><span>m1-provisional-01</span><p>Provisional compatibility; native Flash parity unverified.</p><p>Independent code and newly drawn geometry. Mouse only · Esc to pause · Resume after switching windows.</p></footer>
+      <details id="testing">
+        <summary>Debug / testing</summary>
+        <div class="debug-settings">
+          <label><input id="debug" type="checkbox"> Enable debug controls & collision boxes</label>
+          <label><input id="native" type="checkbox"> Native 350 × 250 view</label>
+          <label><input id="smooth" type="checkbox"> Smooth view (delayed interpolation)</label>
+          <span id="view-label">Reference view · no interpolation</span>
+        </div>
+        <div id="debug-tools" class="debug-tools" hidden>
+          <section>
+            <p class="eyebrow">DEBUG / TESTING ONLY</p>
+            <label for="difficulty">Start directly at recovered level</label>
+            <select id="difficulty" aria-label="Debug starting level"></select>
+            <p id="parameters" class="muted"></p>
+            <div class="controls"><button id="retry">Debug retry <kbd>R</kbd></button><button id="force-player-miss">Force player miss</button><button id="force-enemy-miss">Force enemy miss</button><button id="step" disabled>Step one tick</button><button id="export">Export last 600 ticks</button></div>
+          </section>
+          <section class="diagnostics">
+            <p class="eyebrow">DIAGNOSTICS · NOT SCORE</p>
+            <p>Rally returns <b id="returns">0</b> · Level returns <b id="total">0</b></p>
+            <p>Player misses <b id="player-misses">0</b> · Enemy misses <b id="enemy-misses">0</b></p>
+            <p id="last-event">Ready for first serve</p>
+          </section>
+        </div>
+        <section id="debug-panel" hidden><h2>Simulation state</h2><pre id="state"></pre></section>
+        <p class="muted">m1-provisional-01 · Provisional compatibility; native Flash parity unverified. Export saves a local M2-schema deterministic trace.</p>
+      </details>
+      <footer><span>INDEPENDENT RECONSTRUCTION</span><p>New visuals & synthesized sound · Mouse only · No online services</p></footer>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

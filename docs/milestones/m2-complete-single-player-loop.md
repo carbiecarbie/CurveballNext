@@ -1,6 +1,8 @@
 # M2 — Complete original single-player loop
 
-**Status:** implementation candidate for maintainer review, uncommitted. **Baseline:** clean `main` at `d4a61a9049545110a235e6dacb6e73c8c7183d4a`, the authorized successor of accepted M1 `59cdbb9e3f232cf07a24c6c304ac43c851a64db4`.
+**Accepted and closed:** M2 was accepted at `103193cfc0b7642dc2d1d795fd34ddffce913abc` (`Implement M2 complete single-player loop`). That accepted baseline has 159 passing tests. The evidence below retains the earlier candidate's historical scope and validation counts.
+
+**Status at time of evidence:** implementation candidate for maintainer review, uncommitted. **Baseline:** clean `main` at `d4a61a9049545110a235e6dacb6e73c8c7183d4a`, the authorized successor of accepted M1 `59cdbb9e3f232cf07a24c6c304ac43c851a64db4`.
 
 ## Implemented
 

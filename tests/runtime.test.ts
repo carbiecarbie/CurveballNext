@@ -81,7 +81,7 @@ describe('M1 host/integration policy',()=>{
     for(let n=0;n<620;n++){const r=tick(state);state=r.state;recorder.record([],r);}
     const capture=recorder.export();expect(capture.records).toHaveLength(600);expect(capture.checkpoint.tick).toBe(20);expect(replay(capture)).toEqual(state);
     const before=structuredClone(state),previous=tick(state).state,previousBefore=structuredClone(previous);
-    const ctx=new Proxy({}, {get:()=>()=>undefined,set:()=>true});
+    const ctx=new Proxy({}, {get:(_target,key)=>key==='createRadialGradient'||key==='createLinearGradient'?()=>({addColorStop:()=>undefined}):()=>undefined,set:()=>true});
     const canvas={width:0,height:0,getContext:()=>ctx,getBoundingClientRect:()=>({width:700,height:500})} as unknown as HTMLCanvasElement;
     try {for(const dpr of [1,2]){vi.stubGlobal('window',{devicePixelRatio:dpr});for(const smooth of [false,true])for(const debug of [false,true])draw(canvas,state,previous,0.5,smooth,false,debug);}}
     finally{vi.unstubAllGlobals();}
