@@ -81,3 +81,9 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8p
 footer p { margin: 0; letter-spacing: .3px; }
 @media (max-width: 800px) { main { padding: 22px 20px; } .play-controls { align-items: flex-start; flex-direction: column; gap: 12px; } .hud-top, .hud-bottom { padding-left: 18px; padding-right: 18px; } .debug-tools { grid-template-columns: 1fr; } }
 @media (max-width: 540px) { main { padding: 20px 10px; } .edition { display: none; } .hud-top { min-height: 64px; padding: 12px; } .score-cell, .bonus-cell { min-width: 80px; } .hud-label { font-size: 8px; letter-spacing: 1px; } .score-cell strong { font-size: 22px; } .level-cell { gap: 5px; } .level-cell strong { font-size: 22px; } .bonus-cell strong { font-size: 16px; } .hud-bottom { padding: 12px; gap: 8px; } .life-cell { gap: 6px; } .life-bars { gap: 3px; } .life-bars i { width: 7px; } .phase { font-size: 8px; letter-spacing: .4px; } .screen { padding: 16px; } .eyebrow { margin-bottom: 12px; } #screen-copy { font-size: 12px; } .screen-actions { margin-top: 18px; } .screen-note { margin-top: 14px; font-size: 9px; } }
+/* Online room controls retain the accepted procedural court and palette. */
+[hidden] { display: none !important; }
+.mode-menu, .online-controls { padding: 1.5rem; }
+.mode-menu button, .online-controls button { margin: .3rem; }
+.online-controls input { max-width: 12rem; }
+.online-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: #090508c9; color: #ffda9a; font-size: 2rem; pointer-events: none; }
