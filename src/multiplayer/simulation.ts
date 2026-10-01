@@ -42,6 +42,22 @@ export function countdown(s: OnlineState, side: Side) {
 export function startMatch(s: OnlineState, initialSide: Side) {
   s.matchId++; s.rallyId = 1; s.lives = [3, 3]; s.result = null; s.initialServingSide = initialSide; countdown(s, initialSide);
 }
+export type WallEvent = 'wall-top' | 'wall-bottom' | 'wall-left' | 'wall-right';
+/** One tick of ball motion and walls; returns the end plane crossed, if any. Shared by authority and client prediction. */
+export function advanceBall(b: Ball, wall: (type: WallEvent) => void = () => {}): Side | null {
+  b.vx += b.cx; b.vy += b.cy; b.z += b.vz; b.u += b.vx; b.y -= b.vy;
+  if (b.cx !== 0) b.cx /= DECAY; if (b.cy !== 0) b.cy /= DECAY;
+  if (b.y < 40) { b.y = 40; b.cy /= WALL_DIVISOR; b.vy = -b.vy; wall('wall-top'); }
+  else if (b.y > 211) { b.y = 211; b.cy /= WALL_DIVISOR; b.vy = -b.vy; wall('wall-bottom'); }
+  if (b.u < -135.5) { b.u = -135.5; b.cx /= WALL_DIVISOR; b.vx = -b.vx; wall('wall-left'); }
+  else if (b.u > 135.5) { b.u = 135.5; b.cx /= WALL_DIVISOR; b.vx = -b.vx; wall('wall-right'); }
+  return b.z < 0 ? 0 : b.z > 75 ? 1 : null;
+}
+/** A return at the crossed end plane: curve from the paddle's last displacement. */
+export function reflect(b: Ball, side: Side, p: Pick<Paddle, 'dx' | 'dy'>) {
+  const localCx = -p.dx / 25;
+  b.cx = side === 0 ? localCx : -localCx; b.cy = p.dy / 25; b.vz = -b.vz; b.z = side === 0 ? 0 : 75;
+}
 /** One synchronous transaction: prior boxes/sample, then ball, then independent human movement. */
 export function step(s: OnlineState): OnlineEvent[] {
   if (!ticking(s.phase)) return [];
@@ -60,18 +76,10 @@ export function step(s: OnlineState): OnlineEvent[] {
     emit('launch');
   }
   if (s.phase !== 'Rally') return events;
-  const b = s.ball;
-  b.vx += b.cx; b.vy += b.cy; b.z += b.vz; b.u += b.vx; b.y -= b.vy;
-  if (b.cx !== 0) b.cx /= DECAY; if (b.cy !== 0) b.cy /= DECAY;
-  if (b.y < 40) { b.y = 40; b.cy /= WALL_DIVISOR; b.vy = -b.vy; emit('wall-top'); }
-  else if (b.y > 211) { b.y = 211; b.cy /= WALL_DIVISOR; b.vy = -b.vy; emit('wall-bottom'); }
-  if (b.u < -135.5) { b.u = -135.5; b.cx /= WALL_DIVISOR; b.vx = -b.vx; emit('wall-left'); }
-  else if (b.u > 135.5) { b.u = 135.5; b.cx /= WALL_DIVISOR; b.vx = -b.vx; emit('wall-right'); }
-  const side = b.z < 0 ? 0 : b.z > 75 ? 1 : null;
+  const b = s.ball, side = advanceBall(b, type => emit(type));
   if (side !== null) {
     if (contact(incoming[side].ball, incoming[side].own)) {
-      const p = s.localPaddles[side], localCx = -p.dx / 25;
-      b.cx = side === 0 ? localCx : -localCx; b.cy = p.dy / 25; b.vz = -b.vz; b.z = side === 0 ? 0 : 75; emit('return', side);
+      reflect(b, side, s.localPaddles[side]); emit('return', side);
     } else {
       b.vx = b.vy = b.vz = b.cx = b.cy = 0; s.lives[side]--; s.servingSide = side;
       s.phase = s.lives[side] === 0 ? 'MatchEnded' : 'LifeLostHold'; s.phaseDeadline = s.tick + 19;

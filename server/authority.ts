@@ -1,8 +1,8 @@
 import { randomBytes } from 'node:crypto';
 import { parseClient, sameContext, type Frame, type HealthState } from '../src/multiplayer/protocol';
 import { LIMITS, RULES } from '../src/multiplayer/rules';
-import { boxes, createOnline, paddle, startMatch, step, target } from '../src/multiplayer/simulation';
-import { ticking, type OnlineState, type Side } from '../src/multiplayer/types';
+import { boxes, contact, createOnline, ownBox, paddle, startMatch, step, target } from '../src/multiplayer/simulation';
+import { ticking, type OnlineState, type Paddle, type Side } from '../src/multiplayer/types';
 
 export interface Transport { bufferedAmount: number; send(raw: string): void; close(code: number, reason: string): void; terminate(): void }
 export class Bucket {
@@ -20,6 +20,10 @@ export interface Session {
   nonces: Map<string, number>; heartbeatAt: number; probe: { probeId: number; c0: number; s1: number } | null;
   /** Recently received targets (read space, unclamped) bounding which claimed poses are reachable, with their control context. */
   targets: { x: number; y: number; at: number; matchId: number; rallyId: number; generation: number }[];
+  /** Proactive claim for an upcoming end-plane crossing, sent from the defender's presented frame. */
+  claim: Frame | null;
+  /** Authoritative poses this session's paddle actually occupied (per committed Rally tick), for the claim envelope. */
+  poses: { x: number; y: number; at: number; matchId: number; rallyId: number }[];
 }
 export interface Room {
   code: string; epoch: string; created: number; endedAt: number | null; state: OnlineState;
@@ -48,7 +52,7 @@ export class Authority {
     const s: Session = { id: randomBytes(16).toString('hex'), transport, opened: t, room: null, side: 0, credential: '', closing: null,
       serial: 0, lastSent: '', lastSnapshotSerial: 0, generation: 0, enabled: true, authorized: 0, seq: 0, pending: null, queue: [], issued: new Map(), sync: new Map(), responses: new Map(),
       events: [], latest: null, congested: null, abuse: null, inputs: new Bucket(30, 60, t), commands: new Bucket(5, 10, t),
-      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [] };
+      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, poses: [] };
     this.sessions.add(s); return s;
   }
   receive(s: Session, raw: string) {
@@ -170,15 +174,22 @@ export class Authority {
       if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
     }
     if (f.type === 'contactClaim') {
-      const w = r.wait;
-      if (!w || w.claim || w.side !== s.side || f.tick !== w.tick || f.controlGeneration !== s.generation || f.controlGeneration !== w.generation || !s.enabled || !sameContext(state, f)) return;
-      if (received >= w.deadline) {
-        // The grace window is closed even if no boundary has committed the miss yet.
-        const late = { kind: 'claim-late', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick: w.tick, received, deadline: w.deadline };
-        r.diagnostics.push(late); this.onDiagnostic?.(late); if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
+      const w = r.wait, tick = f.tick as number;
+      if (f.controlGeneration !== s.generation || !s.enabled || !sameContext(state, f)) return;
+      if (w) {
+        if (w.claim || w.side !== s.side || tick !== w.tick || f.controlGeneration !== w.generation) return;
+        if (received >= w.deadline) {
+          // The grace window is closed even if no boundary has committed the miss yet.
+          const late = { kind: 'claim-late', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick: w.tick, received, deadline: w.deadline };
+          r.diagnostics.push(late); this.onDiagnostic?.(late); if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
+        }
+        w.claim = f;
+      } else {
+        // Proactive: the defender's presented ball runs ahead of the authority, so its claim normally precedes the crossing.
+        if (state.phase !== 'Rally' || tick <= state.tick || tick > state.tick + 15) return;
+        s.claim = f;
       }
-      w.claim = f;
-      const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick: w.tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received };
+      const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received, early: !w };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
       if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
     }
@@ -195,7 +206,7 @@ export class Authority {
     if (f.type === 'controlFence') {
       const g = f.generation as number;
       if (g >= Number.MAX_SAFE_INTEGER) { this.disconnect(s, 'generation-exhausted'); return; }
-      if (g === s.generation + 1 && g < Number.MAX_SAFE_INTEGER) { s.generation = g; s.enabled = false; s.pending = null; s.sync.clear(); }
+      if (g === s.generation + 1 && g < Number.MAX_SAFE_INTEGER) { s.generation = g; s.enabled = false; s.pending = null; s.claim = null; s.sync.clear(); }
       else if (g !== s.generation) { this.error(s, f, 'generation'); return; }
       this.ack(s, f, 'fence'); this.cache(s, f.requestId); return;
     }
@@ -223,11 +234,11 @@ export class Authority {
   private begin(r: Room, side: Side) {
     startMatch(r.state, side); r.endedAt = null; r.rematch = [false, false]; r.wait = null;
     r.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: r.state.tick, firstUsed: false }));
-    r.slots.forEach(p => { if (p) { p.pending = null; p.seq = 0; p.tickAt = this.now(); p.healthTick = r.state.tick; p.sync.clear(); } });
+    r.slots.forEach(p => { if (p) { p.pending = null; p.claim = null; p.seq = 0; p.tickAt = this.now(); p.healthTick = r.state.tick; p.sync.clear(); } });
   }
   private closeSocket(s: Session, reason: string) {
     if (s.closing !== null) return;
-    s.closing = this.now(); s.enabled = false; s.pending = null; s.queue = []; s.credential = ''; s.sync.clear(); s.issued.clear(); s.responses.clear(); s.nonces.clear();
+    s.closing = this.now(); s.enabled = false; s.pending = null; s.claim = null; s.queue = []; s.credential = ''; s.sync.clear(); s.issued.clear(); s.responses.clear(); s.nonces.clear();
     s.events = []; s.latest = null; s.transport.close(1000, reason.slice(0, 100));
   }
   disconnect(s: Session, reason: string) {
@@ -256,45 +267,76 @@ export class Authority {
     }
     this.closeSocket(s, reason);
   }
-  /** A Rally tick that would commit a miss/finish for an enabled defender pauses for that defender's claim instead. */
-  private beginWait(r: Room, now: number) {
-    if (r.state.phase !== 'Rally') return false;
-    const trial = structuredClone(r.state), end = step(trial).find(e => e.type === 'miss' || e.type === 'finish');
-    if (!end || end.side === null) return false;
-    const p = r.slots[end.side];
-    if (!p?.enabled || p.closing !== null) return false;
-    r.wait = { side: end.side, tick: r.state.tick + 1, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null };
-    this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait.tick, side: end.side, incomingViewBoxes: r.state.viewBoxes });
-    const record = { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side: end.side, tick: r.wait.tick, at: now };
-    r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift();
-    return true;
-  }
-  /** Install a reachable claimed hit pose; the ordinary deterministic step then decides contact. Anything else keeps the miss. */
-  private resolveWait(r: Room, now: number, interrupted: string | null = null) {
-    const w = r.wait!, f = w.claim, p = r.slots[w.side], actor = r.state.localPaddles[w.side]; r.wait = null;
-    let accepted = false;
-    if (f && f.hit === true && p?.enabled && p.generation === w.generation && sameContext(r.state, f) && f.tick === r.state.tick + 1) {
-      // Only targets of this match/rally/control generation: a fence discards earlier targets for the claim too.
-      const recent = p.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs && sameContext(r.state, t as unknown as Frame) && t.generation === w.generation);
-      // Poses: authoritative C−1, its predecessor C−2 (a fresh rebase may carry that step's displacement) and targets.
-      const raw = (axis: 'x' | 'y') => [actor[axis], actor[axis] - actor[axis === 'x' ? 'dx' : 'dy'], actor[axis === 'x' ? 'tx' : 'ty'], ...recent.map(t => t[axis])];
-      const axis = (values: number[], lo: number, hi: number) => {
-        const clamped = values.map(v => Math.max(lo, Math.min(hi, v)));
-        return { lo: Math.min(...clamped), hi: Math.max(...clamped), reach: (Math.max(...values) - Math.min(...values)) / RULES.easing };
-      };
-      const ax = axis(raw('x'), 55, 296), ay = axis(raw('y'), 45, 206);
-      const x = f.x as number, y = f.y as number, dx = f.dx as number, dy = f.dy as number;
-      // The client reaches poses through the same binary64 easing; allow its rounding, not extra reach.
-      const e = 1e-9, inside = (v: number, a: typeof ax) => v >= a.lo - e && v <= a.hi + e;
-      // Pose and previous pose both lie in the clamped envelope; one easing step is bounded by the UNCLAMPED target
-      // spread, because a target beyond the field still eases a full step before the paddle is clamped at the wall.
-      if (inside(x, ax) && inside(y, ay) && inside(x - dx, ax) && inside(y - dy, ay) && Math.abs(dx) <= ax.reach + e && Math.abs(dy) <= ay.reach + e) {
-        actor.x = actor.px = x; actor.y = actor.py = y; actor.dx = dx; actor.dy = dy; r.state.viewBoxes = boxes(r.state); accepted = true;
-      }
+  /**
+   * Before a Rally tick that crosses an enabled defender's end plane: apply that defender's proactive claim (its presented
+   * frame decides, within the envelope); otherwise commit an authoritative return, and pause for a late claim only when the
+   * authority would commit a miss/finish that some reachable pose could still have returned (plan §5 amendments).
+   */
+  private crossing(r: Room, now: number): 'none' | 'claimed' | 'paused' {
+    if (r.state.phase !== 'Rally') return 'none';
+    const trial = structuredClone(r.state), end = step(trial).find(e => (e.type === 'return' || e.type === 'miss' || e.type === 'finish') && e.side !== null);
+    if (!end || end.side === null) return 'none';
+    const side = end.side, p = r.slots[side], tick = r.state.tick + 1;
+    if (!p?.enabled || p.closing !== null) return 'none';
+    const claim = p.claim?.tick === tick ? p.claim : null;
+    if (p.claim && (p.claim.tick as number) <= tick) p.claim = null;
+    if (claim) {
+      const accepted = this.applyClaim(r, side, claim, p.generation, now);
+      this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, claimed: true, hit: claim.hit, accepted, timedOut: false, interrupted: null, early: true, at: now });
+      return 'claimed';
     }
-    const record = { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
-      timedOut: !f && !interrupted && now >= w.deadline, interrupted, at: now };
-    r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift();
+    if (end.type === 'return') return 'none';
+    if (!this.hitPossible(r, side, p, now)) {
+      this.record(r, { kind: 'contact-impossible', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
+      return 'none';
+    }
+    r.wait = { side, tick, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null };
+    this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick, side, incomingViewBoxes: r.state.viewBoxes });
+    this.record(r, { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
+    return 'paused';
+  }
+  private record(r: Room, record: Record<string, unknown>) { r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift(); }
+  /** Commit the paused crossing with the defender's claim, if any; anything else keeps the authoritative pose. */
+  private resolveWait(r: Room, now: number, interrupted: string | null = null) {
+    const w = r.wait!, f = w.claim; r.wait = null;
+    const accepted = this.applyClaim(r, w.side, f, w.generation, now);
+    this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
+      timedOut: !f && !interrupted && now >= w.deadline, interrupted, early: false, at: now });
+  }
+  /** Reachable poses: authoritative C−1, its predecessor C−2 and recent targets of this match/rally/control generation. */
+  private envelope(r: Room, p: Session, generation: number, now: number) {
+    const actor = r.state.localPaddles[p.side];
+    // Only targets of this match/rally/control generation: a fence discards earlier targets for the claim too.
+    const recent = p.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs && sameContext(r.state, t as unknown as Frame) && t.generation === generation);
+    // A fresh rebase may carry the C−2→C−1 displacement, so the predecessor pose is reachable too.
+    // A defender presented ahead can show a pose its authoritative paddle already passed, so recently occupied poses count.
+    const occupied = p.poses.filter(q => now - q.at <= RULES.claimEnvelopeMs && sameContext(r.state, q as unknown as Frame));
+    const raw = (axis: 'x' | 'y') => [actor[axis], actor[axis] - actor[axis === 'x' ? 'dx' : 'dy'], actor[axis === 'x' ? 'tx' : 'ty'], ...recent.map(t => t[axis]), ...occupied.map(q => q[axis])];
+    const axis = (values: number[], lo: number, hi: number) => {
+      const clamped = values.map(v => Math.max(lo, Math.min(hi, v)));
+      return { lo: Math.min(...clamped), hi: Math.max(...clamped), reach: (Math.max(...values) - Math.min(...values)) / RULES.easing };
+    };
+    return { ax: axis(raw('x'), 55, 296), ay: axis(raw('y'), 45, 206) };
+  }
+  /** Install a reachable claimed pose (hit or miss); the ordinary deterministic step then decides contact and curve. */
+  private applyClaim(r: Room, side: Side, f: Frame | null, generation: number, now: number) {
+    const p = r.slots[side], actor = r.state.localPaddles[side];
+    if (!f || !p?.enabled || p.generation !== generation || !sameContext(r.state, f) || f.tick !== r.state.tick + 1) return false;
+    const { ax, ay } = this.envelope(r, p, generation, now);
+    const x = f.x as number, y = f.y as number, dx = f.dx as number, dy = f.dy as number;
+    // The client reaches poses through the same binary64 easing; allow its rounding, not extra reach.
+    const e = 1e-9, inside = (v: number, a: typeof ax) => v >= a.lo - e && v <= a.hi + e;
+    // Pose and previous pose both lie in the clamped envelope; one easing step is bounded by the UNCLAMPED target
+    // spread, because a target beyond the field still eases a full step before the paddle is clamped at the wall.
+    if (!(inside(x, ax) && inside(y, ay) && inside(x - dx, ax) && inside(y - dy, ay) && Math.abs(dx) <= ax.reach + e && Math.abs(dy) <= ay.reach + e)) return false;
+    actor.x = actor.px = x; actor.y = actor.py = y; actor.dx = dx; actor.dy = dy; r.state.viewBoxes = boxes(r.state); return true;
+  }
+  /** Could any envelope pose overlap the incoming C−1 ball (one-pixel allowance)? If not, a miss needs no pause. */
+  private hitPossible(r: Room, side: Side, p: Session, now: number) {
+    const { ax, ay } = this.envelope(r, p, p.generation, now), ball = r.state.viewBoxes[side].ball;
+    const nearest = (v: number, a: typeof ax) => Math.max(a.lo, Math.min(a.hi, v));
+    const own = ownBox({ x: nearest((ball[0] + ball[1]) / 40, ax), y: nearest((ball[2] + ball[3]) / 40, ay) } as Paddle);
+    return contact([ball[0] - 20, ball[1] + 20, ball[2] - 20, ball[3] + 20], own);
   }
   /** One synchronous simulation transaction and its publication: events, then the resulting snapshot. */
   private commit(r: Room, now: number, before: OnlineState | null, priorSources: Room['sources'] | null) {
@@ -312,6 +354,11 @@ export class Authority {
       r.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: r.state.tick, firstUsed: false }));
     }
     if (r.state.result !== null && r.endedAt === null) r.endedAt = now;
+    if (r.state.phase === 'Rally') r.slots.forEach(p => {
+      if (!p) return;
+      const q = r.state.localPaddles[p.side]; p.poses.push({ x: q.x, y: q.y, at: now, matchId: r.state.matchId, rallyId: r.state.rallyId });
+      while (p.poses.length > 40 || p.poses.length && now - p.poses[0].at > RULES.claimEnvelopeMs) p.poses.shift();
+    });
     r.slots.forEach(p => { if (p) this.snapshot(p); }); this.metrics.ticks++;
   }
   /** Call at <=100 ms, before physics. Network callbacks only enqueue commands. */
@@ -367,7 +414,10 @@ export class Authority {
             const actor = r.state.localPaddles[p.side]; target(actor, f.x as number, f.y as number); actor.seq = f.seq as number; actor.generation = p.generation; actor.appliedTick = r.state.tick + 1;
             this.onDiagnostic?.({ kind: 'consumed', matchId: r.state.matchId, rallyId: r.state.rallyId, seq: actor.seq, generation: p.generation, side: p.side, tick: actor.appliedTick, consumed: this.now() });
           });
-          if (this.beginWait(r, now)) { r.slots.forEach(p => { if (p) this.snapshot(p); }); continue; }
+          const decided = this.crossing(r, now);
+          if (decided === 'paused') { r.slots.forEach(p => { if (p) this.snapshot(p); }); continue; }
+          // An installed claim is the transaction's actual incoming pose.
+          if (decided === 'claimed' && this.onDiagnostic) before = structuredClone(r.state);
           }
           this.commit(r, now, before, priorSources);
         }

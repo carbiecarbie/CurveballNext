@@ -34,7 +34,9 @@ function approach(h: ReturnType<typeof connected>) {
   // Capture strictly after Rally activation (equal timestamps are conservatively ineligible).
   h.advance(20); const r = h.a.session.room!;
   expect(r.state.phase).toBe('Rally');
-  Object.assign(r.state.ball, { u: -120, y: 125.5, z: 1, vx: 0, vy: 0, vz: -2, cx: 0, cy: 0 }); r.state.viewBoxes = boxes(r.state);
+  Object.assign(r.state.ball, { u: -120, y: 125.5, z: 1, vx: 0, vy: 0, vz: -2, cx: 0, cy: 0 });
+  // The defender aimed toward the ball (target x=60) but the paddle has not moved: a return is reachable, not authoritative.
+  r.state.localPaddles[0].tx = 60; r.state.viewBoxes = boxes(r.state);
   return r;
 }
 
@@ -80,7 +82,8 @@ describe('M5 bounded defender contact claim (authority)', () => {
   });
   it('rejects a claimed pose outside the envelope of the authoritative paddle and recently sent targets', () => {
     const h = connected(), r = approach(h); h.advance(40);
-    h.a.client.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, hit: true, x: 60, y: 125.5, dx: 0, dy: 0 });
+    // The envelope spans x 60..175.5 (paddle and its target); 57 lies outside it.
+    h.a.client.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, hit: true, x: 57, y: 125.5, dx: 0, dy: 0 });
     h.advance(40); expect(r.state.lives).toEqual([2, 3]);
     expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: true, accepted: false });
   });
@@ -115,11 +118,12 @@ describe('M5 bounded defender contact claim (presented frame)', () => {
     const h = connected(), r = approach(h), c = h.a.client, v = new OnlineView(0, h.now), claims: ContactClaim[] = [];
     c.onState = (s, e, at) => v.accept(s, at!, e); c.onInput = (x, y, seq, at) => v.input(x, y, seq, at); c.onFence = () => v.fence();
     c.onPending = (p, at) => v.pendingContact(p, at); v.onClaim = claim => { claims.push(claim); c.claim(claim); };
-    h.authority.snapshot(h.a.session); h.flush(); v.draw(h.now(), 0, true);
-    c.pointer(55, 125.5);
+    // Five ticks out: the defender moves late, yet before the presented (ahead) crossing.
+    r.state.ball.z = 9; r.state.viewBoxes = boxes(r.state);
+    h.authority.snapshot(h.a.session); h.flush(); c.pointer(55, 125.5); v.draw(h.now(), 0, true);
     h.advance(400, () => v.draw(h.now(), 0, c.enabled));
     expect(claims).toHaveLength(1); const claim = claims[0];
-    const claimFrame = v.frames.find(f => f.tick === claim.tick - 1 && f.incomingEventId === null && f.own.left === ownBox({ x: claim.x, y: claim.y } as never)[0] / 20)!;
+    const claimFrame = v.frames.find(f => f.tick === claim.tick - 1 && f.own.left === ownBox({ x: claim.x, y: claim.y } as never)[0] / 20)!;
     expect(claimFrame).toBeDefined();
     // The claim is the closed twip inequality over exactly the drawn ball and paddle.
     const twips = (b: typeof claimFrame.ball) => [b.left, b.right, b.top, b.bottom].map(n => Math.round(n * 20)) as [number, number, number, number];

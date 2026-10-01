@@ -37,15 +37,16 @@ describe('M5 stationary non-rally presentation', () => {
     const events = step(s), miss = events.find(e => e.type === 'miss')!;
     expect(s.lives).toEqual([2, 3]); expect(s.phase).toBe('LifeLostHold'); expect(s.phaseDeadline).toBe(20);
     v.accept(s, 100, miss);
-    for (now = 110; now <= 150; now += 10) {
-      v.input(296, 206, 2); expect(v.draw(now, 0, true)!.own).toEqual(preceding.own);
-      expect(v.predicted).toBeNull(); expect(v.history).toHaveLength(0);
-    }
-    now = 180; const incoming = v.draw(now, 0, true)!;
+    // The ball clock runs ahead while this side defends, so the incoming frame is due at once: it holds the drawn pose.
+    now = 110; v.input(296, 206, 2); const incoming = v.draw(now, 0, true)!;
+    expect(v.predicted).toBeNull(); expect(v.history).toHaveLength(0);
     expect(incoming.incomingEventId).toBe(miss.eventId); expect(incoming.own).toEqual(preceding.own);
     expect(incoming.predictedLocal).toEqual(preceding.predictedLocal);
     expect(incoming.ball.left).toBe(miss.incomingViewBoxes[0].ball[0] / 20);
-    now = 197; expect(v.draw(now, 0, true)!.own).toEqual(center);
+    for (now = 127; now <= 197; now += 10) {
+      v.input(296, 206, 3); expect(v.draw(now, 0, true)!.own).toEqual(center);
+      expect(v.predicted).toBeNull(); expect(v.history).toHaveLength(0);
+    }
     for (let i = 0; i < 18; i++) step(s);
     expect(s.phase).toBe('LifeLostHold'); expect(s.lives).toEqual([2, 3]);
     step(s); expect(s.phase).toBe('Countdown'); expect(s.rallyId).toBe(2);

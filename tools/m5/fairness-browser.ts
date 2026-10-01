@@ -28,11 +28,14 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
     };
     const a = await open(0), b = await open(1, a.client.code), peers = [a, b];
     let active: { stimulus: Stimulus; attempt: number; matchId: number; contactNominal: number } | null = null;
-    let captured = false, capture: { event: OnlineEvent; preceding: DrawModel | null; incoming: DrawModel; precedingImage: string } | null = null;
-    let captureTime = 0, previousImage = '', actualFrames: number[] = [], lastFrame = 0, nextDraw = 0;
+    let captured = false, capture: { event: OnlineEvent; preceding: DrawModel | null; incoming: DrawModel } | null = null;
+    let captureTime = 0, actualFrames: number[] = [], lastFrame = 0, nextDraw = 0;
+    // The incoming evidence frame is now the defender's claim frame, presented ahead of the authority's answer; keep the
+    // recent images keyed by frame time so the evidence uses the PNG of exactly that frame and its predecessor.
+    let images: { at: number; url: string }[] = [];
     let writing: Promise<unknown> | null = null, writeFailure = '';
     peers.forEach(p => p.view.onBoundary = (event, preceding, incoming) => {
-      if (active && p.client.side === active.stimulus.defender && event.matchId === active.matchId) capture = { event, preceding, incoming, precedingImage: previousImage };
+      if (active && p.client.side === active.stimulus.defender && event.matchId === active.matchId) capture = { event, preceding, incoming };
     });
     const render = (now: number) => {
       if (stopped) return;
@@ -45,16 +48,18 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       if (active) {
         actualFrames.push(now - lastFrame); if (actualFrames.length > 600) actualFrames.shift();
         const p = peers[active.stimulus.defender];
-        if (capture && !captured) {
+        images.push({ at: p.view.frames.at(-1)?.renderedAt ?? now, url: p.canvas.toDataURL('image/png') }); if (images.length > 240) images.shift();
+        const incomingImage = capture && images.find(i => i.at === capture!.incoming.renderedAt)?.url;
+        const precedingImage = capture?.preceding && images.find(i => i.at === capture!.preceding!.renderedAt)?.url;
+        if (capture && !captured && incomingImage && precedingImage) {
           captured = true;
           const bounds = p.canvas.getBoundingClientRect();
           writing = get('/evidence', { id: active.stimulus.id, manifestHash: hash, attempt: active.attempt, matchId: active.matchId,
             expectedHz: active.stimulus.hz, actualFrames, captureTime, inputRecords: p.client.records.filter(r => r.matchId === active!.matchId), contactNominal: active.contactNominal,
-            probes: p.client.probes, history: p.view.history, corrections: p.view.corrections.filter(r => r.matchId === active!.matchId), ...capture, incomingImage: p.canvas.toDataURL('image/png'),
+            probes: p.client.probes, history: p.view.history, corrections: p.view.corrections.filter(r => r.matchId === active!.matchId), ...capture, incomingImage, precedingImage,
             metadata: { rules: 'online-v1', protocol: 1, userAgent: navigator.userAgent, tcpShapeAttested: false,
               visible: !document.hidden && bounds.left >= 0 && bounds.top >= 0 && bounds.right <= innerWidth && bounds.bottom <= innerHeight } }).catch(e => { writeFailure = String(e); });
-        }
-        previousImage = p.canvas.toDataURL('image/png');
+        } else if (capture && !captured && (!incomingImage || !precedingImage)) { captured = true; writeFailure = `${active.stimulus.id}: incoming/preceding image no longer retained`; }
       }
       lastFrame = now; requestAnimationFrame(render);
     };
@@ -66,12 +71,13 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       if (performance.now() - started >= 7200000) throw new Error('Two-hour profile limit; incomplete cell');
       if (peers.some(p => p.client.closed)) throw new Error('Connection interrupted; retain incomplete attempt');
       const fixture = await (await get('/fixture', { id: stimulus.id, manifestHash: hash })).json();
-      active = { stimulus, ...fixture }; capture = null; captured = false; actualFrames = []; nextDraw = performance.now(); writing = null; writeFailure = '';
+      active = { stimulus, ...fixture }; capture = null; captured = false; actualFrames = []; images = []; nextDraw = performance.now(); writing = null; writeFailure = '';
       const p = peers[stimulus.defender];
       const syncDeadline = performance.now() + 5000;
       while (p.client.state?.matchId !== fixture.matchId && !p.client.closed && performance.now() < syncDeadline) await wait(5);
       if (p.client.state?.matchId !== fixture.matchId || p.client.closed) throw new Error(`${stimulus.id}: fixture state unavailable; retain incomplete attempt`);
-      const at = fixture.contactNominal - stimulus.marginMs - p.client.offset;
+      // Margins are before the contact the defender is SHOWN, which leads the authority's crossing by view.lead().
+      const at = fixture.contactNominal - p.view.lead(p.client.rtt) - stimulus.marginMs - p.client.offset;
       await wait(Math.max(0, at - performance.now())); captureTime = performance.now(); p.client.pointer(stimulus.target.x, stimulus.target.y);
       const until = performance.now() + 5000; while (!captured && performance.now() < until) await wait(10);
       if (!captured) throw new Error(`${stimulus.id}: missing incoming image/association`);

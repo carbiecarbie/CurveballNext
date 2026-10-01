@@ -188,7 +188,9 @@ jobs:
             const a = authority.filter(x => x.id === o.id), p = presentation.find(x => x.id === o.id);
             const pending = a.find(x => x.kind === 'contact-pending'), resolved = a.find(x => x.kind === 'contact-resolved');
             const sent = (p?.inputRecords ?? []).find(x => x.kind === 'sent-claim'), seen = (p?.inputRecords ?? []).find(x => x.kind === 'contact-pending');
-            const key = !pending ? 'no-pending' : !sent ? (seen ? 'pending-seen-no-claim' : 'pending-not-seen') : !resolved?.claimed ? 'claim-late' : resolved.accepted ? 'accepted?' : sent.hit ? 'claim-hit-rejected' : 'claim-miss';
+            // Claims are proactive (sent from the presented crossing); a pause happens only when none arrived in time.
+            const key = !sent ? (pending ? (seen ? 'pending-seen-no-claim' : 'pending-not-seen') : 'no-claim-no-pause') : !resolved?.claimed ? (pending ? 'claim-late' : 'claim-after-crossing')
+              : !resolved.accepted ? (sent.hit ? 'claim-hit-outside-envelope' : 'claim-miss-outside-envelope') : sent.hit ? 'claim-hit-accepted?' : 'claim-miss';
             outcome[key] = (outcome[key] ?? 0) + 1;
             if (outcome[key] <= 2) console.log('::warning::trace ' + o.id + ' ' + key + ' pending=' + JSON.stringify(pending ?? null) + ' sent=' + JSON.stringify(sent ?? null) + ' resolved=' + JSON.stringify(resolved ?? null));
           }

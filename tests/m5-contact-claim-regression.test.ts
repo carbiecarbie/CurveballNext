@@ -31,7 +31,9 @@ function connected() {
 function approach(h: ReturnType<typeof connected>) {
   h.advance(20); const r = h.a.session.room!;
   expect(r.state.phase).toBe('Rally');
-  Object.assign(r.state.ball, { u: -120, y: 125.5, z: 1, vx: 0, vy: 0, vz: -2, cx: 0, cy: 0 }); r.state.viewBoxes = boxes(r.state);
+  Object.assign(r.state.ball, { u: -120, y: 125.5, z: 1, vx: 0, vy: 0, vz: -2, cx: 0, cy: 0 });
+  // The defender aimed toward the ball (target x=60) but the paddle has not moved: a return is reachable, not authoritative.
+  r.state.localPaddles[0].tx = 60; r.state.viewBoxes = boxes(r.state);
   return r;
 }
 /** Raw frames from a modified client, bypassing OnlineClient's own rules. */
@@ -68,8 +70,9 @@ describe('M5 contact claim review regressions', () => {
   });
   it('P3: an honest one-step claim at the wall while aiming outside the court is accepted', () => {
     const h = connected(), r = approach(h), c = h.a.client;
-    Object.assign(r.state.localPaddles[0], { y: 50, py: 50, ty: 50 }); r.state.viewBoxes = boxes(r.state);
-    c.pointer(175.5, -250); h.flush();
+    // Paddle by the top wall, ball high and to the left: aiming beyond the top keeps a return reachable.
+    Object.assign(r.state.localPaddles[0], { y: 50, py: 50, ty: 50 }); r.state.ball.y = 60; r.state.viewBoxes = boxes(r.state);
+    c.pointer(60, -250); h.flush();
     h.advance(40); expect(r.wait).not.toBeNull();
     const p = structuredClone(r.state.localPaddles[0]); move(p);
     expect([p.y, p.dy]).toEqual([45, -5]); // the real easing step, clamped at the top limit

@@ -170,35 +170,37 @@ describe('M5 connected runtime processing and input handshakes', () => {
 });
 
 describe('M5 incoming discontinuity evidence and terminal validation', () => {
-  it.each(['miss', 'finish', 'return'] as const)('runtime-validated authority wall-top/wall-left/%s batch preserves literal incoming geometry', outcome => {
+  it.each(['miss', 'finish', 'return'] as const)('runtime-validated authority wall-top/wall-left/%s batch labels the presented claim frame as incoming evidence', outcome => {
     const h = connected(), s = h.a.session.room!.state, v = new OnlineView(0, h.now);
     startMatch(s, 0); s.phase = 'Rally';
     Object.assign(s.ball, { u: -135.5, y: 40, z: 0, vx: -1, vy: 1, vz: -2 });
     if (outcome === 'finish') s.lives[0] = 1;
     if (outcome === 'return') Object.assign(s.localPaddles[0], { x: 68.38888888888889, y: 53.94444444444444 });
     s.viewBoxes = boxes(s); h.a.client.onState = (state, e, at) => v.accept(state, at!, e);
-    h.authority.snapshot(h.a.session); h.flush(); v.draw(0, 0, true);
+    h.authority.snapshot(h.a.session); h.flush();
+    // The drawn pose is set before the first presentation; the ball is one tick from the plane, so that frame claims.
     Object.assign(v.predicted!, { x: 68.38888888888889, y: 53.94444444444444, px: 68.38888888888889,
       py: 53.94444444444444, tx: 68.38888888888889, ty: 53.94444444444444 });
-    h.setTime(67); const preceding = v.draw(67, 0, true)!;
-    expect(preceding.own).toEqual({ left: 38.35, right: 98.35, top: 33.9, bottom: 73.9 });
+    const incoming = v.draw(0, 0, true)!;
+    expect(incoming.own).toEqual({ left: 38.35, right: 98.35, top: 33.9, bottom: 73.9 });
     h.setTime(100); h.flush(); if (outcome !== 'return') h.advance(RULES.contactGraceMs + 40);
     expect(h.a.client.closed).toBe(false); expect(h.a.client.events.map(e => e.type)).toEqual(['wall-top', 'wall-left', outcome]);
-    const at = h.now() + 80; h.setTime(at); const incoming = v.draw(at, 0, true)!;
-    expect(incoming.own).toEqual(preceding.own); expect(incoming.ball).toEqual({ left: 25, right: 55, top: 25, bottom: 55 });
-    expect(incoming.incomingEventId).toBe(3); expect(v.frames).toContainEqual(preceding);
+    const at = h.now() + 80; h.setTime(at); const after = v.draw(at, 0, true)!;
+    expect(incoming.ball).toEqual({ left: 25, right: 55, top: 25, bottom: 55 });
+    expect(incoming.incomingEventId).toBe(3); expect(after.incomingEventId).toBeNull(); expect(v.frames).toContainEqual(incoming);
     if (outcome === 'finish') expect(h.a.client.known).toMatchObject({ winner: 1, lives: [0, 3] });
   });
   it('retains actual predicted incoming geometry before event-triggered correction/overlay', () => {
     let time = 0; const v = new OnlineView(0, () => time), s = createOnline(); startMatch(s, 0); s.phase = 'Rally';
     v.accept(s, 0); v.draw(0, 0, true); v.input(55, 45, 1); time = 100; const previous = v.draw(100, 0, true)!;
     Object.assign(s.ball, { u: -120, z: 0, vz: -2 }); s.lives[0] = 1; s.viewBoxes = boxes(s);
+    // No presented crossing was claimed (the ball was stationary when last shown), so the event's own incoming frame
+    // is presented once the ball clock — ahead while this side defends — reaches it.
     const e = step(s).find(e => e.type === 'finish')!; v.accept(s, 100, e);
-    expect(v.draw(110, 0, true)!.overlayAllowed).toBe(false);
-    time = 180; const incoming = v.draw(180, 0, true)!;
+    time = 110; const incoming = v.draw(110, 0, true)!;
     expect(incoming.incomingEventId).toBe(e.eventId); expect(incoming.ball.left).toBe(e.incomingViewBoxes[0].ball[0] / 20);
     expect(incoming.own.left).not.toBe(s.viewBoxes[0].own[0] / 20); expect(incoming.overlayAllowed).toBe(false);
-    expect(v.frames).toContainEqual(previous); time = 197; const after = v.draw(197, 0, true)!;
+    expect(v.frames).toContainEqual(previous); time = 127; const after = v.draw(127, 0, true)!;
     expect(after.incomingEventId).toBeNull(); expect(after.overlayAllowed).toBe(true);
   });
   it.each([
