@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import { createHash } from 'node:crypto';
-import { cell, classify, independentBox, manifest, offsetInterval, type Observation, type Profile } from './fairness';
+import { cell, classify, independentBox, manifest, offsetInterval, realizedMarginOk, type Observation, type Profile } from './fairness';
 
 const directory = resolve(process.argv[2] ?? '');
 if (!process.argv[2]) throw new Error('usage: verify-fairness RUN_DIRECTORY [INDEPENDENT_REVIEW_JSON]');
@@ -47,9 +47,12 @@ for (const captured of presentation) {
     const driftError = observedDrift * Math.max(0, captured.captureTime - probes.at(-1).at), uncertainty = residual + driftError + frameError;
     const input = captured.inputRecords.find((r: any) => r.kind === 'captured-input'), sent = captured.inputRecords.find((r: any) => r.kind === 'sent-input' && r.seq === input?.seq);
     if (!input || !sent) throw new Error('Missing actual capture/wire-send record');
+    // The declared stratum must be what the defender was shown: capture to the presented incoming frame, same clock.
+    const realizedMarginMs = captured.incoming.renderedAt - input.at;
+    if (!realizedMarginOk(s.marginMs, realizedMarginMs)) throw new Error(`Realized margin ${realizedMarginMs.toFixed(1)} ms outside the declared ${s.marginMs} ms stratum`);
     const trace = authority.filter(r => r.id === s.id && r.attempt === captured.attempt && r.seq === input.seq && r.generation === input.generation && r.side === s.defender);
     const receipt = trace.find(r => r.kind === 'received'), consumed = trace.find(r => r.kind === 'consumed'), used = trace.find(r => r.kind === 'first-use');
-    timing.push({ id: s.id, captureToContact: [contact.committed - (input.at + hi + uncertainty), contact.committed - (input.at + lo - uncertainty)],
+    timing.push({ id: s.id, realizedMarginMs, captureToContact: [contact.committed - (input.at + hi + uncertainty), contact.committed - (input.at + lo - uncertainty)],
       receiptToContact: receipt ? contact.committed - receipt.received : null, consumedToContact: consumed ? contact.committed - consumed.consumed : null,
       firstUseToContact: used ? contact.committed - used.used : null, serverNominal: contact.nominal, serverCommitted: contact.committed, frameError, observedDrift, residual, offset: [lo, hi], trace });
     const checked = review.observations[s.id];

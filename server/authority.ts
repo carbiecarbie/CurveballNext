@@ -22,6 +22,8 @@ export interface Session {
   targets: { x: number; y: number; at: number; matchId: number; rallyId: number; generation: number }[];
   /** Proactive claim for an upcoming end-plane crossing, sent from the defender's presented frame. */
   claim: Frame | null;
+  /** This client claims its presented crossings proactively (it has sent at least one claim ahead of a crossing). */
+  proactive: boolean;
   /** Authoritative poses this session's paddle actually occupied (per committed Rally tick), for the claim envelope. */
   poses: { x: number; y: number; at: number; matchId: number; rallyId: number }[];
 }
@@ -30,7 +32,7 @@ export interface Room {
   slots: [Session | null, Session | null]; ready: [boolean, boolean]; rematch: [boolean, boolean]; diagnostics: unknown[];
   sources: { seq: number; generation: number; publishedTick: number; firstUsed: boolean }[];
   /** Paused uncommitted miss awaiting the defender's contact claim (plan §5 amendment). */
-  wait: { side: Side; tick: number; deadline: number; generation: number; claim: Frame | null } | null;
+  wait: { side: Side; tick: number; deadline: number; generation: number; claim: Frame | null; authoritative: string } | null;
 }
 const codeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function normalizeCode(v: string) { return v.toUpperCase().replaceAll('-', ''); }
@@ -52,7 +54,7 @@ export class Authority {
     const s: Session = { id: randomBytes(16).toString('hex'), transport, opened: t, room: null, side: 0, credential: '', closing: null,
       serial: 0, lastSent: '', lastSnapshotSerial: 0, generation: 0, enabled: true, authorized: 0, seq: 0, pending: null, queue: [], issued: new Map(), sync: new Map(), responses: new Map(),
       events: [], latest: null, congested: null, abuse: null, inputs: new Bucket(30, 60, t), commands: new Bucket(5, 10, t),
-      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, poses: [] };
+      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, proactive: false, poses: [] };
     this.sessions.add(s); return s;
   }
   receive(s: Session, raw: string) {
@@ -187,7 +189,7 @@ export class Authority {
       } else {
         // Proactive: the defender's presented ball runs ahead of the authority, so its claim normally precedes the crossing.
         if (state.phase !== 'Rally' || tick <= state.tick || tick > state.tick + 15) return;
-        s.claim = f;
+        s.claim = f; s.proactive = true;
       }
       const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received, early: !w };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
@@ -269,8 +271,8 @@ export class Authority {
   }
   /**
    * Before a Rally tick that crosses an enabled defender's end plane: apply that defender's proactive claim (its presented
-   * frame decides, within the envelope); otherwise commit an authoritative return, and pause for a late claim only when the
-   * authority would commit a miss/finish (plan §5 amendments).
+   * frame decides, within the envelope); otherwise pause for its late claim, whatever the authoritative outcome would be, so
+   * a presented miss is never overturned by the stale authoritative pose (plan §5 amendments).
    */
   private crossing(r: Room, now: number): 'none' | 'claimed' | 'paused' {
     if (r.state.phase !== 'Rally') return 'none';
@@ -282,13 +284,14 @@ export class Authority {
     if (p.claim && (p.claim.tick as number) <= tick) p.claim = null;
     if (claim) {
       const accepted = this.applyClaim(r, side, claim, p.generation, now);
-      this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, claimed: true, hit: claim.hit, accepted, timedOut: false, interrupted: null, early: true, at: now });
+      this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, claimed: true, hit: claim.hit, accepted, timedOut: false, interrupted: null, early: true, authoritative: end.type, at: now });
       return 'claimed';
     }
-    if (end.type === 'return') return 'none';
-    // No claim yet for an authoritative miss: wait for it. Its targets may still be in flight (an asymmetric upstream can
-    // exceed the client's lead), so "no reachable pose" cannot be judged here; an honest claim normally arrives first.
-    r.wait = { side, tick, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null };
+    // No claim yet: wait for it. For a miss always; for a return only from a proactive claimer, whose presented frame then
+    // decides (a client that never claims ahead keeps the authoritative return). Its targets may still be in flight (an
+    // asymmetric upstream can exceed the lead); an honest claim normally arrives first, so the wait lasts only its lateness.
+    if (end.type === 'return' && !p.proactive) return 'none';
+    r.wait = { side, tick, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null, authoritative: end.type };
     this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick, side, incomingViewBoxes: r.state.viewBoxes });
     this.record(r, { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
     return 'paused';
@@ -299,7 +302,7 @@ export class Authority {
     const w = r.wait!, f = w.claim; r.wait = null;
     const accepted = this.applyClaim(r, w.side, f, w.generation, now);
     this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
-      timedOut: !f && !interrupted && now >= w.deadline, interrupted, early: false, at: now });
+      timedOut: !f && !interrupted && now >= w.deadline, interrupted, early: false, authoritative: w.authoritative, at: now });
   }
   /** Reachable poses: authoritative C−1, its predecessor C−2 and recent targets of this match/rally/control generation. */
   private envelope(r: Room, p: Session, generation: number, now: number) {

@@ -45,6 +45,8 @@ export function classify(ball: Rect, paddle: Rect, hit: boolean) {
   if (x <= -1 || y <= -1) return hit ? 'apparent-noncontact-accepted' : 'clear-noncontact';
   return 'borderline';
 }
+/** The stimulus margin the defender was actually shown (capture → presented incoming frame, browser clock) must match its stratum. */
+export function realizedMarginOk(declaredMs: number, realizedMs: number) { return Number.isFinite(realizedMs) && Math.abs(realizedMs - declaredMs) <= 1000 / 30; }
 export function offsetInterval(c0: number, s1: number, s2: number, c3: number): [number, number] {
   const interval: [number, number] = [s2 - c3, s1 - c0]; if (interval[0] > interval[1]) throw new Error('Inconsistent clock evidence'); return interval;
 }

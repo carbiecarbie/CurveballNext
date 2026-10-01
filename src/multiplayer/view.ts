@@ -40,7 +40,9 @@ export class OnlineView {
     this.history = this.history.filter(h => h.at >= this.now() - 2000); if (this.history.length > 60) this.history.shift();
   }
   private stopPrediction() { this.history = []; this.predicted = null; this.previous = null; this.correction = null; }
-  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; }
+  // A fence also drops this defender's claims: the authority discards them with the old control generation, so a resumed
+  // defender must claim (and predict) its next crossing afresh.
+  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; this.claims.clear(); }
   private rebase(s: OnlineState) {
     if (s.phase !== 'Rally') { this.stopPrediction(); return; }
     const from = this.predicted ? rect(ownBox(this.predicted)) : null;
@@ -132,7 +134,11 @@ export class OnlineView {
   }
   private ballFrame(t: number): BallFrame {
     const latest = this.samples.at(-1)!;
-    if (t > latest.time && latest.state.phase === 'Rally' && this.predicted) return this.predictBall(latest, t);
+    // Anchor prediction at the FIRST sample of the latest tick: a claim pause repeats that tick with later send times,
+    // and re-anchoring on each would step the predicted flight backward.
+    const sameTick = (x: OnlineState) => x.matchId === latest.state.matchId && x.rallyId === latest.state.rallyId && x.tick === latest.state.tick && x.lastEventId === latest.state.lastEventId;
+    const anchor = this.samples.find(x => sameTick(x.state)) ?? latest;
+    if (t > anchor.time && latest.state.phase === 'Rally' && this.predicted) return this.predictBall(anchor, t);
     const older = this.samples.filter(s => s.time <= t).at(-1) ?? this.samples[0], newer = this.samples.find(s => s.time > t) ?? older;
     const same = older.state.matchId === newer.state.matchId && older.state.rallyId === newer.state.rallyId && older.state.lastEventId === newer.state.lastEventId;
     const alpha = same && newer.time > older.time ? Math.max(0, Math.min(1, (t - older.time) / (newer.time - older.time))) : 0;
@@ -171,8 +177,10 @@ export class OnlineView {
       goal = time + u * u * (3 - 2 * u) * Math.max(0, serverNow + this.lead(rtt) - time);
     }
     const dt = Number.isFinite(this.lastDraw) ? Math.max(0, now - this.lastDraw) : 0, prior = this.ballTime;
-    let ballTime = !Number.isFinite(prior) ? goal : goal >= prior ? Math.min(goal, prior + dt * 1.35) : prior + dt * .75;
-    ballTime = Math.max(ballTime, time, Number.isFinite(prior) ? prior : -Infinity);
+    // Within 0.75–1.35× real time, also when the buffered time itself jumps (RTT/offset changes); only a large
+    // discontinuity (first frame, stall, new timeline) snaps.
+    let ballTime = !Number.isFinite(prior) || Math.abs(goal - prior) > 500 ? goal : goal >= prior ? Math.min(goal, prior + dt * 1.35) : prior + dt * .75;
+    if (Number.isFinite(prior)) ballTime = Math.max(ballTime, prior);
     this.ballTime = ballTime; this.lastDraw = now;
     const shown = this.ballFrame(ballTime);
     let own = rally ? rect(a.own) : this.heldIncomingOwn ?? rect(latest.state.viewBoxes[this.side].own);
