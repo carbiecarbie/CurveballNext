@@ -180,6 +180,19 @@ jobs:
             console.log('::warning::rejected ' + o.id + ' margin=' + o.marginMs + 'ms hz=' + o.hz + ' captureToContact=[' + (t.captureToContact ?? []).map(ms) + ']' +
               ' receiptToContact=' + ms(t.receiptToContact) + ' consumedToContact=' + ms(t.consumedToContact) + ' firstUseToContact=' + ms(t.firstUseToContact));
           }
+          // Contact-claim trace for each rejection: authority pending/claim/resolution and the defender's own records.
+          const jsonl = name => readFileSync(run + '/' + name, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l));
+          const authority = jsonl('authority.jsonl').filter(x => /^(contact-|claim-)/.test(x.kind)), presentation = jsonl('presentation.jsonl');
+          const outcome = {};
+          for (const o of r.observations.filter(o => o.classification === 'apparent-contact-rejected')) {
+            const a = authority.filter(x => x.id === o.id), p = presentation.find(x => x.id === o.id);
+            const pending = a.find(x => x.kind === 'contact-pending'), resolved = a.find(x => x.kind === 'contact-resolved');
+            const sent = (p?.inputRecords ?? []).find(x => x.kind === 'sent-claim'), seen = (p?.inputRecords ?? []).find(x => x.kind === 'contact-pending');
+            const key = !pending ? 'no-pending' : !sent ? (seen ? 'pending-seen-no-claim' : 'pending-not-seen') : !resolved?.claimed ? 'claim-late' : resolved.accepted ? 'accepted?' : sent.hit ? 'claim-hit-rejected' : 'claim-miss';
+            outcome[key] = (outcome[key] ?? 0) + 1;
+            if (outcome[key] <= 2) console.log('::warning::trace ' + o.id + ' ' + key + ' pending=' + JSON.stringify(pending ?? null) + ' sent=' + JSON.stringify(sent ?? null) + ' resolved=' + JSON.stringify(resolved ?? null));
+          }
+          console.log('::notice::' + r.profile + ' rejection causes ' + JSON.stringify(outcome));
           for (const f of r.failures.slice(0, 10)) console.log('::error::' + f);
           console.log('::notice::' + readFileSync(out + '/shape-plan.txt', 'utf8').trim());
           if (bad) process.exit(1);
