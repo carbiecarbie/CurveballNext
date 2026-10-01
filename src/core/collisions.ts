@@ -8,8 +8,8 @@ export function classify(cx: number, cy: number): 'SUPER' | 'CURVE' | 'NONE' {
 }
 export function walls(b: Ball, events: Event[], profile: Profile = PROFILE) {
   const f = field(profile), r = DIAMETER / 2;
-  if (b.y - r < f.top) { b.y = f.top + r; b.vy = -b.vy; b.cy /= WALL_DIVISOR; events.push({ type: 'wall-top' }); }
-  else if (b.y + r > f.bottom) { b.y = f.bottom - r; b.vy = -b.vy; b.cy /= WALL_DIVISOR; events.push({ type: 'wall-bottom' }); }
-  if (b.x - r < f.left) { b.x = f.left + r; b.vx = -b.vx; b.cx /= WALL_DIVISOR; events.push({ type: 'wall-left' }); }
-  else if (b.x + r > f.right) { b.x = f.right - r; b.vx = -b.vx; b.cx /= WALL_DIVISOR; events.push({ type: 'wall-right' }); }
+  if (b.y - r < f.top) { b.y = f.top + r; b.cy /= WALL_DIVISOR; b.vy = -b.vy; events.push({ type: 'wall-top' }); }
+  else if (b.y + r > f.bottom) { b.y = f.bottom - r; b.cy /= WALL_DIVISOR; b.vy = -b.vy; events.push({ type: 'wall-bottom' }); }
+  if (b.x - r < f.left) { b.x = f.left + r; b.cx /= WALL_DIVISOR; b.vx = -b.vx; events.push({ type: 'wall-left' }); }
+  else if (b.x + r > f.right) { b.x = f.right - r; b.cx /= WALL_DIVISOR; b.vx = -b.vx; events.push({ type: 'wall-right' }); }
 }

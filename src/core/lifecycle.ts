@@ -1,10 +1,10 @@
 import { display, type DisplayAdapter } from '../compat/display';
 import { field, PROFILE, type Profile } from '../compat/profile';
-import { DEPTH, DIAMETER, difficulty } from './constants';
+import { DEPTH, DIAMETER, difficulty, LEVEL_INTRO_TICKS } from './constants';
 import { accurate, classify, overlaps } from './collisions';
 import { project } from './projection';
 import { awardPlayerContact } from './scoring';
-import { createState, freshBall, publish } from './state';
+import { freshBall, publish } from './state';
 import type { Audit, Event, Sample, State } from './types';
 export function installCurve(s: State, sample: Sample, enemy = false, serve = false, profile: Profile = PROFILE) {
   const b = s.ball, c = difficulty(s.level).curve, center = field(profile);
@@ -23,11 +23,12 @@ export function retry(s: State, profile: Profile = PROFILE, adapter: DisplayAdap
   // A depleted-side miss must reach resolveMiss, including for direct callers.
   if (!canRetry(s)) return false;
   s.ball = freshBall(s.tick, s.ball.generation + 1, profile, adapter);
+  s.ballAvailable = true; s.ballLoadTick = null;
   s.publishedBall = publish(s.ball, s.tick); s.cache = null; s.phase = 'ServeWaiting'; s.phaseTick = s.tick; s.missTick = null;
   s.rally++; s.diagnostics.rallyReturns = 0;
   return true;
 }
-export function resolveMiss(s: State, events: Event[], profile: Profile = PROFILE, adapter: DisplayAdapter = display): State {
+export function resolveMiss(s: State, events: Event[], _profile: Profile = PROFILE, _adapter: DisplayAdapter = display): State {
   // The original ball-frame action checks enemy depletion before player depletion.
   if (s.enemyLives < 1) {
     s.score += s.remainingBonus;
@@ -37,23 +38,32 @@ export function resolveMiss(s: State, events: Event[], profile: Profile = PROFIL
       events.push({ type: 'content-complete' });
       return s;
     }
-    const next = createState(s.level + 1, s.tick, s.trial + 1, s.ball.generation + 1, profile, adapter);
-    next.score = s.score; next.playerLives = s.playerLives;
-    next.phase = 'LevelIntro'; next.phaseTick = s.tick;
+    // The original retains the player through the intro. Enemy/ball Load occurs
+    // after setup at +45; their first EnterFrame is one frame after Load.
+    s.level++; s.trial++; s.rally = 1; s.enemyLives = 3;
+    s.diagnostics = {rallyReturns:0,returns:0,playerMisses:0,enemyMisses:0};
+    s.phase = 'LevelIntro'; s.phaseTick = s.tick; s.missTick = null;
+    s.ballAvailable = s.enemyAvailable = false; s.cache = null;
+    s.enemyLoadTick = s.tick + LEVEL_INTRO_TICKS + 1;
+    s.ballLoadTick = s.tick + LEVEL_INTRO_TICKS + 2;
     events.push({ type: 'level-intro' });
-    return next;
+    return s;
   }
   if (s.playerLives < 1) {
     s.phase = 'GameOver'; s.phaseTick = s.tick; s.missTick = null;
     events.push({ type: 'game-over' });
     return s;
   }
-  retry(s, profile, adapter); events.push({ type: 'auto-retry' });
+  // Same-level rewind removes the ball now; its Load runs at the next boundary.
+  s.ballAvailable = false; s.ballLoadTick = s.tick + 1; s.cache = null;
+  s.phase = 'ServeWaiting'; s.phaseTick = s.tick; s.missTick = null;
+  s.rally++; s.diagnostics.rallyReturns = 0;
+  events.push({ type: 'auto-retry' });
   return s;
 }
 /** Explicit developer fixture: force an out-of-bounds old-box plane crossing. */
 export function debugMiss(s: State, side: 'player' | 'enemy', profile: Profile = PROFILE, adapter: DisplayAdapter = display) {
-  if (s.phase !== 'ServeWaiting' && s.phase !== 'Rally') return;
+  if (!s.ballAvailable || (s.phase !== 'ServeWaiting' && s.phase !== 'Rally')) return;
   const b = s.ball;
   b.x = 1000; b.y = field(profile).y; b.z = side === 'enemy' ? DEPTH : 0;
   b.vx = b.vy = b.cx = b.cy = 0; b.vz = (side === 'enemy' ? 1 : -1) * difficulty(s.level).speed;
@@ -63,6 +73,7 @@ export function debugMiss(s: State, side: 'player' | 'enemy', profile: Profile =
 export function serve(s: State, events: Event[], audit: Audit, profile: Profile = PROFILE) {
   let reason: string | undefined;
   if (s.phase !== 'ServeWaiting' || s.ball.vz !== 0) reason = 'not-waiting';
+  else if (!s.ballAvailable) reason = 'ball-unavailable';
   else if (!s.cache) reason = 'cache-not-ready';
   else if (!overlaps(s.ball.box, s.player.box)) reason = 'not-overlapping';
   audit.contacts.push({ kind: 'serve', side: 'player', oldBallBox: structuredClone(s.ball.box), paddleBox: structuredClone(s.player.box),

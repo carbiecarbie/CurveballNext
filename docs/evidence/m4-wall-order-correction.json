@@ -1,0 +1,129 @@
+{
+  "acceptedBaseline": "ab3cea33ddbd62f6277888532b5fc571b702bf72",
+  "observationsSha256": "fb916f2af113cfa0186668a45bc142bcf959f63a6cd32893cbb6a8b35b1ac81b",
+  "before": [
+    {
+      "case": "wall-right",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "DIVERGENCE",
+      "differences": [
+        {
+          "field": "wall-assignment-order[1]",
+          "original": "cx",
+          "next": "vx"
+        },
+        {
+          "field": "wall-assignment-order[2]",
+          "original": "vx",
+          "next": "cx"
+        }
+      ],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "DIVERGENCE",
+      "differences": [
+        {
+          "field": "wall-assignment-order[1]",
+          "original": "cy",
+          "next": "vy"
+        },
+        {
+          "field": "wall-assignment-order[2]",
+          "original": "vy",
+          "next": "cy"
+        },
+        {
+          "field": "wall-assignment-order[4]",
+          "original": "cx",
+          "next": "vx"
+        },
+        {
+          "field": "wall-assignment-order[5]",
+          "original": "vx",
+          "next": "cx"
+        }
+      ],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-left",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "DIVERGENCE",
+      "differences": [
+        {
+          "field": "wall-assignment-order[1]",
+          "original": "cx",
+          "next": "vx"
+        },
+        {
+          "field": "wall-assignment-order[2]",
+          "original": "vx",
+          "next": "cx"
+        }
+      ],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "DIVERGENCE",
+      "differences": [
+        {
+          "field": "wall-assignment-order[1]",
+          "original": "cy",
+          "next": "vy"
+        },
+        {
+          "field": "wall-assignment-order[2]",
+          "original": "vy",
+          "next": "cy"
+        }
+      ],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    }
+  ],
+  "after": [
+    {
+      "case": "wall-right",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-left",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    }
+  ],
+  "effect": "Clamp then attenuate curve then reverse velocity. Final numeric values and wall event order unchanged.",
+  "currentObservationsSha256": "148a5267df590fecd82dc54c5bad70d017db8835becd8e77f73c5966df41bed9",
+  "provenanceNote": "observationsSha256 is preserved first-pass55 corpus (exact reconstruction verified); currentObservationsSha256 identifies expanded63 corpus. All original wall instruction phases repeated exactly; before/after rows are preserved."
+}

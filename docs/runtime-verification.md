@@ -1,5 +1,7 @@
 # Curveball — M0.5 Runtime Verification Report
 
+**Historical report:** The blocked results below describe M0.5 on 29 September 2026. The later [M4 continuation](milestones/m4-original-runtime-parity-closure.md#continuation--actual-runtime-evidence) executed the unchanged movie in pinned Ruffle. The [final independent M4 review](milestones/m4-original-runtime-parity-closure.md#final-independent-review-and-closure) accepted and closed M4 against that provisional oracle, with U01–U05 resolved within measured scopes, intentional R12 containment and explicitly retained uncertainties. This does not retroactively change M0.5 or prove historical Flash equivalence.
+
 **Date:** 2026-09-29  
 **Status:** EXECUTION BLOCKED — NO GAMEPLAY RUNTIME OBSERVATIONS  
 **Contract readiness:** **NO**  

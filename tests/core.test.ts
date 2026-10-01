@@ -25,9 +25,9 @@ describe('M0 mathematical/control-flow contract', () => {
     for (const invalid of [0,11,1.1,NaN,Infinity]) expect(() => difficulty(invalid)).toThrow();
   });
   test('T02 eased displacement and repeated error reduction', () => {
-    let s = createState(); s.target = { x:205.5,y:110.5 }; s = tick(s).state;
+    let s = createState(); s.target = { x:205.5,y:110.5 }; s = tick(s,[],PROFILE,{...display,readInput:p=>p}).state;
     expect([s.player.x,s.player.y,s.player.dx,s.player.dy]).toEqual([195.5,115.5,20,-10]);
-    for (let i=0;i<8;i++) { const old = 205.5-s.player.x; s=tick(s).state; close(205.5-s.player.x,old/3); }
+    for (let i=0;i<8;i++) { const old = 205.5-s.player.x; s=tick(s,[],PROFILE,{...display,readInput:p=>p}).state; close(205.5-s.player.x,old/3); }
   });
   test.each([[1e5,1e5,296,206],[-1e5,-1e5,55,45]])('T02 clamps after easing (%s,%s)', (x,y,px,py) => {
     let s=createState(); s.target={x,y}; s=tick(s).state; expect([s.player.x,s.player.y]).toEqual([px,py]);
@@ -92,7 +92,7 @@ describe('M0 mathematical/control-flow contract', () => {
     close(s.enemy.dx,30/difficulty(level).ai);close(s.enemy.dy,-15/difficulty(level).ai);
     s.enemy={...s.enemy,x:205.5,y:110.5,previous:{x:205.5,y:110.5}};s.publishedBall.vz=0;enemyStep(s);expect([s.enemy.dx,s.enemy.dy]).toEqual([-2,1]);
   });
-  test('T08 enemy logical clamp at K=1',()=>{const s=createState(10);s.publishedBall={...s.publishedBall,x:999,y:-999,vz:6};enemyStep(s);expect([s.enemy.x,s.enemy.y]).toEqual([296,45]);close(s.enemy.box.width,60*scale(75));});
+  test('T08 enemy logical clamp at K=1',()=>{const s=createState(10);s.publishedBall={...s.publishedBall,x:999,y:-999,vz:6};enemyStep(s);expect([s.enemy.x,s.enemy.y]).toEqual([296,45]);expect(s.enemy.box.width).toBe(15);});
   test.each([[1,38],[5,23],[10,13],[4,26]])('T09 crossings level %s at %s', (level,count)=>{
     for(const far of [true,false]) {
       let s=ball(createState(level),{z:far?0:75,vz:(far?1:-1)*difficulty(level).speed});
@@ -109,11 +109,11 @@ describe('M0 mathematical/control-flow contract', () => {
   });
 });
 
-describe('M1 provisional compatibility',()=>{
-  test('T01 U01 registration geometry',()=>{expect(field()).toEqual({left:25,right:326,top:25,bottom:226,x:175.5,y:125.5});expect(PROFILE.id).toBe('m1-provisional-01');});
+describe('M4 pinned runtime compatibility',()=>{
+  test('T01 U01 registration geometry',()=>{expect(field()).toEqual({left:25,right:326,top:25,bottom:226,x:175.5,y:125.5});expect(PROFILE.id).toBe('m4-ruffle-06-01');});
   test('T10 closed AABB edges/corners; just outside',()=>{
     const box=(x:number,y:number)=>display.install({x,y,width:30,height:30},{tick:0,generation:1});
-    expect(overlaps(box(0,0),box(30,30))).toBe(true);expect(overlaps(box(0,0),box(30-1e-8,30))).toBe(true);expect(overlaps(box(0,0),box(30+1e-8,30))).toBe(false);
+    expect(overlaps(box(0,0),box(30,30))).toBe(true);expect(overlaps(box(0,0),box(30-1e-8,30))).toBe(true);expect(overlaps(box(0,0),box(30+1e-8,30))).toBe(true);expect(overlaps(box(0,0),box(30+.05,30))).toBe(false);
   });
   test.each([false,true])('T10 R08 separating fixture inverse=%s',inverse=>{
     const s=ball(tick(createState()).state,{x:175.5+(inverse?62:42),y:125.5,z:1,vx:inverse?-20:20,vz:-2});
@@ -128,12 +128,17 @@ describe('M1 provisional compatibility',()=>{
     const current=display.install(project(contact.before.x,contact.before.y,contact.before.z,30,30),{tick:2,generation:1});
     expect(overlaps(current,contact.paddleBox)).toBe(inverse);
   });
-  test('T12 moving serve consumes previous displacement; return uses current',()=>{
-    let s=tick(createState(),[command(createState(),{type:'pointer',x:205.5,y:110.5})]).state;
-    const r=tick(s,[command(s,{type:'down',x:165.5,y:130.5})]);
-    expect(r.events[0].sample).toMatchObject({dx:20,dy:-10,tick:1});expect(r.audit.checkpoints[0].ball).toMatchObject({cx:-0.8,cy:-0.4});
-    expect(r.state.player.dx).toBe(-20);expect(r.audit.aiInput.vz).toBe(0);expect(r.state.publishedBall.vz).toBe(2);
-    s=ball(s,{z:1,vz:-2});const ret=tick(s,[command(s,{type:'pointer',x:165.5,y:130.5})]);expect(ret.events[0].sample).toMatchObject({dx:-20,dy:10,tick:2});expect(ret.state.ball.cx).toBe(0.8);
+  test('T12 serve uses previous ball cache; return uses prior paddle publication; AI uses current ball',()=>{
+    let s=tick(createState(),[command(createState(),{type:'pointer',x:215,y:150})]).state;
+    const r=tick(s,[command(s,{type:'down',x:220,y:155})]);
+    expect(r.events[0].sample).toMatchObject({dx:0,dy:0,tick:0});
+    expect(r.audit.checkpoints[0].ball).toMatchObject({cx:-.01,cy:-.01});
+    expect(r.audit.aiInput.vz).toBe(2);expect(r.audit.aiInput.tick).toBe(2);
+    s=ball(s,{z:1,vz:-2}); const prior=sample(s.player);
+    const ret=tick(s,[command(s,{type:'pointer',x:165,y:130})]);
+    expect(ret.events[0].sample).toEqual(prior);
+    close(ret.state.ball.cx,-(215-175.5)/1.5/25);
+    expect(ret.events[0].sample!.tick).toBe(ret.state.tick-1);
   });
   test('T12 invalid cache, reset+down, and repeated down',()=>{
     let s=createState();expect(tick(s,[command(s,{type:'down',x:175.5,y:125.5})]).events[0].reason).toBe('cache-not-ready');
@@ -141,23 +146,25 @@ describe('M1 provisional compatibility',()=>{
     expect(tick(s,[command(s,{type:'reset',level:5}),command(s,down,2)]).events[1].reason).toBe('cache-not-ready');
     expect(tick(s,[command(s,down),command(s,down,2)]).events.map(e=>e.type)).toEqual(['serve','serve-rejected']);
   });
-  test('T02/U02 changed player readback commits without changing ball logical values',()=>{
+  test('T02/U02 native display readback does not feed logical paddle publication or ball position',()=>{
     const s=createState();s.target.x=205.7;const before=structuredClone(s);
-    const r=tick(s,[],PROFILE,{...display,readPlayer:b=>({x:Math.round(b.x),y:Math.round(b.y)})});
-    expect(r.state.player.x).toBe(196);expect(r.state.player.dx).toBe(20.5);expect(r.state.ball.x).toBe(175.5);
-    expect(s).toEqual(before);
+    const r=tick(s);
+    close(r.state.player.x,175.5+(206-175.5)/1.5);
+    expect(r.state.player.box.x).toBe(195.8);
+    expect(r.state.player.x).not.toBe(r.state.player.box.x);
+    expect(r.state.ball.x).toBe(175.5);expect(s).toEqual(before);
   });
   test.each(['player','enemy'] as const)('T13 %s miss holds exactly 19 intervals',side=>{
     let s=ball(createState(),{x:40,y:40,z:side==='player'?1:74,vz:side==='player'?-2:2});
     let r=tick(s);s=r.state;expect(s.phase).toBe('MissHold');const box=structuredClone(s.ball.box),m=s.tick;
     for(let n=1;n<19;n++){r=tick(s,[command(s,{type:'down',x:296,y:206})]);s=r.state;expect(s.phase).toBe('MissHold');expect(s.ball.box).toEqual(box);expect(r.events.some(e=>e.type==='miss')).toBe(false);}
-    expect(s.player.x).toBeGreaterThan(290);s=tick(s).state;expect(s.tick).toBe(m+19);expect(s.phase).toBe('ServeWaiting');expect(s.ball.generation).toBe(2);expect(s.diagnostics[side==='player'?'playerMisses':'enemyMisses']).toBe(1);
+    expect(s.player.x).toBeGreaterThan(290);s=tick(s).state;expect(s.tick).toBe(m+19);expect(s.phase).toBe('ServeWaiting');expect(s.ballAvailable).toBe(false);s=tick(s).state;expect(s.ball.generation).toBe(2);expect(s.cache).toBeNull();s=tick(s).state;expect(s.cache).not.toBeNull();expect(s.diagnostics[side==='player'?'playerMisses':'enemyMisses']).toBe(1);
   });
   test('T13 retry matrix and hard reset',()=>{
     let s=tick(createState(),[command(createState(),{type:'pointer',x:220,y:160})]).state;
     s.diagnostics.returns=8;s.diagnostics.playerMisses=2;const p=structuredClone(s.player),e=structuredClone(s.enemy),target={...s.target};
     retry(s);expect(s.player).toEqual(p);expect(s.enemy).toEqual(e);expect(s.target).toEqual(target);expect(s.cache).toBeNull();expect(s.publishedBall.vz).toBe(0);expect(s.diagnostics.returns).toBe(8);
     const prior=s.player.x;s=tick(s).state;close(s.player.dx,(target.x-prior)/1.5);
-    const oldTick=s.tick;s=tick(s,[command(s,{type:'reset',level:10})]).state;expect(s.tick).toBe(oldTick+1);expect(s.level).toBe(10);expect(s.trial).toBe(2);expect(s.player.generation).toBe(2);expect(s.diagnostics.returns).toBe(0);expect(s.player.dx).toBe(0);
+    const oldTick=s.tick;s=tick(s,[command(s,{type:'reset',level:10})]).state;expect(s.tick).toBe(oldTick+1);expect(s.level).toBe(10);expect(s.trial).toBe(2);expect(s.player.generation).toBe(2);expect(s.diagnostics.returns).toBe(0);close(s.player.dx,1/3);
   });
 });

@@ -38,7 +38,7 @@ describe('M1 host/integration policy',()=>{
   });
   test('T12 catch-up consumes no future target',()=>{
     const clock=new Clock(0),q=new InputQueue(clock);q.enqueue({type:'pointer',x:220,y:150},50);
-    expect(clock.due(100)).toBe(3);let s=createState();s=tick(s,q.take(1)).state;clock.advance();expect(s.player.x).toBe(175.5);
+    expect(clock.due(100)).toBe(3);let s=createState();s=tick(s,q.take(1)).state;clock.advance();expect(s.player.x).toBe(175.5 + .5 / 1.5);
     s=tick(s,q.take(2)).state;clock.advance();expect(s.player.x).toBeGreaterThan(175.5);
   });
   test('T12 out-of-order delivery is consumed by timestamp, ties by sequence',()=>{
@@ -68,8 +68,8 @@ describe('M1 host/integration policy',()=>{
     const before=structuredClone(result.state),oldBefore=structuredClone(old);
     for(const smooth of [false,true])for(const alpha of [0,0.5,1])poses(result.state,old,alpha,smooth,false);
     expect(result.state).toEqual(before);expect(old).toEqual(oldBefore);
-    expect(poses(result.state,old,0,true,true).player.x).toBe(result.state.player.x);
-    expect(poses(result.state,old,0,true,false).player.x).toBe(old.player.x);
+    expect(poses(result.state,old,0,true,true).player.x).toBe(result.state.player.box.x);
+    expect(poses(result.state,old,0,true,false).player.x).toBe(old.player.box.x);
   });
   test('T14 ring checkpoint survives truncation and JSON round-trip',()=>{
     let state=createState();const recorder=new Recorder(state,10);

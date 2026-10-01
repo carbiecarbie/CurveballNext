@@ -1,7 +1,7 @@
 export const PROFILE = Object.freeze({
-  id: 'm1-provisional-01', left: 25, top: 25, width: 301, height: 201,
-  order: 'lifecycle → commands → player → enemy → ball', edges: 'closed',
-  quantization: 'identity', retry: 'retain paddles; replace ball', missHold: 19,
+  id: 'm4-ruffle-06-01', left: 25, top: 25, width: 301, height: 201,
+  order: 'lifecycle → commands → ball → enemy → player', edges: 'closed',
+  quantization: 'ruffle-0.6 axis-aligned twips/f32; device-pixel mouse', retry: 'retain paddles; deferred automatic ball Load', missHold: 19,
 });
 export type Profile = typeof PROFILE;
 export function field(p: Profile = PROFILE) {

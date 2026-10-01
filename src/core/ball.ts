@@ -8,7 +8,7 @@ import { advanceLevelBonus, awardPlayerContact, resetAwards } from './scoring';
 import { publish, sample } from './state';
 import type { Audit, Event, State } from './types';
 export function ballStep(s: State, events: Event[], audit: Audit, profile: Profile = PROFILE, adapter: DisplayAdapter = display) {
-  if (s.phase !== 'ServeWaiting' && s.phase !== 'Rally') return;
+  if (!s.ballAvailable || (s.phase !== 'ServeWaiting' && s.phase !== 'Rally')) return;
   const b = s.ball;
   const checkpoint = (phase: string) => audit.checkpoints.push({ phase, ball: structuredClone(b) });
   s.cache = { tick: s.tick, player: sample(s.player), enemy: sample(s.enemy) };

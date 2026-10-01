@@ -42,11 +42,20 @@ export function validateState(s: State) {
   else if (s.missTick !== null) throw new Error('Invalid missTick outside MissHold');
   if (s.phase === 'GameOver' && s.playerLives !== 0) throw new Error('Invalid game-over lives');
   if (s.phase === 'ContentComplete' && (s.level !== 10 || s.enemyLives !== 0)) throw new Error('Invalid content-complete state');
-  // Level setup constructs a fresh stopped ball and stopped AI publication.
-  // Neither is advanced while LevelIntro holds; curves would also start motion.
+  // Removed actor placeholders and retained root publication stay stopped during intro.
   if (s.phase === 'LevelIntro' && [s.ball.vx, s.ball.vy, s.ball.vz, s.ball.cx, s.ball.cy,
     s.publishedBall.vx, s.publishedBall.vy, s.publishedBall.vz].some(value => value !== 0)) throw new Error('Invalid LevelIntro motion');
-  stamp(s.publishedBall, 'publishedBall', s.tick, s.ball.generation);
+  for (const side of ['ball','enemy'] as const) {
+    const available = s[`${side}Available`], load = s[`${side}LoadTick`];
+    if (typeof available !== 'boolean') throw new Error('Invalid actor availability');
+    if (load !== null) index(load, `${side}LoadTick`, s.tick + 1);
+    if (available !== (load === null)) throw new Error('Invalid actor Load schedule');
+  }
+  stamp(s.publishedBall, 'publishedBall', s.tick, s.publishedBall.generation);
+  const publicationGeneration = s.publishedBall.generation;
+  if (publicationGeneration !== s.ball.generation && !(publicationGeneration === s.ball.generation - 1
+    && s.ballAvailable && s.cache === null && s.ball.box.tick === s.tick)) throw new Error('Invalid publishedBall generation provenance');
+  if (!s.ballAvailable && s.cache !== null) throw new Error('Invalid absent ball cache');
   stamp(s.ball.box, 'ball.box', s.tick, s.ball.generation);
   for (const side of ['player', 'enemy'] as const) {
     const paddle = s[side];

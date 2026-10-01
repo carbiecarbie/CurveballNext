@@ -153,12 +153,12 @@ export function draw(canvas: HTMLCanvasElement, current: State, previous: State,
   const activity = orbActivity(current, feedback, time);
   court(ctx, p.ball, current, activity, pulse(time, feedback.wallTick));
   if (showActors) {
-    paddle(ctx, p.enemy, true, pulse(time, feedback.enemyTick));
-    orb(ctx, p.ball, activity, time, current.phase === 'MissHold');
+    if (current.enemyAvailable) paddle(ctx, p.enemy, true, pulse(time, feedback.enemyTick));
+    if (current.ballAvailable) orb(ctx, p.ball, activity, time, current.phase === 'MissHold');
     paddle(ctx, p.player, false, pulse(time, feedback.playerTick));
   }
   if (debug && showActors) {
     ctx.strokeStyle = '#f791cb'; ctx.lineWidth = 0.4;
-    for (const box of [current.ball.box, current.player.box, current.enemy.box]) ctx.strokeRect(box.left, box.top, box.width, box.height);
+    for (const box of [current.player.box, ...(current.ballAvailable ? [current.ball.box] : []), ...(current.enemyAvailable ? [current.enemy.box] : [])]) ctx.strokeRect(box.left, box.top, box.width, box.height);
   }
 }

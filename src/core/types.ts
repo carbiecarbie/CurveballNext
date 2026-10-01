@@ -12,6 +12,7 @@ export interface State {
   score: number; playerLives: number; enemyLives: number;
   hitScore: number; curveBonus: number; superCurveBonus: number; accuracyBonus: number;
   remainingBonus: number; bonusCounter: number;
+  ballAvailable: boolean; enemyAvailable: boolean; ballLoadTick: number | null; enemyLoadTick: number | null;
   target: Point; player: Paddle; enemy: Paddle; ball: Ball; publishedBall: PublishedBall; cache: Cache | null;
   diagnostics: { rallyReturns: number; returns: number; playerMisses: number; enemyMisses: number };
 }
@@ -19,5 +20,5 @@ export type Action = { type: 'pointer' | 'down'; x: number; y: number } | { type
 export type Command = Action & { tick: number; sequence: number; timestamp: number; late: boolean };
 export interface Event { type: string; side?: 'player' | 'enemy'; reason?: string; accurate?: boolean; curve?: 'SUPER' | 'CURVE' | 'NONE'; sample?: Sample }
 export interface ContactAudit { kind: 'serve' | 'return'; side: 'player' | 'enemy'; oldBallBox: Box; paddleBox: Box; before: Ball; sample: Sample | null; accepted: boolean; newBallBox?: Box }
-export interface Audit { checkpoints: { phase: string; ball: Ball }[]; contacts: ContactAudit[]; aiInput: PublishedBall }
+export interface Audit { callbacks?: string[]; checkpoints: { phase: string; ball: Ball }[]; contacts: ContactAudit[]; aiInput: PublishedBall }
 export interface Result { state: State; events: Event[]; audit: Audit }

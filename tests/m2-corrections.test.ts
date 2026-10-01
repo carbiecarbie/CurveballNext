@@ -118,10 +118,10 @@ describe('F2 LevelIntro checkpoint motion invariants', () => {
     } finally { spy.mockRestore(); }
   });
 
-  test('legitimate LevelIntro replays all 45 intervals into stopped serve waiting', () => {
+  test('legitimate LevelIntro replays setup at +45 and ball Load at +47 into stopped serve waiting', () => {
     const run = recordFrom(levelIntro());
     expect(() => validateState(run.state)).not.toThrow();
-    for (let i = 0; i < 44; i++) run.step();
+    for (let i = 0; i < 46; i++) run.step();
     expect(run.state.phase).toBe('LevelIntro');
     run.step();
     expect(run.state).toMatchObject({ phase: 'ServeWaiting', ball: { vx: 0, vy: 0, vz: 0, cx: 0, cy: 0 }, remainingBonus: 3000, bonusCounter: 10 });

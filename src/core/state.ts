@@ -19,6 +19,7 @@ export function createState(level = 1, tick = 0, trial = 1, ballGeneration = 1, 
     box: adapter.install(project(x, y, z, PADDLE.width, PADDLE.height, profile), { tick, generation: trial }) });
   const ball = freshBall(tick, ballGeneration, profile, adapter);
   return { profile: profile.id, tick, trial, rally: 1, level, phase: 'ServeWaiting', phaseTick: tick, missTick: null,
+    ballAvailable: true, enemyAvailable: true, ballLoadTick: null, enemyLoadTick: null,
     score: 0, playerLives: 5, enemyLives: 3, ...INITIAL_AWARDS, remainingBonus: INITIAL_BONUS, bonusCounter: 10, target: { x, y },
     player: paddle(0), enemy: paddle(DEPTH), ball, publishedBall: publish(ball, tick), cache: null,
     diagnostics: { rallyReturns: 0, returns: 0, playerMisses: 0, enemyMisses: 0 } };

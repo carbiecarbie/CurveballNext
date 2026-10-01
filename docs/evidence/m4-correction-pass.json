@@ -1,0 +1,482 @@
+{
+  "schema": "curveball-m4-correction-pass-1",
+  "oracle": {
+    "tag": "v0.6.0",
+    "commit": "cac5c99ce4a17e606f4ee3090389bb878f852055",
+    "executableSha256": "7e62e751fc772e4afb746fa2fcab75dbd38f8ab9508f33421dc3d03b7e59da94",
+    "instrumentationPatchSha256": "18ecf239ded25c0708abf61a4bb2d959daf88c6eabee2d8668c4aed7e0323c7c",
+    "referenceSha256": "4c837f4960ac661a40b0b7cad4323f5410df1905693fa3ecb810f9740c325977",
+    "frameRate": 30,
+    "viewport": [
+      350,
+      250,
+      1
+    ],
+    "originalBufferShift": 20,
+    "frontend": "headless normal PlayerEvent and Player.run_frame; null renderer/audio/network backends",
+    "nativeFlashEquivalence": "UNVERIFIED",
+    "rustc": "1.98.1 (48a229cea 2026-09-01)",
+    "cargo": "1.98.1 (797e8a9bc 2026-08-05)",
+    "toolchain": "stable-x86_64-pc-windows-msvc",
+    "java": "Microsoft OpenJDK 21.0.12.1"
+  },
+  "observationsSha256": "148a5267df590fecd82dc54c5bad70d017db8835becd8e77f73c5966df41bed9",
+  "sessions": 63,
+  "ordinarySessions": 4,
+  "completeFrames": 5371,
+  "observations": 192372,
+  "repeated": [
+    {
+      "case": "ordinary-serve",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "507bd0ef722f245d1fa4ef5d1fdb90a038ac458b5346e6b38c442160f190f8ba",
+      "repeatTraceSha256": "5ede00580ff00bd4191787e3ce9ef942a8fd43c9102098f55c64d27bbe1ef447",
+      "driverSha256": "81df7e4d45ab3d3f4c0e2503b96519ba9ee74f8b08965c90dd222e87904e14b6"
+    },
+    {
+      "case": "moving-cache",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "076814bce2c61c780be18a63a7e55daf4bc23f80d123610114863633a9e5c198",
+      "repeatTraceSha256": "8c935561658f36494baf8cc68452dc17e4a3ae861e7bb2433ccc9e03a78318e7",
+      "driverSha256": "b2f1997091c1dafa4aab0024d2ceaf5d81cbb07f1408f96846f4063f3785fd72"
+    },
+    {
+      "case": "fractional-input",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "6afeff8b8a15b4be25e6ac2402f0d2720a61ce47bfe0e44964a5d3732404d874",
+      "repeatTraceSha256": "e73c309a00bd19dca1a88fe6661191b6a3025bb5fa04a53a04685286fba431df",
+      "driverSha256": "3b7b5e13c4da48e0016c8c424cb40c1c269c74a7431186924fdf378304af320f"
+    },
+    {
+      "case": "centered-cache",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "86ff75b9743ffaf2bbb7ce13894932d9559a0924021d9a7f7ede1263420d9fa2",
+      "repeatTraceSha256": "d57e441d7a5ecd12f919d5b9cf0a4de179672a5efd40e13cfe4c0857f6accf9a",
+      "driverSha256": "d9d4978b4dbe50a40f069be3433ba3aa1a53facc55c2eb03e72daf778b87e298"
+    },
+    {
+      "case": "wall-right",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "a5ad52db6c01d4fc6983b332b47589641b2d8d69c1c6e1111f58009a3fc90092",
+      "repeatTraceSha256": "5dedbd330b82a2b973d4a171985d5f6c11a600862a21e43a17e0802358f5c1d0",
+      "driverSha256": "6d13470ed84a9d14a09a24bba5f48b8bd7c8d59ad5806a52034b09c5ade555a0"
+    },
+    {
+      "case": "wall-corner",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "fb5094e7860cec47dfc92e84ccf74b2d49d0f34380d5c93b0158bc850c4269f3",
+      "repeatTraceSha256": "89d5fbc318217658284d54628af91425bf3fc634fbe3d08ec9f59a35985eb95b",
+      "driverSha256": "6f92e953a7a890e1f51688817f07df6ad73c6695fa11ad902b32f8bb8ecb1b74"
+    },
+    {
+      "case": "wall-left",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "3870e8d2e807fb36befbd01a6a162369f119db02067f4bbfcbca2f09963eb581",
+      "repeatTraceSha256": "11a95a56aa2a0b9fa101ea7a73f37f7a2328737454bc9b7efc5b643babc8245e",
+      "driverSha256": "cd150c6d72a0ddf73980a5783dace38b88c5e37dfa061ed3918215b1cf12ef4f"
+    },
+    {
+      "case": "wall-bottom",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "2db88048d6912dadf90dabca70b5b77881082ce8e76120a397590165989523ae",
+      "repeatTraceSha256": "880cafd4db928a2538c782cc60088439eb2487b8377aad32abc62202220ef6b1",
+      "driverSha256": "c73660693fbc26393eb1aeb13426211dda04c24aa8c3a4d9ed9fd9a3dc841571"
+    },
+    {
+      "case": "old-box",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "ef5f28926c5793f28b8cc209d240d6a5997a43614aa55700d5e29d0853b95c16",
+      "repeatTraceSha256": "e698ad52c6e8422e5617fadec444c5122e6dab0c4126238b8968c6c7da2059ea",
+      "driverSha256": "6585225cf96cc2db95827d7be7557d7d15b2238ec5c5132f67d1cc9069b448f2"
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "a40756a1266814c51aa1eae7d830345a456a305bd4c809459ed459be144d4900",
+      "repeatTraceSha256": "03fed5da7b3b9b2a4fa75ab5fecf0229f33e3dd4bcae483cbfa922105173cac5",
+      "driverSha256": "449dd89e5ce3b9ae3615d673208352234ecef8bd90adb258f730b10d28e8788b"
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "1cf4685ddf0de8c0c83cf7f34d7fd4aa76dec48fbcdf4b7eb6d0d7ee50092bec",
+      "repeatTraceSha256": "472187fa3316736e42c8b3742c33589875fe700a6642064387fc2ea377c24a50",
+      "driverSha256": "ddb44a349b967a9ce0fa267de23c2e0e3c599c51d8051b0643ba919f53197c08"
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "2474ec12fbaf7ac695a6aaaa3b500b68b31c3b7851fb8902b9556b68770ced05",
+      "repeatTraceSha256": "519993866b885144f2e2a028f80577c99fd93bb5d75d924d829ea3c5e9bb30ce",
+      "driverSha256": "ca62ea8aca066910bc388f127d1f7d45021a0486b762f9dfa1193cac284dd2db"
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "d0304510d4c7fbae5d9589c4124680facf8ec97ac388a3aabf975d1f2b2dacef",
+      "repeatTraceSha256": "00003b33f17abc7c21e6921b66f534725dca3a5699a72364a2d9215dc2c29795",
+      "driverSha256": "ff81af3396bc71103ffa158a3dd3431722a957a0c6418f0cc8b4b92111d56f35"
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "8b0cee827176ecf14041ded8b7fafa5f12f080b5902f71e46786977c1d24fdaa",
+      "repeatTraceSha256": "2edf7510154c9f67930cb306ffc748b080b52367014a11d5b71e41ede5ff6db6",
+      "driverSha256": "a3230985e49a2c62c1427f1a5fdf2828deeeafee58c3ff3bd33bd19eacd35bc5"
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "5ba6b9b8f169b31f91255b11a819828a38a62345c529beea7b64f63733ecd0e0",
+      "repeatTraceSha256": "ea793669e75d70f904035aea0a170effd06a316d07ff6d5c943a77e168973081",
+      "driverSha256": "9fb1daf80f7baf4bdb9f9ab56b452091b170512805222dc66ab6c3a51eac532d"
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "52e3fb482973b5028625db4a13ff304773575c240afb505f4a3df52e6e5d89c1",
+      "repeatTraceSha256": "2ae490ff85f562ab8ba86e3a38a24c767e7a772cabc2491fc397fea3039c4484",
+      "driverSha256": "ff069107eb8664e4ff4bf30fed33f72c07b3cfa5214396c3bcdd7cd0068b395e"
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "6036c32ca26cd607fdc5c70d61f67df5b838c9ed591210740b3fd1d1e1c87c2e",
+      "repeatTraceSha256": "57451125b93831b595c8c456609e9598b2975fa87bc5a5cf32a9de64a06cde31",
+      "driverSha256": "184cbd90e40a3a2a7b09d2a4a9b1eb60328bad535b7a1ebadb4a778bff7f4470"
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "8729550c51cd196414ce3d174c58ac89cf48477f2118e3eb0631176edf10c8b9",
+      "repeatTraceSha256": "4036d8e1ca1a0225ea42931aa2e0f8b759e2a385e30647ad3fa7ec1e6953696b",
+      "driverSha256": "d5fdaa97532ebed8133bca9200332f1b6fde89ac78e62d69333cd5e9345f4912"
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "4760f7cda22febcfe8e5ae88ab4eb4c2b7b9cfccd916c6f801f93784866a96d1",
+      "repeatTraceSha256": "8b21c9bd84420a84981062cfece6c1102d5db347164ba414ced114e469deeb46",
+      "driverSha256": "b386ca731bb2d16b67f60e39da0a38b53da559cbe068e2faef68a842a9dc2cb7"
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "eaa4308fd66164b3d20f6bda71f95c09f6fe4dc93b0793e8717e7d2a43f9bcb0",
+      "repeatTraceSha256": "0f788c311c5757e4061cb1bb3ce3d3c0a8533a393c11e431e5a57d51133b27af",
+      "driverSha256": "3c4ee82b009e24a015bb21822ed7a63a5c15a10896d7ac0eef2de7879c4069a7"
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "a1d0b3770755dc2710240bfc8a7f15c11dcc9b56b097ca0e9300b3061c265a05",
+      "repeatTraceSha256": "166084294771ab32874b435c7cca32d1fc5b65c2755687b5c143149ed8ca0956",
+      "driverSha256": "cffae30f65281a662aab43f6b3720b3a521032f49bf495584914dd70d57b8daa"
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "6911f1f77dc6f5a54abc0338acbc6ba1561a373d6e1ef327dc0946398bdbf62e",
+      "repeatTraceSha256": "1f40805ec8406e4d50429cde385f2c04a285a0a68b5472ede5e93dcfb753bd2c",
+      "driverSha256": "9df3aacf3472f5865f2fb9ccb3370501a561a57742acc09be611cea5c857288b"
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "73585619fea011fedb954d1011408ef1c96f5292f927a41a3957d06b3a0a985a",
+      "repeatTraceSha256": "c018f25f8fd8031d0bcbf9851a85f441f57b890500967a1e544db100e3fa26f4",
+      "driverSha256": "8df560f68b99ecc3b213d88c8aa2d456fe97b895c7bc578211cf14b9a1be4ccd"
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "bffb21aebccb1fc4d62b3f4a7f8ed27155a2f5e25d4f5a5976c40ecb12d57fde",
+      "repeatTraceSha256": "9da257513ae75c432397ec73c07357d4f765c194481bff78f4ab191a1331b9cf",
+      "driverSha256": "909811095545d7d99e25aa69a28947b160fa534e5ca3c0963b64690ad1e893ea"
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "4ea84e5ddde508eba4f3f849901481c79bdc2e7049ca7737c9b92602e6738622",
+      "repeatTraceSha256": "9ceae4684fbd566750fd7eded6a66ce008a7283025ee07f8bb4d204acd8736bb",
+      "driverSha256": "a6a1e7fbd869da8a0ca51398f9529bf2a14c3fc97284f02a873e050a4d090dd4"
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "02f75ba57e88a04ec73f0657f84aecbbd50cd218aca934ce42c7137a97fae1d9",
+      "repeatTraceSha256": "8d003a4c08def140a3c2b06723a7a11a0eb3b8e5fc398fa9039b0b14e531cd05",
+      "driverSha256": "ca03c6d525132fb6ed3a87f950140093f304e7fb00d6daffd257b1443921bae0"
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "fdc29a6088a67d13a1aa3048f9cf6f5f578b5e6c46212228c306f48e3888be28",
+      "repeatTraceSha256": "f6de4aa679f37e5167d13058da2314a3756f6bd196fd2d52cdf3146ef33cfe1c",
+      "driverSha256": "7aafac8b01face4f2fc010ccc0a3987aa6466bc0b364f9558206b9ab7c6c372f"
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "a4ac0fd869121853a20fb5a9ee7a134018f27d1cf18083a8bab16cfc03e8da70",
+      "repeatTraceSha256": "916896f2b9166b2d47d38d63b3049f6c40e4637e24025e8998b6f7b8c3ad4f4f",
+      "driverSha256": "06bb5ef5d411e02a8f30abf1413de4beee8397564843a65c893e05dfa2f7456f"
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "87d2ab05654a7ee8d3194e9de0c8a866db11a5b750726ef4e140d1dea75ac05f",
+      "repeatTraceSha256": "7401343f3f3d0f3355be80d2eedc2ea2d14c7b9d96faa294c5f0397724b62be9",
+      "driverSha256": "cf42e7b3dacb8be0a39a6aea4f35556be1a9e4d9f321ad5af32cb349663a6bb5"
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "065878ed51de99b622bb6a3aab41ae3600b534e118b7fed21112e269304f32ee",
+      "repeatTraceSha256": "6199fac3ff99871f2506026d67b82156baaf7288e5adf40630319f85d5fdae2c",
+      "driverSha256": "08ffb7e5a680ec7aa78d85aedff0a567cf428192d14be4f9717d600c61268936"
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "dcfb5271db3f1e3bf066ddc35614030e92136c827bc88bb24af545a995feac21",
+      "repeatTraceSha256": "20903fd030442184f796291f79b0466ce4677715f0710f88a4f3073c2e9b6328",
+      "driverSha256": "015d59450d35ddf017b87a7ff48d7de37345c13e418370c66f69417cbfb5860c"
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "77c811971cbc2dae5bff71c603c57e1ec6c098509a63d12c4cde5374797de6f6",
+      "repeatTraceSha256": "94892ccddf116816a223a4c437d16645fd074d24b8d70d8a456fff25fdc97ed5",
+      "driverSha256": "c29c02646e61f59d1193aa7a21871863dc6080bdc30df018d5dd3483438e972d"
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "92905b8aceba0e3abe7db0899cdc42055ea2f35ad2bf4a34483e64d78cefd835",
+      "repeatTraceSha256": "e9158fa01f75eb10bb2f055448bc7d55c8f4cbee364450aef4ec4e722e8db47c",
+      "driverSha256": "9b61c05c612bf161fb5ee1a5fe16f88d65190e6bda102a9dd05b3c06596be688"
+    },
+    {
+      "case": "accuracy-0-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "50e316cbe35a4c474c393eeb81aefbcce9f6941afe7a849b5375d46b6a46d1d3",
+      "repeatTraceSha256": "48ce54bd7d02b452333abfa96f98ebca322e62e61ce765ad69e7834d151802e7",
+      "driverSha256": "af36adb7b32e7350be4804cbfb134ca52dc039d16e782910a5535ca88fb60473"
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "67d63236faf3c2e2ebe2ef7b9a4c3201cd0123a4b2de82c98510d8e521041745",
+      "repeatTraceSha256": "65909f1813754cbd939c1010093e273153d00631d445e7ed76c4656252ee6145",
+      "driverSha256": "b84fa2ccf8599403d16074a8338624fab3cbae711b06622fcd7e46f971baaccf"
+    },
+    {
+      "case": "accuracy--7-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "c0b92233fb65b67e8e75f114216549e9bf9f41c7ec67313ced612401f19f93a9",
+      "repeatTraceSha256": "e60247c2feebf48feffd53d89c00f650571af62067c62fb8ae3956e8abd3d121",
+      "driverSha256": "4b7538ae3c44d7e3093268b8a05ecea0ad6b4ad745dbae5e02359475e9208667"
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "7f6a7edacc2f4a35400ffc7de6268549d16055fd4a57f1bae8c7e427ad0e8268",
+      "repeatTraceSha256": "b798a1b4bef61c0b329e1894b5d2a4bf93ea2f6240b9948134fc185b21595b4a",
+      "driverSha256": "4a54cb5448856293ff3ddf96e2b91d322312eba073fa0ffc8a7b49bc0031551d"
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "b68269b3c5446df794b81537a2c32299abb3e8606bee67ad819e6599d6831dc9",
+      "repeatTraceSha256": "553376606de901cf02b60cdc693b7466579e3851f8ee6e0dd949fe5ef740f5df",
+      "driverSha256": "ad5c1405a4be77ebe6105dd20aad56cb100c902df234f3b22e658d864e67dfb3"
+    },
+    {
+      "case": "accuracy-7-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "5f64f707f0d5212b48f9471cc4dead7f7b1782a931073e7ae2e03aaf6a4f44c1",
+      "repeatTraceSha256": "69563a4b40de83bee7bbfe6540668a87db2e63ebf9c2546ec4cf2a03f8636254",
+      "driverSha256": "8f5c19f28c82a411aaab1a8a402ac43300d5b7cf676cd6973cfe17d1ec4790c6"
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "7713123a3306c1f155050417c70bbbfb606613cf4bfc5bfb7ba28361abce7fdc",
+      "repeatTraceSha256": "66536504ac11dd5f66ec01efe19e5203a44b8769219bfa3c0254663b8fbbe0f2",
+      "driverSha256": "64e7dd6e03cd20de9e92e0939b451ea5a73dc56ec975ec80757b12b21b40c2d7"
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "1e0f586f65bd1856f35a1ab25810a151a54d38192c80fa15c49eb4d676c22c98",
+      "repeatTraceSha256": "80598d5663070de83ea51500d58a33d4717a0cc57fab579235428d8bb6104e0e",
+      "driverSha256": "259a7611f4d77bfb192de4374af5abf906336e8cada2f3e2fc413d713e736c10"
+    },
+    {
+      "case": "accuracy-0--5",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "d6081b997c324814af896bacd3d3d40963485654468a03799f6d863a303c5fa4",
+      "repeatTraceSha256": "2db2e8ca554af69900ebb3ba7e15c32b0039fb3c48eb02a994f6bbb898266cf3",
+      "driverSha256": "e1cbf9da0992e5160ba45ca6ec61286265e5f65574b68cbd1541a695b50e980f"
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "7b7bf204936b3a0bdd8732c85b875fefc4050961bd19b93fd150472edb19edce",
+      "repeatTraceSha256": "582f400b0139102a362965332d89afe99c3db4928d1069ad3e25b4993ce80ae0",
+      "driverSha256": "d226c16097d943c11060e639c8bd7f91774f94cc869f2fb5a0b1fe3c2eeeb991"
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "a5c3fe5108f4f1fa710ec149169c318bd1b763074d3709de14893b9b99f625d5",
+      "repeatTraceSha256": "4783bffa00febd563dbf06dd7ad3889b416898349030b858835e93847ba67c7d",
+      "driverSha256": "cb65e5ebb58443d80683df18b75ad14467c08ed8b5ebc27e26f7f1e9fab42fa1"
+    },
+    {
+      "case": "accuracy-0-5",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "83ee1be854cf2edc975bf6d26decad11985ca530794d9a23dba01168a9ac4bdc",
+      "repeatTraceSha256": "8d54039acb2099fe5d02df601fcca90484ce3dd86d4ccff970eb5ed21d314356",
+      "driverSha256": "2cbe1ba6a70d245a8014a78fe964a5a1ae4b3da11589f6fee57d370c2cd0eb16"
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "364102da7d05a7773e45bebe8b42098ea4a0b00a7f3cd16c64baf80c380776fa",
+      "repeatTraceSha256": "ed77cb53b4809c754656a0e6722edc8b906a2d73095edc140f54a9d04bd5e8fb",
+      "driverSha256": "9c8fa407840017073334fa6fa5629f6c2db69b2157719a79a14fb99c228c9576"
+    },
+    {
+      "case": "accuracy--7--5",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "150042145d2d007c7aadef874c389d78a18cd9944f91119efda1678ad8cfb76c",
+      "repeatTraceSha256": "9f41697c455dbdc26315f8f223411cc7ee9f9ae632b1c4f5ba8e921b4da498a3",
+      "driverSha256": "9e66db681bf76c2ec7301326d32227213bd877eb815169744244de6f9989ed68"
+    },
+    {
+      "case": "accuracy--7-5",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "9a26d135d38cff14186ae24aa134baffe4e260e4d537d48425e3fceff706b13a",
+      "repeatTraceSha256": "e27b1bd60244e746154f2c10ec3d790c6001c4d5714550ae9e7cf11b0ccee495",
+      "driverSha256": "2a88eba4f0648f42f3de9684c740a228c84594d5e6132717e99a2b2b53d2bf58"
+    },
+    {
+      "case": "accuracy-7--5",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "55d2e34e13b3f4f4f2705b6406a2834f8b3a362614cce01b1221dfbc18f287a1",
+      "repeatTraceSha256": "e685687844d8b3c82bf8fd8bd893641de239dc396f805fc6898221cca677fc85",
+      "driverSha256": "50136e899169c19bd433bd45f3e7d4699fb566245bb29794175bc55c3e856c2d"
+    },
+    {
+      "case": "accuracy-7-5",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "ace09c828a0afbf3c558d968d62c53634cd2690928f0e6fa41f7ea28b693d090",
+      "repeatTraceSha256": "5474eb1b222190a6fff3b4e094905417746f92fe7e3087cb5fc0ba840707727c",
+      "driverSha256": "ded080ee27b366cfeb4e8bb4865b48e20f53f8f2d25d066e790a6f60ff7aa33f"
+    },
+    {
+      "case": "accuracy-velocity",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "e8642d0badf78fc8f0e4152829d6da555f505517af30dc5e0f890c8a4b261c3b",
+      "repeatTraceSha256": "30e9e4f7f3683779a8d9b1e07f2d111e3e4a5e78fb27f858cb6e377b504da79c",
+      "driverSha256": "ef552366afc394e6ed8a9cf4abfb46e3d1dffffea5c340b3773f2c1fca3c8f4b"
+    },
+    {
+      "case": "retry-player",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "f83b2849fa7e0ffe8d1b95a3f65c2cdc1edaaba07a1f8b075c8334b90cf9374c",
+      "repeatTraceSha256": "65f1c09800d32792fe93703d9eb57a47cfe6882cd2c9077871fd6457fdabfd8b",
+      "driverSha256": "87590fca203b8a29620e0fef6fe89dcb63664658444d0a78f46367ceb1c0839f"
+    },
+    {
+      "case": "retry-enemy",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "fd390a2a280de2465d637d2cc82c96835b7d26b0db89eaf21e669b1aef5f19fc",
+      "repeatTraceSha256": "3de98e8164505cedb2a5c47cbaee85b3b952ad856acef1ff9405dddb05cd9602",
+      "driverSha256": "b11adc7c372d7715215fb9d5e2305d240cf984c6dd80e1e4578e9bd5b3fb1a7e"
+    },
+    {
+      "case": "level-1-completion",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "3f6f45d2bdc64e8ea86a92bc12a2cfc92b807c0241f2c726e52739ea45407163",
+      "repeatTraceSha256": "161dc431f9ded3c54c1a4d899942779636e8674e1ad7612105877194b386ac1a",
+      "driverSha256": "1628e51bb28d85df966a57f2550f339af05ae677c0265809b64598f3e28e4d9a"
+    },
+    {
+      "case": "level-10-completion",
+      "status": "EXACT_DERIVED_REPEAT",
+      "priorTraceSha256": "9dd4367483a0b4018e51fdea5a2839775866939b395c014272470d7dbddf0d1d",
+      "repeatTraceSha256": "5f574c723e4f58912232e74a371fe6e571cbf100048ae645691a6af22ffa3eab",
+      "driverSha256": "ad0a6ace75144efcef0045fc59264f5ecefa3baa19bdbcc8b67cce8416c80727"
+    }
+  ],
+  "added": [
+    "display-depth-0",
+    "display-depth-1",
+    "display-depth-15",
+    "display-depth-37.5",
+    "display-depth-74",
+    "display-depth-75",
+    "fractional-input-odd",
+    "level-intro-input"
+  ],
+  "rootCauses": [
+    {
+      "targets": [
+        "R02",
+        "R14"
+      ],
+      "before": "Player/enemy/ball; AI prior ball; moving serve score150 and curves(-1.04,+.64)",
+      "observation": "Ball/marker/enemy/player; ball prior paddle, AI current ball; synchronous MouseDown prior cache; score100 and curves(-.01,+.01)",
+      "correction": "Ball before enemy/player, with actual callback audit and prior sample stamps",
+      "after": "MATCH"
+    },
+    {
+      "targets": [
+        "R05"
+      ],
+      "before": "Identity binary64 display and host target; player display readback fed logical movement",
+      "observation": "Logical myPos/oldPos/publication separate from truncated twip display; f32 transformed bounds round ties to even; root mouse device-pixel readback",
+      "correction": "General axis-aligned twip/f32 adapter, normal-input pixel readback, independent logical paddle state",
+      "after": "MATCH",
+      "farTouch": "Original native closed edges accepted; prior enemy-first update installed nominal undersized enemy before testing. Ordering correction fixes this; native quantization preserves it in later frames."
+    },
+    {
+      "targets": [
+        "R11",
+        "R10"
+      ],
+      "before": "Immediate retry ball/publication; recentered reconstructed player; frozen intro; immediate bonus setup",
+      "observation": "Retry removal, Load+1/cache+2; level player retained/updating, setup+45/enemy Load+46/ball Load+47/cache+48; root publication retained through Load",
+      "correction": "Actor availability/Load boundaries, retained player/target/logical previous state, deferred setup and publication",
+      "after": "MATCH"
+    },
+    {
+      "targets": [
+        "R06"
+      ],
+      "before": "Clamp/reversal/attenuation (accepted M3)",
+      "observation": "Clamp/attenuation/reversal; y before x",
+      "correction": "Prior M4 correction preserved; see m4-wall-order-correction.json",
+      "after": "MATCH"
+    },
+    {
+      "targets": [
+        "R12"
+      ],
+      "observation": "Injected level10 completion increments11 and later requests undefined difficulty; natural path unproven",
+      "correction": "None: existing ContentComplete containment10 retained",
+      "after": "INTENTIONAL CURVEBALLNEXT CONTAINMENT"
+    }
+  ],
+  "limits": [
+    "Checkpoint comparisons and disclosed prepared states, not an exhaustive naturally reachable campaign proof",
+    "Pinned Ruffle provisional oracle; historical Adobe Flash Player equivalence unproven",
+    "Only axis-aligned original actor shapes and recorded between-frame normal input are covered",
+    "U06 natural post10, U07 stopped-miss/early-Load clicks, U08 service and U09 exact audiovisual timing remain open"
+  ],
+  "numericalPolicy": "Discrete/bounds/order exact; logical math abs1e-9+rel1e-12 unchanged; no collision tolerance; signed zero as existing replay",
+  "deterministicProfile": "m4-ruffle-06-01; old m1-provisional-01 captures rejected; schema curveball-m2-trace-2 retained"
+}

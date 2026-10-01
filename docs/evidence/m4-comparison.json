@@ -1,0 +1,6102 @@
+{
+  "schema": "curveball-m4-comparison-1",
+  "observationsSha256": "148a5267df590fecd82dc54c5bad70d017db8835becd8e77f73c5966df41bed9",
+  "numericalPolicy": "Discrete exact; math abs 1e-9 + rel 1e-12; no collision tolerance. Signed zero alike as existing replay policy.",
+  "summary": {
+    "MATCH": 759,
+    "INTENTIONAL CURVEBALLNEXT CONTAINMENT": 1
+  },
+  "comparisons": [
+    {
+      "case": "ordinary-serve",
+      "scope": "field",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "callback-order",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "checkpoint-serve-ball",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Production serve using the same observed prior cache, outside a Next tick; dispatch mechanism comparison only."
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "checkpoint-serve-awards",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "checkpoint-first-flight",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "ai-publication-age",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual source opcode-write frame versus Next publishedBall stamp, from the same aligned serve checkpoint."
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "waiting-bonus",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "active-11-bonus",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "active-22-bonus",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "ordinary-rally-ball",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Includes naturally executed near/far contacts; accumulated scheduling/display differences are not isolated by this long run."
+    },
+    {
+      "case": "ordinary-serve",
+      "scope": "ordinary-rally-awards",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "moving-cache",
+      "scope": "field",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "moving-cache",
+      "scope": "callback-order",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "moving-cache",
+      "scope": "checkpoint-serve-ball",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Production serve using the same observed prior cache, outside a Next tick; dispatch mechanism comparison only."
+    },
+    {
+      "case": "moving-cache",
+      "scope": "checkpoint-serve-awards",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "moving-cache",
+      "scope": "checkpoint-first-flight",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "moving-cache",
+      "scope": "ai-publication-age",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual source opcode-write frame versus Next publishedBall stamp, from the same aligned serve checkpoint."
+    },
+    {
+      "case": "moving-cache",
+      "scope": "ordinary-moving-input-serve",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Same integer host input sequence from measured ready state. Ball consumes the prior paddle publication; MouseDown consumes the cache made by the preceding complete ball callback."
+    },
+    {
+      "case": "moving-cache",
+      "scope": "moving-paddle-publication",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "fractional-input",
+      "scope": "field",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "fractional-input",
+      "scope": "callback-order",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "fractional-input",
+      "scope": "fractional-host-readback",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Normal PlayerEvent path and device-pixel mouse readback; historical Flash equivalence remains unverified."
+    },
+    {
+      "case": "centered-cache",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "centered-cache",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "centered-cache",
+      "scope": "checkpoint-serve-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Production serve using the same observed prior cache, outside a Next tick; dispatch mechanism comparison only."
+    },
+    {
+      "case": "centered-cache",
+      "scope": "checkpoint-serve-awards",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "centered-cache",
+      "scope": "checkpoint-first-flight",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-right",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "wall-right",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "wall-right",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "wall-right",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "wall-right",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-right",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-right",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-right",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-right",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-right",
+      "scope": "wall-event-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Original instruction-state transitions establish y response before x."
+    },
+    {
+      "case": "wall-right",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-corner",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-corner",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-corner",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-corner",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-corner",
+      "scope": "wall-event-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Original instruction-state transitions establish y response before x."
+    },
+    {
+      "case": "wall-corner",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-left",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "wall-left",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "wall-left",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "wall-left",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "wall-left",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-left",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-left",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-left",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-left",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-left",
+      "scope": "wall-event-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Original instruction-state transitions establish y response before x."
+    },
+    {
+      "case": "wall-left",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "wall-event-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Original instruction-state transitions establish y response before x."
+    },
+    {
+      "case": "wall-bottom",
+      "scope": "wall-assignment-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Actual production walls setter sequence versus changes at selected original AVM1 instructions; clamp, attenuation, reversal."
+    },
+    {
+      "case": "old-box",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "old-box",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "old-box",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "old-box",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "old-box",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "old-box",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "old-box",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "old-box",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "old-box",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "old-box",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "old-box",
+      "scope": "new-box-counterfactual",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "After contact the newly installed box no longer overlaps. Original contact was true on its previous installed box."
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x--1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-x-1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y--1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-player-y-1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x--1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-x-1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y--1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1--0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "edge-enemy-y-1-0.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7.05-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--6.95-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-6.95-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7.05-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0--4.95",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-4.95",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-0-5.05",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7--5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy--7-5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7--5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-7-5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "native-contact",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native old ball box seeded exactly; Next installs its own paddle box through the production tick."
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "accuracy-velocity",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "retry-player",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "retry-player",
+      "scope": "miss-score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "miss-delay",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "resolution-level-score",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "resolution-ball-present",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Removed actor placeholders are unavailable; fresh ball Load follows at the measured boundary."
+    },
+    {
+      "case": "retry-player",
+      "scope": "resolution-player-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "resolution-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+0-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+0-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+0-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+0-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+1-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+2-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "lifecycle+3-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "retry-enemy-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "retry-ball-replacement",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-player",
+      "scope": "retry-bonus-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Waiting is stopped; resumed result independently simulated below."
+    },
+    {
+      "case": "retry-player",
+      "scope": "resumed-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "miss-score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "miss-delay",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "resolution-level-score",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "resolution-ball-present",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Removed actor placeholders are unavailable; fresh ball Load follows at the measured boundary."
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "resolution-player-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "resolution-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+0-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+0-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+0-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+0-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+1-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+2-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "lifecycle+3-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "retry-enemy-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "retry-ball-replacement",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "retry-bonus-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Waiting is stopped; resumed result independently simulated below."
+    },
+    {
+      "case": "retry-enemy",
+      "scope": "resumed-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "miss-score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "miss-delay",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "resolution-level-score",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "resolution-ball-present",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Removed actor placeholders are unavailable; fresh ball Load follows at the measured boundary."
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "resolution-player-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "resolution-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+0-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+0-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+0-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+0-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+1-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+1-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+1-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+1-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+2-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+2-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+2-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+2-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+3-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+3-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+3-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+3-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+44-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+44-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+44-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+44-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+45-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+45-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+45-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+45-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+46-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+46-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+46-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+46-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+47-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+48-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "lifecycle+50-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "next-level-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "next-level-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-1-completion",
+      "scope": "next-level-enemy-reconstructed",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "miss-score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "miss-delay",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "resolution-player-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "resolution-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-10-completion",
+      "scope": "undefined-level-11-difficulty",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "INTENTIONAL CURVEBALLNEXT CONTAINMENT",
+      "differences": [
+        {
+          "field": "level",
+          "original": 11,
+          "next": 10
+        },
+        {
+          "field": "ballAvailable",
+          "original": false,
+          "next": true
+        }
+      ],
+      "detail": "Injected world.level=10 while cached level-1 difficulty remains; original advances to undefined entry 11. Next intentionally contains completion at level 10. No natural level-10 campaign or undefined-motion execution was tested."
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-0",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-1",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-15",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-37.5",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-74",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "ball-numeric",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Aligned measured checkpoint; full production tick, existing math tolerance only."
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "ball-display-installation",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Native twips/f32 display versus production compatibility adapter; no tolerance widening or collision tolerance."
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "player-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "player-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "enemy-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "enemy-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "display-depth-75",
+      "scope": "score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "fractional-input-odd",
+      "scope": "field",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "fractional-input-odd",
+      "scope": "callback-order",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "fractional-input-odd",
+      "scope": "fractional-host-readback",
+      "evidenceClass": "ORDINARY_RUNTIME_INPUT",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Normal PlayerEvent path and device-pixel mouse readback; historical Flash equivalence remains unverified."
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "field",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Logical dimensions/center; stroke bounds are recorded separately."
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "callback-order",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Ruffle ball/marker/enemy/player; Next production callback audit. Original cosmetic marker is recorded but excluded from the core-order comparison."
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "miss-score-lives-bonus",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "miss-delay",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "resolution-level-score",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "resolution-ball-present",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": "Removed actor placeholders are unavailable; fresh ball Load follows at the measured boundary."
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "resolution-player-retention",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "resolution-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+0-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+0-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+0-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+0-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+1-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+1-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+1-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+1-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+2-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+2-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+2-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+2-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+3-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+3-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+3-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+3-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+44-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+44-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+44-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+44-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+45-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+45-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+45-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+45-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+46-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+46-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+46-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+46-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+47-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+48-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-availability",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-publication",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-player",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-ball",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-native-display",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "lifecycle+50-cache",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "next-level-player-position",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "next-level-world",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    },
+    {
+      "case": "level-intro-input",
+      "scope": "next-level-enemy-reconstructed",
+      "evidenceClass": "CONTROLLED_RUNTIME_FIXTURE",
+      "status": "MATCH",
+      "differences": [],
+      "detail": ""
+    }
+  ]
+}

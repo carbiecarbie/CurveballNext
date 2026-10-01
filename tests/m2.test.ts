@@ -16,6 +16,7 @@ function command(s: State, action: Action) {
 function step(s: State, action?: Action) { return tick(s, action ? [command(s, action)] : []); }
 function hold(s: State) { for (let i = 0; i < 19; i++) s = step(s).state; return s; }
 function miss(s: State, side: 'player' | 'enemy') {
+  while (!s.ballAvailable || !s.cache) s = step(s).state;
   const result = step(s, { type: 'debug-miss', side });
   expect(result.events.map(e => e.type)).toContain('miss');
   expect(result.state.phase).toBe('MissHold');
@@ -82,11 +83,12 @@ describe('M2 campaign lifecycle', () => {
     expect(s.enemyLives).toBe(0); expect(s.score).toBe(440);
     s = hold(s);
     expect([s.phase, s.level, s.score, s.playerLives, s.enemyLives]).toEqual(['LevelIntro', level + 1, 3165, 2, 3]);
-    expect([s.hitScore, s.curveBonus, s.superCurveBonus, s.accuracyBonus, s.remainingBonus, s.bonusCounter]).toEqual([100, 50, 150, 100, 3000, 10]);
-    for (let i = 0; i < 44; i++) s = step(s).state;
+    expect([s.hitScore, s.curveBonus, s.superCurveBonus, s.accuracyBonus, s.remainingBonus, s.bonusCounter]).toEqual([100, 50, 150, 100, 2725, 4]);
+    for (let i = 0; i < 46; i++) s = step(s).state;
     expect([s.phase, s.score]).toEqual(['LevelIntro', 3165]);
     s = step(s).state;
     expect([s.phase, s.score]).toEqual(['ServeWaiting', 3165]);
+    expect([s.remainingBonus,s.bonusCounter]).toEqual([3000,10]);
     expect(DIFFICULTIES[s.level - 1]).toEqual(DIFFICULTIES[level]);
   });
 
@@ -192,7 +194,8 @@ describe('M2 level time bonus and replay', () => {
     expect([s.remainingBonus, s.bonusCounter]).toEqual([2750, 0]);
     s = hold(s);
     expect([s.remainingBonus, s.bonusCounter]).toEqual([2750, 0]);
-    s = step(s).state;
+    s = step(s).state; // replacement Load, cache still unavailable
+    s = step(s).state; // first ordinary ball callback
     s = step(s, { type: 'down', ...center }).state;
     expect([s.remainingBonus, s.bonusCounter]).toEqual([2725, 10]);
   });
@@ -253,10 +256,10 @@ describe('M2 level time bonus and replay', () => {
     const recorder = new Recorder(s, 600), observed: string[] = [];
     const run = (action?: Action) => { const commands = action ? [command(s, action)] : []; const result = tick(s, commands); s = result.state; recorder.record(commands, result); observed.push(...result.events.map(e => e.type)); };
     run();
-    for (let i = 0; i < 3; i++) { run({ type: 'debug-miss', side: 'enemy' }); for (let j = 0; j < 19; j++) run(); }
-    for (let j = 0; j < 45; j++) run();
+    for (let i = 0; i < 3; i++) { while(!s.ballAvailable || !s.cache) run(); run({ type: 'debug-miss', side: 'enemy' }); for (let j = 0; j < 19; j++) run(); }
+    for (let j = 0; j < 47; j++) run();
     run(); run({ type: 'down', ...center });
-    for (let i = 0; i < 5; i++) { run({ type: 'debug-miss', side: 'player' }); for (let j = 0; j < 19; j++) run(); }
+    for (let i = 0; i < 5; i++) { while(!s.ballAvailable || !s.cache) run(); run({ type: 'debug-miss', side: 'player' }); for (let j = 0; j < 19; j++) run(); }
     expect(s.phase).toBe('GameOver');
     expect(observed).toContain('return'); expect(observed).toContain('level-complete'); expect(observed).toContain('game-over');
     const finalScore = s.score;

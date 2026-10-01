@@ -1,0 +1,588 @@
+diff --git a/core/src/avm1/activation.rs b/core/src/avm1/activation.rs
+index ceac03a3..c37e028e 100644
+--- a/core/src/avm1/activation.rs
++++ b/core/src/avm1/activation.rs
+@@ -501,12 +501,15 @@ impl<'a, 'gc> Activation<'a, 'gc> {
+     }
+ 
+     pub fn run_actions(&mut self, code: SwfSlice) -> Result<ReturnType<'gc>, Error<'gc>> {
++        crate::m4::action(self.context,"action-enter",self.base_clip(),code.start,code.end);
+         let mut read = Reader::new(&code.movie.data()[code.start..], self.swf_version());
+ 
+         loop {
++            let position = read.get_ref().as_ptr() as usize - code.movie.data().as_ptr() as usize;
++            crate::m4::instruction(self.context,self.base_clip(),code.start,position);
+             let result = self.do_action(&code, &mut read);
+             match result {
+-                Ok(FrameControl::Return(return_type)) => break Ok(return_type),
++                Ok(FrameControl::Return(return_type)) => { crate::m4::action(self.context,"action-exit",self.base_clip(),code.start,code.end); break Ok(return_type) },
+                 Ok(FrameControl::Continue) => {}
+                 Err(e) => break Err(e),
+             }
+@@ -1180,6 +1183,7 @@ impl<'a, 'gc> Activation<'a, 'gc> {
+         let object = object_val.coerce_to_object_or_bare(self)?;
+ 
+         let result = object.get(name, self)?;
++        crate::m4::field(self.context,"read",format!("object:{:p}",object.as_ptr()),&name.to_utf8_lossy(),result);
+         self.stack_push(result);
+ 
+         Ok(FrameControl::Continue)
+@@ -1242,6 +1246,7 @@ impl<'a, 'gc> Activation<'a, 'gc> {
+         let path = var_path.coerce_to_string(self)?;
+ 
+         let value: Value<'gc> = self.get_variable(path)?.into();
++        crate::m4::variable(self.context,"read",self.base_clip(),&path.to_utf8_lossy(),value);
+ 
+         let value = if self.swf_version() <= 4 {
+             value.as_swf4_variable()
+@@ -1941,6 +1946,7 @@ impl<'a, 'gc> Activation<'a, 'gc> {
+ 
+         let object = self.context.avm1.pop().coerce_to_object_or_bare(self)?;
+         object.set(name, value, self)?;
++        crate::m4::field(self.context,"write",format!("object:{:p}",object.as_ptr()),&name.to_utf8_lossy(),value);
+ 
+         Ok(FrameControl::Continue)
+     }
+@@ -1998,6 +2004,7 @@ impl<'a, 'gc> Activation<'a, 'gc> {
+         let var_path_val = self.context.avm1.pop();
+         let var_path = var_path_val.coerce_to_string(self)?;
+         self.set_variable(var_path, value)?;
++        crate::m4::variable(self.context,"write",self.base_clip(),&var_path.to_utf8_lossy(),value);
+         Ok(FrameControl::Continue)
+     }
+ 
+diff --git a/core/src/avm1/globals/movie_clip.rs b/core/src/avm1/globals/movie_clip.rs
+index a5b1d41d..03ca77e2 100644
+--- a/core/src/avm1/globals/movie_clip.rs
++++ b/core/src/avm1/globals/movie_clip.rs
+@@ -254,7 +254,9 @@ pub fn hit_test<'gc>(
+             false,
+         )?;
+         if let Some(other) = other {
+-            return Ok(movie_clip.hit_test_object(other).into());
++            let result = movie_clip.hit_test_object(other);
++            crate::m4::record(activation.context,"native-hit-test",serde_json::json!({"a":crate::m4::clip(movie_clip.into()),"b":crate::m4::clip(other),"result":result}));
++            return Ok(result.into());
+         }
+     }
+ 
+diff --git a/core/src/display_object/container.rs b/core/src/display_object/container.rs
+index 61b8459b..f630b3c7 100644
+--- a/core/src/display_object/container.rs
++++ b/core/src/display_object/container.rs
+@@ -371,6 +371,7 @@ pub trait TDisplayObjectContainer<'gc>:
+     /// Remove (and unloads) a child display object from this container's render and depth lists.
+     #[no_dynamic]
+     fn remove_child_directly(&self, context: &mut UpdateContext<'gc>, child: DisplayObject<'gc>) {
++        crate::m4::record(context,"remove-child",serde_json::json!({"clip":crate::m4::clip(child)}));
+         dispatch_removed_event(child, context);
+         let this: DisplayObjectContainer<'gc> = *self;
+         self.raw_container_mut(context.gc())
+diff --git a/core/src/display_object/movie_clip.rs b/core/src/display_object/movie_clip.rs
+index 425edf85..40f89808 100644
+--- a/core/src/display_object/movie_clip.rs
++++ b/core/src/display_object/movie_clip.rs
+@@ -167,6 +167,7 @@ impl MovieClipHandle {
+ #[repr(C, align(8))]
+ pub struct MovieClipData<'gc> {
+     base: InteractiveObjectBase<'gc>,
++    m4_allocation: u64,
+     cell: RefLock<MovieClipDataMut<'gc>>,
+     shared: Lock<Gc<'gc, MovieClipShared<'gc>>>,
+ 
+@@ -234,6 +235,7 @@ impl<'gc> MovieClipData<'gc> {
+     fn new(shared: MovieClipShared<'gc>, mc: &Mutation<'gc>) -> Self {
+         let movie = shared.movie();
+         Self {
++            m4_allocation: crate::m4::allocation(),
+             base: Default::default(),
+             cell: RefLock::new(MovieClipDataMut {
+                 container: ChildContainer::new(&movie),
+@@ -360,8 +362,12 @@ impl<'gc> MovieClip<'gc> {
+         mc
+     }
+ 
++    pub fn m4_id(self) -> u64 { self.0.m4_allocation }
++
+     pub fn instantiate(self, mc: &Mutation<'gc>) -> Self {
+-        Self(Gc::new(mc, (*self.0).clone()))
++        let mut data = (*self.0).clone();
++        data.m4_allocation = crate::m4::allocation();
++        Self(Gc::new(mc, data))
+     }
+ 
+     /// Replace the current MovieClipData with a completely new SwfMovie.
+@@ -1647,6 +1653,7 @@ impl<'gc> MovieClip<'gc> {
+             self.assert_expected_tag_start();
+         }
+ 
++        crate::m4::record(context,"goto",serde_json::json!({"clip":crate::m4::clip(self.into()),"from":self.current_frame(),"to":frame,"implicit":is_implicit}));
+         let frame_before_rewind = self.current_frame();
+         self.base().set_skip_next_enter_frame(false);
+ 
+@@ -2745,6 +2752,7 @@ impl<'gc> TDisplayObject<'gc> for MovieClip<'gc> {
+         self.0.set_flag(MovieClipFlags::POST_INSTANTIATED, true);
+ 
+         self.set_default_instance_name(context);
++        crate::m4::record(context,"post-instantiation",serde_json::json!({"clip":crate::m4::clip(self.into())}));
+ 
+         if !self.movie().is_action_script_3() {
+             context.avm1.add_to_exec_list(context.gc(), self);
+diff --git a/core/src/lib.rs b/core/src/lib.rs
+index d76c1cba..5f3e035c 100644
+--- a/core/src/lib.rs
++++ b/core/src/lib.rs
+@@ -38,6 +38,7 @@ mod net_connection;
+ mod orphan_manager;
+ pub mod pixel_bender;
+ mod player;
++pub mod m4;
+ mod prelude;
+ pub mod socket;
+ mod streams;
+diff --git a/core/src/player.rs b/core/src/player.rs
+index 2d58d056..432385d7 100644
+--- a/core/src/player.rs
++++ b/core/src/player.rs
+@@ -1038,6 +1038,7 @@ impl Player {
+     /// Handle an event sent into the player from the external windowing system
+     /// or an HTML element.
+     pub fn handle_event(&mut self, event: PlayerEvent) -> bool {
++        if crate::m4::active() { self.mutate_with_update_context(|c|crate::m4::record(c,"host-input",serde_json::json!({"event":format!("{event:?}")}))); }
+         match event {
+             PlayerEvent::FocusGained | PlayerEvent::FocusLost => self.handle_focus_event(event),
+             PlayerEvent::KeyDown { .. }
+@@ -2065,6 +2066,7 @@ impl Player {
+         }
+ 
+         self.update(|context| {
++            crate::m4::begin(context);
+             // TODO: Is this order correct?
+             run_all_phases_avm2(context);
+             Avm1::run_frame(context);
+@@ -2078,6 +2080,7 @@ impl Player {
+             }
+         });
+ 
++        if crate::m4::active() { self.mutate_with_update_context(|c|crate::m4::record(c,"frame-end",serde_json::Value::Null)); }
+         self.needs_render = true;
+     }
+ 
+@@ -2205,6 +2208,7 @@ impl Player {
+                 && (!action.clip.movie().is_action_script_3()
+                     && (action.clip.avm1_removed() || action.clip.avm1_pending_removal()))
+             {
++                crate::m4::record(context,"action-skipped",serde_json::json!({"clip":crate::m4::clip(action.clip)}));
+                 continue;
+             }
+ 
+diff --git a/core/src/m4.rs b/core/src/m4.rs
+new file mode 100644
+--- /dev/null
++++ b/core/src/m4.rs
+@@ -0,0 +1,329 @@
++//! Local M4 observer. No ActionScript evaluation, getters, queue drains or game writes.
++use crate::avm1::{Object, Value as AvmValue};
++use crate::context::UpdateContext;
++use crate::display_object::{BoundsMode, DisplayObject, TDisplayObject};
++use crate::prelude::TDisplayObjectContainer;
++
++use crate::Player;
++use serde_json::{Value, json};
++use std::sync::{
++    Mutex,
++    atomic::{AtomicBool, AtomicU64, Ordering},
++};
++
++static ACTIVE: AtomicBool = AtomicBool::new(false);
++static DETAIL: AtomicBool = AtomicBool::new(false);
++static ALLOCATION: AtomicU64 = AtomicU64::new(1);
++static TRACE: Mutex<Trace> = Mutex::new(Trace {
++    seq: 0,
++    frame: 0,
++    shift: 0,
++    rows: Vec::new(),
++    writes: std::collections::BTreeMap::new(),
++});
++struct Trace {
++    seq: u64,
++    frame: u64,
++    shift: usize,
++    rows: Vec<Value>,
++    writes: std::collections::BTreeMap<String, u64>,
++}
++pub fn allocation() -> u64 {
++    ALLOCATION.fetch_add(1, Ordering::Relaxed)
++}
++pub fn active() -> bool {
++    ACTIVE.load(Ordering::Relaxed)
++}
++pub fn detail(on: bool) {
++    DETAIL.store(on, Ordering::Relaxed);
++}
++pub fn start(shift: usize) {
++    TRACE.lock().unwrap().shift = shift;
++    ACTIVE.store(true, Ordering::Relaxed);
++}
++pub fn finish(path: &str) {
++    ACTIVE.store(false, Ordering::Relaxed);
++    let trace = TRACE.lock().unwrap();
++    let mut out = std::io::BufWriter::new(std::fs::File::create(path).unwrap());
++    for row in &trace.rows {
++        serde_json::to_writer(&mut out, row).unwrap();
++        std::io::Write::write_all(&mut out, b"\n").unwrap();
++    }
++}
++fn number(v: f64) -> Value {
++    if v.is_nan() {
++        json!({"special":"NaN","bits":format!("{:016x}",v.to_bits())})
++    } else if v == f64::INFINITY {
++        json!({"special":"+Infinity"})
++    } else if v == f64::NEG_INFINITY {
++        json!({"special":"-Infinity"})
++    } else if v == 0.0 && v.is_sign_negative() {
++        json!({"special":"-0"})
++    } else {
++        json!(v)
++    }
++}
++fn scalar(v: AvmValue<'_>) -> Value {
++    match v {
++        AvmValue::Undefined => json!({"special":"undefined"}),
++        AvmValue::Null => Value::Null,
++        AvmValue::Bool(v) => json!(v),
++        AvmValue::Number(v) => number(v),
++        AvmValue::String(v) => json!(v.to_utf8_lossy()),
++        _ => json!({"special":"object-reference-not-resolved"}),
++    }
++}
++fn props(obj: Object<'_>) -> Value {
++    let mut out = serde_json::Map::new();
++    for (key, value) in obj.own_properties() {
++        // Read property.data only; object references and virtual getters are never resolved.
++        if let AvmValue::Object(o) = value {
++            if o.as_function().is_none() && o.as_display_object_no_super().is_none() {
++                let mut nested = serde_json::Map::new();
++                for (k, v) in o.own_properties() {
++                    if !matches!(v, AvmValue::Object(_) | AvmValue::MovieClip(_)) {
++                        nested.insert(k.to_utf8_lossy().to_string(), scalar(v));
++                    }
++                }
++                out.insert(key.to_utf8_lossy().to_string(), Value::Object(nested));
++            }
++        } else if !matches!(value, AvmValue::MovieClip(_)) {
++            out.insert(key.to_utf8_lossy().to_string(), scalar(value));
++        }
++    }
++    Value::Object(out)
++}
++pub(crate) fn clip(d: DisplayObject<'_>) -> Value {
++    let b = d.world_bounds(BoundsMode::Script);
++    let local = d.bounds(BoundsMode::Script);
++    let m = d.base().matrix();
++    json!({"cid":d.id(), "allocation":d.as_movie_clip().map(|c|c.m4_id()),
++        "name":d.name().map(|s|s.to_utf8_lossy().to_string()),
++        "timeline":d.as_movie_clip().map(|c|c.current_frame()),
++        "props":d.object1().map(props),
++        "display":{"x":number(d.x().to_pixels()),"y":number(d.y().to_pixels()),
++            "width":number(d.width()),"height":number(d.height()),
++            "worldTwips":[b.x_min.get(),b.y_min.get(),b.x_max.get(),b.y_max.get()],
++            "localTwips":[local.x_min.get(),local.y_min.get(),local.x_max.get(),local.y_max.get()],
++            "matrix":[m.a as f64,m.b as f64,m.c as f64,m.d as f64,m.tx.get(),m.ty.get()]}})
++}
++fn walk<'gc>(d: DisplayObject<'gc>, list: &mut Vec<Value>) {
++    if matches!(d.id(), 0 | 7 | 59 | 75 | 77 | 80) || d.as_avm1_button().is_some() {
++        list.push(clip(d));
++    }
++    if let Some(c) = d.as_container() {
++        for child in c.iter_render_list() {
++            walk(child, list);
++        }
++    }
++}
++fn snapshot(context: &UpdateContext<'_>) -> Value {
++    let mut list = Vec::new();
++    let mut world = Value::Null;
++    if let Some(root) = context.stage.root_clip() {
++        walk(root, &mut list);
++        if let Some(obj) = root.object1() {
++            for (k, v) in obj.own_properties() {
++                if k.to_utf8_lossy() == "world" {
++                    if let AvmValue::Object(o) = v {
++                        world = props(o);
++                    }
++                }
++            }
++        }
++    }
++    json!({"clips":list,"world":world,"playerVersion":context.player_version})
++}
++pub(crate) fn record(context: &UpdateContext<'_>, kind: &str, data: Value) {
++    if !active() {
++        return;
++    }
++    let state = snapshot(context);
++    let mut t = TRACE.lock().unwrap();
++    t.seq += 1;
++    let row = json!({"seq":t.seq,"frame":t.frame,"kind":kind,"data":data,"state":state});
++    t.rows.push(row);
++}
++pub(crate) fn begin(context: &UpdateContext<'_>) {
++    if !active() {
++        return;
++    }
++    TRACE.lock().unwrap().frame += 1;
++    record(context, "frame-begin", Value::Null);
++}
++pub(crate) fn action(
++    context: &UpdateContext<'_>,
++    phase: &str,
++    d: DisplayObject<'_>,
++    start: usize,
++    end: usize,
++) {
++    if !active() {
++        return;
++    }
++    let shift = TRACE.lock().unwrap().shift;
++    record(
++        context,
++        phase,
++        json!({"clip":clip(d),"bufferStart":start,"originalStart":start+shift,"originalEnd":end+shift}),
++    );
++}
++pub(crate) fn instruction(
++    context: &UpdateContext<'_>,
++    d: DisplayObject<'_>,
++    start: usize,
++    position: usize,
++) {
++    if !active() || !DETAIL.load(Ordering::Relaxed) {
++        return;
++    }
++    let shift = TRACE.lock().unwrap().shift;
++    let absolute = position + shift;
++    if (0x8636..0x8c79).contains(&absolute)
++        || (0xa5b0..0xb02f).contains(&absolute)
++        || (0xb787..0xdef0).contains(&absolute)
++    {
++        record(
++            context,
++            "instruction-before",
++            json!({"cid":d.id(),"allocation":d.as_movie_clip().map(|c|c.m4_id()),"bufferStart":start,"bufferOffset":position,"originalOffset":absolute}),
++        );
++    }
++}
++pub(crate) fn field(
++    _context: &UpdateContext<'_>,
++    op: &str,
++    namespace: String,
++    name: &str,
++    value: AvmValue<'_>,
++) {
++    if !active() {
++        return;
++    }
++    if !(name.starts_with("paddle")
++        || name.starts_with("enemy")
++        || name.starts_with("ballPos")
++        || name.starts_with("ballDir")
++        || matches!(
++            name,
++            "pPosX" | "pPosY" | "pSpeedX" | "pSpeedY" | "ePosX" | "ePosY" | "eSpeedX" | "eSpeedY"
++        ))
++    {
++        return;
++    }
++    let mut t = TRACE.lock().unwrap();
++    t.seq += 1;
++    let seq = t.seq;
++    let key = format!("{namespace}:{name}");
++    let source = t.writes.get(&key).copied();
++    if op == "write" {
++        t.writes.insert(key, seq);
++    }
++    let row = json!({"seq":seq,"frame":t.frame,"kind":format!("field-{op}"),"data":{"namespace":namespace,"name":name,"value":scalar(value),"sourceWriteSeq":source},"state":null});
++    t.rows.push(row);
++}
++pub(crate) fn variable(
++    context: &UpdateContext<'_>,
++    op: &str,
++    d: DisplayObject<'_>,
++    name: &str,
++    value: AvmValue<'_>,
++) {
++    field(
++        context,
++        op,
++        format!(
++            "clip:{}:{}",
++            d.id(),
++            d.as_movie_clip().map(|c| c.m4_id()).unwrap_or(0)
++        ),
++        name,
++        value,
++    );
++}
++pub fn mark(player: &mut Player, label: &str) {
++    player.mutate_with_update_context(|c| record(c, "mark", json!({"label":label})));
++}
++// Fixture preparation is deliberately separate from every observational path.
++// All writes are raw stored fields or native display setters and are logged in full.
++pub fn inject(player: &mut Player, fixture: &Value) {
++    use crate::avm1::Attribute;
++    player.mutate_with_update_context(|c| {
++        record(c, "fixture-before", fixture.clone());
++        let root = c.stage.root_clip().unwrap();
++        let mut clips = Vec::new();
++        fn collect<'gc>(d: DisplayObject<'gc>, out: &mut Vec<DisplayObject<'gc>>) {
++            out.push(d);
++            if let Some(container) = d.as_container() {
++                for child in container.iter_render_list() {
++                    collect(child, out);
++                }
++            }
++        }
++        collect(root, &mut clips);
++        for write in fixture.as_array().unwrap() {
++            let cid = write["cid"].as_u64().unwrap() as u16;
++            let d = *clips
++                .iter()
++                .find(|d| d.id() == cid)
++                .expect("fixture clip absent");
++            let mut obj = d.object1().unwrap();
++            if write["world"].as_bool() == Some(true) {
++                obj = obj
++                    .own_properties()
++                    .into_iter()
++                    .find_map(|(k, v)| {
++                        if k.to_utf8_lossy() == "world" {
++                            if let AvmValue::Object(o) = v {
++                                return Some(o);
++                            }
++                        }
++                        None
++                    })
++                    .expect("world absent");
++            }
++            if let Some(target) = write["object"].as_str() {
++                obj = obj
++                    .own_properties()
++                    .into_iter()
++                    .find_map(|(k, v)| {
++                        if k.to_utf8_lossy() == target {
++                            if let AvmValue::Object(o) = v {
++                                return Some(o);
++                            }
++                        }
++                        None
++                    })
++                    .expect("fixture nested object absent");
++            }
++            if let Some(fields) = write["fields"].as_object() {
++                for (k, v) in fields {
++                    let value = if let Some(n) = v.as_f64() {
++                        AvmValue::Number(n)
++                    } else if v["special"] == "undefined" {
++                        AvmValue::Undefined
++                    } else {
++                        panic!("unsupported fixture value")
++                    };
++                    let name = crate::string::AvmString::new_utf8(c.gc(), k);
++                    obj.define_value(c.gc(), name, value, Attribute::empty());
++                }
++            }
++            if let Some(display) = write["display"].as_object() {
++                if let Some(x) = display.get("x") {
++                    d.set_x(swf::Twips::from_pixels(x.as_f64().unwrap()));
++                }
++                if let Some(y) = display.get("y") {
++                    d.set_y(swf::Twips::from_pixels(y.as_f64().unwrap()));
++                }
++                if let Some(w) = display.get("width") {
++                    d.set_width(c, w.as_f64().unwrap());
++                }
++                if let Some(h) = display.get("height") {
++                    d.set_height(c, h.as_f64().unwrap());
++                }
++            }
++        }
++        record(c, "fixture-after", fixture.clone());
++    });
++}
+diff --git a/core/examples/m4_capture.rs b/core/examples/m4_capture.rs
+new file mode 100644
+--- /dev/null
++++ b/core/examples/m4_capture.rs
+@@ -0,0 +1,71 @@
++use ruffle_core::{
++    LoadBehavior, PlayerBuilder,
++    events::{MouseButton, PlayerEvent},
++    m4,
++    tag_utils::movie_from_path,
++};
++use serde_json::{Value, json};
++fn main() {
++    let args: Vec<_> = std::env::args().collect();
++    assert_eq!(
++        args.len(),
++        4,
++        "m4_capture <unchanged.swf> <driver.json> <trace.jsonl>"
++    );
++    let raw = std::fs::read(&args[1]).unwrap();
++    let movie = movie_from_path(&args[1], None).unwrap();
++    assert!(
++        raw.ends_with(movie.data()),
++        "runtime buffer must be exact suffix of verified FWS"
++    );
++    let shift = raw.len() - movie.data().len();
++    m4::start(shift);
++    let player = PlayerBuilder::new()
++        .with_movie(movie)
++        .with_autoplay(true)
++        .with_load_behavior(LoadBehavior::Blocking)
++        .with_viewport_dimensions(350, 250, 1.0)
++        .build();
++    let mut player = player.lock().unwrap();
++    m4::mark(
++        &mut player,
++        &format!("buffer-calibration:{shift};headless-null-backends;normal-frame-driver"),
++    );
++    let steps: Value = serde_json::from_slice(&std::fs::read(&args[2]).unwrap()).unwrap();
++    for step in steps.as_array().unwrap() {
++        match step["op"].as_str().unwrap() {
++            "frames" => {
++                m4::detail(step["detail"].as_bool().unwrap_or(false));
++                for _ in 0..step["n"].as_u64().unwrap() {
++                    player.run_frame();
++                }
++            }
++            "mark" => m4::mark(&mut player, step["label"].as_str().unwrap()),
++            "inject" => m4::inject(&mut player, &step["writes"]),
++            "move" | "down" | "up" => {
++                let x = step["x"].as_f64().unwrap();
++                let y = step["y"].as_f64().unwrap();
++                m4::detail(step["detail"].as_bool().unwrap_or(false));
++                m4::mark(&mut player, &format!("host-arrival:{}:{x}:{y}", step["op"]));
++                let event = match step["op"].as_str().unwrap() {
++                    "move" => PlayerEvent::MouseMove { x, y },
++                    "down" => PlayerEvent::MouseDown {
++                        x,
++                        y,
++                        button: MouseButton::Left,
++                        index: None,
++                    },
++                    _ => PlayerEvent::MouseUp {
++                        x,
++                        y,
++                        button: MouseButton::Left,
++                    },
++                };
++                player.handle_event(event);
++                m4::mark(&mut player, "host-dispatch-returned");
++            }
++            _ => panic!("unsupported driver operation: {}", json!(step)),
++        }
++    }
++    m4::finish(&args[3]);
++}
