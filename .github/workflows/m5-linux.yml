@@ -2,7 +2,7 @@ name: M5 Linux qualification
 
 on:
   push:
-    branches: [main, m5-candidate]
+    branches: [main, m5-candidate, m5-fairness-full]
   pull_request:
   workflow_dispatch:
     inputs:
@@ -143,7 +143,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["C0","C1","C2","C3","C4a","C4b","C5a","C5b"]' || '["C3"]') }}
+        profile: ${{ fromJSON((github.event_name == 'workflow_dispatch' || github.ref_name == 'm5-fairness-full') && '["C0","C1","C2","C3","C4a","C4b","C5a","C5b"]' || '["C3"]') }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -155,7 +155,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: node tools/m5/build-qualification.mjs
       - name: Capture shaped profile
-        run: bash tools/m5/fairness-ci.sh "${{ matrix.profile }}" "${{ github.event.inputs.fairness_limit || '12' }}"
+        run: bash tools/m5/fairness-ci.sh "${{ matrix.profile }}" "${{ github.event.inputs.fairness_limit || (github.ref_name == 'm5-fairness-full' && '300') || '12' }}"
       - name: Summarize cell
         if: always()
         run: |
