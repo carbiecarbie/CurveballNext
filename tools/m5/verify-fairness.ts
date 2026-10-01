@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import { createHash } from 'node:crypto';
-import { cell, classify, independentBox, manifest, offsetInterval, realizedMarginOk, resolveAttempts, type Observation, type Profile } from './fairness';
+import { cell, classify, independentBox, manifest, offsetInterval, realizedMarginOk, type Observation, type Profile } from './fairness';
 
 const directory = resolve(process.argv[2] ?? '');
 if (!process.argv[2]) throw new Error('usage: verify-fairness RUN_DIRECTORY [INDEPENDENT_REVIEW_JSON]');
@@ -15,7 +15,7 @@ const authority = lines('authority.jsonl'), presentation = lines('presentation.j
 const equal = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 for (const captured of presentation) {
   const s = scheduled.find(s => s.id === captured.id); if (!s) { failures.push('Unscheduled observation'); continue; }
-  const entry: Observation = { id: s.id, classification: 'ambiguous', completed: false, imagesCorroborated: false, investigated: false, marginMs: s.marginMs, hz: s.hz, attempt: captured.attempt };
+  const entry: Observation = { id: s.id, classification: 'ambiguous', completed: false, imagesCorroborated: false, investigated: false, marginMs: s.marginMs, hz: s.hz };
   try {
     const ticks = authority.filter(r => r.id === s.id && r.attempt === captured.attempt && r.kind === 'tick');
     const contact = ticks.find(r => r.events.some((e: any) => ['return', 'miss', 'finish'].includes(e.type)));
@@ -50,8 +50,7 @@ for (const captured of presentation) {
     if (!input || !sent) throw new Error('Missing actual capture/wire-send record');
     // The declared stratum must be what the defender was shown: capture to the presented incoming frame, same clock.
     const realizedMarginMs = captured.incoming.renderedAt - input.at;
-    // Outside its stratum: instrumentation-invalid. Still classified, so a repeat can be checked for a changed outcome.
-    if (!realizedMarginOk(s.marginMs, realizedMarginMs)) entry.instrumentationInvalid = true;
+    if (!realizedMarginOk(s.marginMs, realizedMarginMs)) throw new Error(`Realized margin ${realizedMarginMs.toFixed(1)} ms belongs to another stratum than the declared ${s.marginMs} ms`);
     const trace = authority.filter(r => r.id === s.id && r.attempt === captured.attempt && r.seq === input.seq && r.generation === input.generation && r.side === s.defender);
     const receipt = trace.find(r => r.kind === 'received'), consumed = trace.find(r => r.kind === 'consumed'), used = trace.find(r => r.kind === 'first-use');
     timing.push({ id: s.id, realizedMarginMs, captureToContact: [contact.committed - (input.at + hi + uncertainty), contact.committed - (input.at + lo - uncertainty)],
@@ -64,9 +63,8 @@ for (const captured of presentation) {
   } catch (e) { failures.push(`${s.id}: ${e instanceof Error ? e.message : String(e)}`); }
   records.push(entry);
 }
-const resolved = resolveAttempts(records); failures.push(...resolved.errors);
-const cells = [0, 1].map(side => cell(resolved.observations.filter(r => r.id.startsWith(`${declared.profile}/${side}/`)), scheduled.filter(s => s.defender === side)));
-const report = { hash, profile: declared.profile, cells, failures, observations: resolved.observations, attempts: records, repeated: resolved.repeated, timing, tcpShapeVerified: review.tcpShapeVerified === true,
+const cells = [0, 1].map(side => cell(records.filter(r => r.id.startsWith(`${declared.profile}/${side}/`)), scheduled.filter(s => s.defender === side)));
+const report = { hash, profile: declared.profile, cells, failures, observations: records, timing, tcpShapeVerified: review.tcpShapeVerified === true,
   stimulusApproved: review.stimulusApproved === true, physicalApproved: review.physicalApproved === true,
   completeGate: cells.every(c => c.numericalGate) && !failures.length && review.tcpShapeVerified === true && review.stimulusApproved === true && review.physicalApproved === true };
 writeFileSync(resolve(directory, 'independent-assessment.json'), JSON.stringify(report, null, 2));

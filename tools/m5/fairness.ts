@@ -59,29 +59,7 @@ export function realizedMarginOk(declaredMs: number, realizedMs: number) {
 export function offsetInterval(c0: number, s1: number, s2: number, c3: number): [number, number] {
   const interval: [number, number] = [s2 - c3, s1 - c0]; if (interval[0] > interval[1]) throw new Error('Inconsistent clock evidence'); return interval;
 }
-export interface Observation { id: string; classification: ReturnType<typeof classify> | 'ambiguous'; completed: boolean; imagesCorroborated: boolean; investigated: boolean; marginMs: number; hz: number;
-  attempt?: number; instrumentationInvalid?: boolean }
-/**
- * Plan §9: an instrumentation-invalid attempt (shown margin outside its declared stratum) may be repeated with the same seed;
- * every attempt is retained. The last attempt decides only when every earlier one was instrumentation-invalid; a rejection is
- * never replaced (it stays counted), and a repeat that changes the outcome blocks the observation for investigation.
- */
-export function resolveAttempts(attempts: Observation[]) {
-  const errors: string[] = [], repeated: { id: string; attempts: number }[] = [], observations: Observation[] = [];
-  const byId = new Map<string, Observation[]>();
-  for (const a of attempts) byId.set(a.id, [...byId.get(a.id) ?? [], a]);
-  for (const [id, list] of byId) {
-    const last = list.at(-1)!, earlier = list.slice(0, -1), blocked = (why: string) => { errors.push(`${id}: ${why}`); observations.push({ ...last, classification: 'ambiguous' }); };
-    if (list.length > 1) repeated.push({ id, attempts: list.length });
-    if (earlier.some(a => !a.instrumentationInvalid)) { blocked('repeated without an instrumentation fault'); continue; }
-    const rejected = earlier.find(a => a.classification === 'apparent-contact-rejected');
-    if (rejected) { observations.push({ ...rejected, instrumentationInvalid: false }); continue; }
-    if (earlier.some(a => a.completed && last.completed && a.classification !== 'ambiguous' && a.classification !== last.classification)) { blocked('a repeat changed the outcome; investigate'); continue; }
-    if (last.instrumentationInvalid) { blocked('shown margin outside its declared stratum in every attempt'); continue; }
-    observations.push(last);
-  }
-  return { observations, errors, repeated };
-}
+export interface Observation { id: string; classification: ReturnType<typeof classify> | 'ambiguous'; completed: boolean; imagesCorroborated: boolean; investigated: boolean; marginMs: number; hz: number }
 export function cell(observations: Observation[], scheduled: Stimulus[]) {
   const seen = new Set<string>(), errors: string[] = [], strata: Record<string, { n: number; rejected: number; noncontact: number }> = {};
   let n = 0, rejected = 0, apparent = 0, noncontact = 0, falseAccepted = 0, borderline = 0, ambiguous = 0;
