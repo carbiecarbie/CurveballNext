@@ -45,7 +45,7 @@ jobs:
           { uname -a; nproc; node --version; cat /proc/cpuinfo | grep 'model name' | head -1; } | tee captures-local/m5-local/environment.txt
       - name: Run capacity measurement
         run: node dist-server/qualify-local.mjs "${{ github.event.inputs.capacity_seconds || '60' }}"
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: m5-linux-capacity
@@ -108,16 +108,20 @@ jobs:
           base=$(measure)
           # Downstream C3-like profile on client receiver: 40 ms base, 10 ms uniform jitter, 1% loss.
           echo "::notice::median connect unshaped=${base}s"
-          if ! sudo ip netns exec cbm5a bash tools/m5/ingress-netem.sh va cbm5a 10.55.0.1 downstream 8787 40 10 1 1234 10 > tc-after-setup.txt 2>&1; then
+          # Runner iproute2 6.1 lacks netem "seed"; use a newer iproute2 from a
+          # privileged container against the same host network namespaces.
+          if ! docker run --rm --privileged --network host -v /var/run/netns:/var/run/netns -v "$PWD:/w" -w /w debian:trixie bash -c \
+              'apt-get update -qq >/dev/null && apt-get install -y -qq iproute2 >/dev/null && tc -V && ip netns exec cbm5a bash tools/m5/ingress-netem.sh va cbm5a 10.55.0.1 downstream 8787 40 10 1 1234 10' > tc-after-setup.txt 2>&1; then
             echo "::error::ingress-netem.sh failed: $(tail -3 tc-after-setup.txt | tr '\n' ' ')"
             exit 1
           fi
+          echo "::notice::shaper $(grep -m1 "tc utility" tc-after-setup.txt)"
           shaped=$(measure)
           sudo ip netns exec cbm5a tc -s qdisc show dev cbm5a | tee tc-after-traffic.txt
           echo "median connect unshaped=${base}s shaped=${shaped}s" | tee shaper-result.txt
           echo "::notice::median connect unshaped=${base}s shaped=${shaped}s (expected 0.030..0.100)"
           awk -v s="$shaped" 'BEGIN { exit !(s >= 0.030 && s <= 0.100) }'
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: m5-netem-shaper
