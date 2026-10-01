@@ -1,5 +1,5 @@
-# Review template. Replace app/origin only after separate publication authorization.
-app = "REPLACE_ME"
+# M5 authority on Fly. Origins: production Pages site and the m5-candidate preview branch alias.
+app = "curveballnext"
 primary_region = "gru"
 kill_signal = "SIGTERM"
 kill_timeout = "5s"
@@ -11,7 +11,7 @@ kill_timeout = "5s"
   NODE_ENV = "production"
   HOST = "0.0.0.0"
   PORT = "8787"
-  ALLOWED_ORIGINS = "https://FRONTEND.example.invalid"
+  ALLOWED_ORIGINS = "https://curveballnext.pages.dev,https://m5-candidate.curveballnext.pages.dev"
   TRUST_FLY_PROXY = "1"
 
 [http_service]
