@@ -5,6 +5,9 @@ import { OnlineView } from '../src/multiplayer/view';
 import { boxes, createOnline, startMatch, step } from '../src/multiplayer/simulation';
 import { validState } from '../src/multiplayer/protocol';
 import type { OnlineEvent, OnlineState } from '../src/multiplayer/types';
+import { RULES } from '../src/multiplayer/rules';
+// A client that never claims lets an uncommitted miss resolve only after the grace window (plan §5 amendment).
+const unclaimedMiss = RULES.contactGraceMs + 80;
 
 function connected() {
   let time = 0; const authority = new Authority(() => time, () => 0);
@@ -46,7 +49,7 @@ describe('M5 connected runtime processing and input handshakes', () => {
     expect(r.state.localPaddles[0].x).toBe(175.5);
     c.pointer(55, 45); h.advance(40);
     expect(r.state.localPaddles[0].x).toBe(95.16666666666667); expect(c.seq).toBe(1);
-    Object.assign(r.state.ball, { u: -120, z: 0, vz: -2 }); r.state.viewBoxes = boxes(r.state); h.advance(40);
+    Object.assign(r.state.ball, { u: -120, z: 0, vz: -2 }); r.state.viewBoxes = boxes(r.state); h.advance(unclaimedMiss);
     expect(c.state!.phase).toBe('LifeLostHold'); expect(r.state.lives).toEqual([2, 3]);
     const holdX = r.state.localPaddles[0].x;
     for (let i = 0; i < 30; i++) { c.pointer(296, 206); h.advance(10); expect(r.state.localPaddles[0].x).toBe(holdX); }
@@ -105,7 +108,7 @@ describe('M5 connected runtime processing and input handshakes', () => {
   it('final delivery distinguishes known from undelivered and retains knowledge through closure', () => {
     const h = connected(); h.a.client.command('ready', true); h.b.client.command('ready', true); h.flush();
     const r = h.a.session.room!; r.state.phase = 'Rally'; r.state.lives[0] = 1; Object.assign(r.state.ball, { u: -120, z: 0, vz: -2 }); r.state.viewBoxes = boxes(r.state);
-    h.b.dropDown = true; h.advance(40); expect(h.a.client.known?.winner).toBe(1); expect(h.b.client.known).toBeNull();
+    h.b.dropDown = true; h.advance(unclaimedMiss); expect(h.a.client.known?.winner).toBe(1); expect(h.b.client.known).toBeNull();
     h.authority.shutdown(); h.flush(); h.a.client.transportClosed(); h.b.client.transportClosed();
     expect(h.a.client.status).toBe('Final result received'); expect(h.a.client.known?.winner).toBe(1); expect(h.b.client.status).toContain('unknown');
   });
@@ -113,7 +116,7 @@ describe('M5 connected runtime processing and input handshakes', () => {
     const h = connected(), c = h.a.client, v = new OnlineView(0, h.now);
     c.onState = (s, e, at) => v.accept(s, at!, e); c.onInput = (x, y, seq) => v.input(x, y, seq); c.onFence = () => v.fence();
     c.command('ready', true); h.b.client.command('ready', true); h.flush(); h.advance(3010);
-    const r = h.a.session.room!; r.state.lives[0] = 1; Object.assign(r.state.ball, { u: -120, z: 0, vz: -2 }); r.state.viewBoxes = boxes(r.state); h.advance(40);
+    const r = h.a.session.room!; r.state.lives[0] = 1; Object.assign(r.state.ball, { u: -120, z: 0, vz: -2 }); r.state.viewBoxes = boxes(r.state); h.advance(unclaimedMiss);
     expect(c.known?.winner).toBe(1); const result = structuredClone(c.known), seq = c.seq;
     for (let i = 0; i < 20; i++) { c.pointer(55, 45); h.advance(10); expect(v.draw(h.now(), 0, c.enabled)!.own.left).toBe(145.5); }
     expect(c.seq).toBe(seq); expect(v.history).toHaveLength(0); c.leave(); h.flush();
@@ -179,9 +182,9 @@ describe('M5 incoming discontinuity evidence and terminal validation', () => {
       py: 53.94444444444444, tx: 68.38888888888889, ty: 53.94444444444444 });
     h.setTime(67); const preceding = v.draw(67, 0, true)!;
     expect(preceding.own).toEqual({ left: 38.35, right: 98.35, top: 33.9, bottom: 73.9 });
-    h.setTime(100); h.flush();
+    h.setTime(100); h.flush(); if (outcome !== 'return') h.advance(RULES.contactGraceMs + 40);
     expect(h.a.client.closed).toBe(false); expect(h.a.client.events.map(e => e.type)).toEqual(['wall-top', 'wall-left', outcome]);
-    h.setTime(180); const incoming = v.draw(180, 0, true)!;
+    const at = h.now() + 80; h.setTime(at); const incoming = v.draw(at, 0, true)!;
     expect(incoming.own).toEqual(preceding.own); expect(incoming.ball).toEqual({ left: 25, right: 55, top: 25, bottom: 55 });
     expect(incoming.incomingEventId).toBe(3); expect(v.frames).toContainEqual(preceding);
     if (outcome === 'finish') expect(h.a.client.known).toMatchObject({ winner: 1, lives: [0, 3] });

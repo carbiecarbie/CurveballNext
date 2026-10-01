@@ -17,3 +17,6 @@ export interface OnlineEvent {
   lives: [number, number]; result: Result | null;
 }
 export const ticking = (phase: Phase) => phase === 'Countdown' || phase === 'Rally' || phase === 'LifeLostHold';
+/** Authority asks the defender what its incoming frame showed before committing a miss (plan §5 amendment). */
+export interface ContactPending { matchId: number; rallyId: number; tick: number; side: Side; incomingViewBoxes: [ViewBoxes, ViewBoxes] }
+export interface ContactClaim { matchId: number; rallyId: number; tick: number; hit: boolean; x: number; y: number; dx: number; dy: number }

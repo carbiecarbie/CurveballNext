@@ -29,7 +29,7 @@ const observer = createServer(async (req, res) => {
     if (req.url === '/fixture') {
       const room = [...app.authority.rooms.values()][0]; if (!room || room.slots.some(p => !p)) throw new Error('bind both clients first');
       current = stimulus.id; attempt++;
-      startMatch(room.state, stimulus.initialServingSide); room.state.phase = 'Rally'; room.state.ball = { ...stimulus.ball }; room.state.viewBoxes = boxes(room.state);
+      startMatch(room.state, stimulus.initialServingSide); room.wait = null; room.state.phase = 'Rally'; room.state.ball = { ...stimulus.ball }; room.state.viewBoxes = boxes(room.state);
       room.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: room.state.tick, firstUsed: false }));
       room.slots.forEach(p => { if (p) { p.pending = null; p.seq = 0; p.tickAt = performance.now(); p.healthTick = room.state.tick; app.authority.snapshot(p); } });
       const contactNominal = app.authority.nextBoundary + 37 * 1000 / 30;

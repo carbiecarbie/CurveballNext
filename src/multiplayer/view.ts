@@ -1,5 +1,5 @@
-import { move, ownBox, target } from './simulation';
-import { ticking, type Bounds, type OnlineEvent, type OnlineState, type Paddle, type Side } from './types';
+import { contact, move, ownBox, target } from './simulation';
+import { ticking, type Bounds, type ContactClaim, type ContactPending, type OnlineEvent, type OnlineState, type Paddle, type Side } from './types';
 export interface Rect { left: number; right: number; top: number; bottom: number }
 export interface DrawModel { ball: Rect; own: Rect; remote: Rect; z: number; tick: number; missed: boolean; incomingEventId: number | null; sourceTicks: [number, number]; renderedAt: number; snapshotAge: number; frozen: boolean; degraded: boolean; overlayAllowed: boolean;
   bufferMs: number; estimatedServerNow: number; sourceServerTimes: [number, number]; interpolationUnderflow: boolean; predictedLocal: Paddle | null }
@@ -15,7 +15,12 @@ export class OnlineView {
   private stoppedTransactions = new Map<string, { tail: number; own: Rect; prediction: Paddle | null }>();
   onBoundary: (e: OnlineEvent, preceding: DrawModel | null, incoming: DrawModel) => void = () => {};
   onAudio: (e: OnlineEvent) => void = () => {};
+  onClaim: (c: ContactClaim) => void = () => {};
+  private contactWait: (ContactPending & { time: number; done: boolean }) | null = null;
+  private claims = new Map<string, { own: Rect; prediction: Paddle | null }>();
   constructor(public side: Side, private now: () => number) {}
+  /** The authority paused an uncommitted miss; claim from the frame where this transaction is presented. */
+  pendingContact(p: ContactPending, serverTime: number) { if (p.side === this.side) this.contactWait = { ...p, time: serverTime, done: false }; }
   input(x: number, y: number, seq: number, capturedAt = this.now()) {
     if (!this.predicted || this.samples.at(-1)?.state.phase !== 'Rally') return;
     target(this.predicted, x, y);
@@ -25,7 +30,7 @@ export class OnlineView {
     this.history = this.history.filter(h => h.at >= this.now() - 2000); if (this.history.length > 60) this.history.shift();
   }
   private stopPrediction() { this.history = []; this.predicted = null; this.previous = null; this.correction = null; }
-  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; }
+  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; this.contactWait = null; }
   private rebase(s: OnlineState) {
     if (s.phase !== 'Rally') { this.stopPrediction(); return; }
     const from = this.predicted ? rect(ownBox(this.predicted)) : null;
@@ -111,6 +116,18 @@ export class OnlineView {
       bufferMs: delay, estimatedServerNow: serverNow, sourceServerTimes: [older.time, newer.time], interpolationUnderflow: time > latest.time,
       predictedLocal: this.predicted ? structuredClone(this.predicted) : this.heldIncomingPrediction ? structuredClone(this.heldIncomingPrediction) : null,
       overlayAllowed: !this.events.some(e => e.event.eventId > this.drawnEvent && e.event.type === 'finish') };
+    const w = this.contactWait;
+    if (w && !w.done && time >= w.time && !model.frozen) {
+      w.done = true;
+      if (this.predicted && rally && latest.state.matchId === w.matchId && latest.state.rallyId === w.rallyId) {
+        // The claim frame: exact predicted pose (no blend) against the incoming C−1 ball, so the claim is what was shown.
+        const box = ownBox(this.predicted), prediction = structuredClone(this.predicted), v = w.incomingViewBoxes[this.side];
+        own = rect(box);
+        model = { ...model, ball: rect(v.ball), own, remote: rect(v.remote), tick: w.tick - 1, sourceTicks: [w.tick - 1, w.tick - 1], predictedLocal: prediction };
+        this.claims.set(`${w.matchId}/${w.rallyId}/${w.tick}`, { own, prediction }); if (this.claims.size > 8) this.claims.delete(this.claims.keys().next().value!);
+        this.onClaim({ matchId: w.matchId, rallyId: w.rallyId, tick: w.tick, hit: contact(v.ball, box), x: prediction.x, y: prediction.y, dx: prediction.dx, dy: prediction.dy });
+      }
+    }
     const dueEvents = this.events.filter(e => e.time <= time && e.event.eventId > this.drawnEvent);
     for (const e of dueEvents) {
       if (['return', 'miss', 'finish'].includes(e.event.type)) break;
@@ -121,8 +138,10 @@ export class OnlineView {
     if (boundary) {
       const e = boundary.event;
       if (['return', 'miss', 'finish'].includes(e.type) && !boundary.sampled && !model.frozen) {
-        const stopped = this.stoppedTransactions.get(`${e.matchId}/${e.rallyId}/${e.tick}`);
-        if (stopped && !closed) { own = { ...stopped.own }; model.predictedLocal = stopped.prediction ? structuredClone(stopped.prediction) : null; }
+        const key = `${e.matchId}/${e.rallyId}/${e.tick}`, stopped = this.stoppedTransactions.get(key), claimed = this.claims.get(key);
+        // A claimed transaction presents the pose that was claimed; otherwise the actual preceding draw.
+        if (claimed && !closed) { own = { ...claimed.own }; model.predictedLocal = claimed.prediction ? structuredClone(claimed.prediction) : null; this.claims.delete(key); }
+        else if (stopped && !closed) { own = { ...stopped.own }; model.predictedLocal = stopped.prediction ? structuredClone(stopped.prediction) : null; }
         boundary.sampled = true; boundary.incomingOwn = own;
         model = { ...model, ball: rect(e.incomingViewBoxes[this.side].ball), own, remote: rect(e.incomingViewBoxes[this.side].remote),
           tick: e.incomingBoxTick, incomingEventId: e.eventId, sourceTicks: [e.incomingBoxTick, e.incomingBoxTick], overlayAllowed: false };

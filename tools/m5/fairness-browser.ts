@@ -21,6 +21,7 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       sessions.push(client);
       ws.onmessage = e => client.receive(String(e.data)); ws.onclose = () => client.transportClosed();
       client.onState = (s, e, at) => view.accept(s, at!, e); client.onInput = (x, y, seq) => view.input(x, y, seq); client.onFence = () => view.fence();
+      client.onPending = (p, at) => view.pendingContact(p, at); view.onClaim = c => client.claim(c);
       timers.push(setInterval(() => client.pump(), 10)); const until = performance.now() + 5000;
       while (!client.epoch && performance.now() < until) await wait(10); if (!client.epoch) throw new Error(client.status);
       return { client, view, canvas: document.querySelector<HTMLCanvasElement>(side ? '#b' : '#a')! };

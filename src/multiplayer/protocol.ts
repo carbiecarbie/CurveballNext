@@ -1,5 +1,5 @@
 import { RULES } from './rules';
-import type { OnlineState, Phase } from './types';
+import type { OnlineState, Phase, ViewBoxes } from './types';
 
 export type Frame = Record<string, unknown> & { type: string; protocolVersion: number };
 type Validator = (v: unknown) => boolean;
@@ -16,6 +16,7 @@ const fields: Record<string, Record<string, Validator>> = {
   controlFence: { generation: integer, requestId: string }, controlSync: { generation: integer, requestId: string },
   controlResume: { generation: integer, stateSerial: integer, matchId: integer, rallyId: integer, requestId: string },
   input: { matchId: integer, rallyId: integer, controlGeneration: integer, resumeStateSerial: integer, seq: integer, x: finite, y: finite, processedSnapshotSerial: integer },
+  contactClaim: { matchId: integer, rallyId: integer, tick: integer, controlGeneration: integer, hit: bool, x: finite, y: finite, dx: finite, dy: finite },
   heartbeat: { runtimeBeatSeq: integer, processedServerSerial: integer, processedSnapshotSerial: integer, processedTick: integer,
     matchId: integer, rallyId: integer, phase, echoNonce: string, probeId: integer, c0: finite, c3: finite },
 };
@@ -82,6 +83,10 @@ export function validServer(v: unknown): v is Frame & { serverSerial: number; se
   }
   if (f.type === 'controlAck') return exact(f, [...common, 'requestId', 'kind', 'generation', 'enabled', 'stateSerial', 'freshSnapshot']) &&
     string(f.requestId) && ['fence', 'sync', 'resume', 'resync'].includes(f.kind as string) && integer(f.generation) && integer(f.stateSerial) && bool(f.enabled) && validState(f.freshSnapshot);
+  if (f.type === 'contactPending') return exact(f, [...common, 'matchId', 'rallyId', 'tick', 'side', 'incomingViewBoxes']) &&
+    [f.matchId, f.rallyId, f.tick].every(integer) && (f.side === 0 || f.side === 1) && Array.isArray(f.incomingViewBoxes) && f.incomingViewBoxes.length === 2 &&
+    f.incomingViewBoxes.every((v: ViewBoxes) => v && exact(v, ['ball', 'own', 'remote']) && [v.ball, v.own, v.remote].every(b =>
+      Array.isArray(b) && b.length === 4 && b.every(n => Number.isSafeInteger(n)) && b[0] <= b[1] && b[2] <= b[3]));
   if (f.type === 'error') return exact(f, [...common, 'requestId', 'code']) && typeof f.requestId === 'string' && string(f.code);
   if (f.type === 'interrupted') return exact(f, [...common, 'reason', 'freshSnapshot']) && string(f.reason) && validState(f.freshSnapshot);
   if (f.type === 'event') {

@@ -51,6 +51,7 @@ export function mountOnline(root: HTMLElement, back: () => void) {
         created.focused = focused;
         created.onState = (s, event, time) => { createdView.side = created.side; createdView.accept(s, time ?? performance.now() + created.offset, event); };
         created.onInput = (x, y, seq, at) => createdView.input(x, y, seq, at); created.onFence = () => createdView.fence();
+        created.onPending = (p, time) => createdView.pendingContact(p, time); createdView.onClaim = c => created.claim(c);
         createdView.onAudio = e => sound.play([{ type: e.type === 'launch' ? 'serve' : e.type === 'finish' ? 'game-over' : e.type, ...(e.side !== null ? { side: e.side === created.side ? 'player' as const : 'enemy' as const } : {}) }]);
         void sound.unlock();
       };

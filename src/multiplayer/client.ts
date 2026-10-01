@@ -1,6 +1,6 @@
 import { validServer, validState, type Frame } from './protocol';
 import { LIMITS } from './rules';
-import { ticking, type OnlineEvent, type OnlineState, type Result, type Side } from './types';
+import { ticking, type ContactClaim, type ContactPending, type OnlineEvent, type OnlineState, type Result, type Side } from './types';
 
 export interface ClientSocket { bufferedAmount: number; readyState: number; send(raw: string): void; close(): void }
 export interface Probe { lo: number; hi: number; at: number; rtt: number; c0: number; s1: number; s2: number; c3: number }
@@ -15,6 +15,7 @@ export class OnlineClient {
   onState: (s: OnlineState, event?: OnlineEvent, serverTime?: number) => void = () => {};
   onInput: (x: number, y: number, seq: number, capturedAt: number) => void = () => {};
   onFence: () => void = () => {};
+  onPending: (pending: ContactPending, serverTime: number) => void = () => {};
   private deadline: number; private lastBeat = -Infinity; private lastSend = -Infinity;
   private target: { x: number; y: number } | null = null; private nonce = ''; private request = 0;
   private syncRequest = ''; private resumeRequest = ''; private syncSerial = 0; private context = ''; private pendingProbe = new Map<number, number>();
@@ -123,6 +124,12 @@ export class OnlineClient {
       if (Array.isArray(f.ready)) this.ready = f.ready as boolean[];
       if (Array.isArray(f.rematch)) this.rematch = f.rematch as boolean[];
     } else if (f.type === 'heartbeat') { if (typeof f.nonce !== 'string') return; this.nonce = f.nonce; this.probe(f); }
+    else if (f.type === 'contactPending') {
+      if (f.side === this.side && this.state && this.state.matchId === f.matchId && this.state.rallyId === f.rallyId) {
+        this.record({ kind: 'contact-pending', matchId: f.matchId, rallyId: f.rallyId, tick: f.tick });
+        this.onPending({ matchId: f.matchId as number, rallyId: f.rallyId as number, tick: f.tick as number, side: f.side as Side, incomingViewBoxes: f.incomingViewBoxes as ContactPending['incomingViewBoxes'] }, f.serverTime);
+      }
+    }
     else if (f.type === 'controlAck') {
       if (f.generation !== this.generation || !this.focused || !this.apply(f.freshSnapshot, undefined, false, f.serverTime as number)) return;
       if ((f.kind === 'sync' && f.requestId === this.syncRequest || f.kind === 'resync' && f.requestId === this.resumeRequest) && this.state!.phase !== 'MatchEnded') {
@@ -168,6 +175,17 @@ export class OnlineClient {
       this.send('input', { ...t, seq: ++this.seq, matchId: this.state.matchId, rallyId: this.state.rallyId, controlGeneration: this.generation,
         resumeStateSerial: this.authorized, processedSnapshotSerial: this.snapshotSerial });
     }
+  }
+  /** Report what the incoming frame showed. Any unsent target goes first so the authority can bound the claimed pose. */
+  claim(c: ContactClaim) {
+    if (!this.enabled || this.closed || this.closing || !this.state || this.state.matchId !== c.matchId || this.state.rallyId !== c.rallyId) return;
+    if (this.inputEligible() && this.target) {
+      this.lastSend = this.now(); const t = this.target; this.target = null;
+      this.send('input', { ...t, seq: ++this.seq, matchId: this.state.matchId, rallyId: this.state.rallyId, controlGeneration: this.generation,
+        resumeStateSerial: this.authorized, processedSnapshotSerial: this.snapshotSerial });
+    }
+    this.send('contactClaim', { ...c, controlGeneration: this.generation });
+    this.record({ kind: 'sent-claim', ...c, generation: this.generation });
   }
   private inputEligible() {
     return this.enabled && this.focused && !this.closed && !this.closing && this.state?.phase === 'Rally' &&

@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { parseClient, sameContext, type Frame, type HealthState } from '../src/multiplayer/protocol';
 import { LIMITS, RULES } from '../src/multiplayer/rules';
-import { createOnline, startMatch, step, target } from '../src/multiplayer/simulation';
+import { boxes, createOnline, paddle, startMatch, step, target } from '../src/multiplayer/simulation';
 import { ticking, type OnlineState, type Side } from '../src/multiplayer/types';
 
 export interface Transport { bufferedAmount: number; send(raw: string): void; close(code: number, reason: string): void; terminate(): void }
@@ -18,11 +18,15 @@ export interface Session {
   responses: Map<string, string>; events: string[]; latest: string | null; congested: number | null; abuse: number | null;
   inputs: Bucket; commands: Bucket; lastExcess: number; healthAt: number; tickAt: number; healthSerial: number; healthTick: number; beatSeq: number;
   nonces: Map<string, number>; heartbeatAt: number; probe: { probeId: number; c0: number; s1: number } | null;
+  /** Recently received targets (read space) bounding which claimed poses are reachable. */
+  targets: { x: number; y: number; at: number }[];
 }
 export interface Room {
   code: string; epoch: string; created: number; endedAt: number | null; state: OnlineState;
   slots: [Session | null, Session | null]; ready: [boolean, boolean]; rematch: [boolean, boolean]; diagnostics: unknown[];
   sources: { seq: number; generation: number; publishedTick: number; firstUsed: boolean }[];
+  /** Paused uncommitted miss awaiting the defender's contact claim (plan §5 amendment). */
+  wait: { side: Side; tick: number; deadline: number; generation: number; claim: Frame | null } | null;
 }
 const codeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function normalizeCode(v: string) { return v.toUpperCase().replaceAll('-', ''); }
@@ -44,7 +48,7 @@ export class Authority {
     const s: Session = { id: randomBytes(16).toString('hex'), transport, opened: t, room: null, side: 0, credential: '', closing: null,
       serial: 0, lastSent: '', lastSnapshotSerial: 0, generation: 0, enabled: true, authorized: 0, seq: 0, pending: null, queue: [], issued: new Map(), sync: new Map(), responses: new Map(),
       events: [], latest: null, congested: null, abuse: null, inputs: new Bucket(30, 60, t), commands: new Bucket(5, 10, t),
-      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null };
+      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [] };
     this.sessions.add(s); return s;
   }
   receive(s: Session, raw: string) {
@@ -130,7 +134,7 @@ export class Authority {
         if (this.rooms.size >= 10) { this.error(s, f, 'capacity'); this.closeSocket(s, 'capacity'); return; }
         let code: string;
         do { code = [...randomBytes(12)].map(n => codeAlphabet[n & 31]).join(''); } while (this.rooms.has(code));
-        room = { code, epoch: randomBytes(16).toString('hex'), created: now, endedAt: null, state: createOnline(), slots: [null, null], ready: [false, false], rematch: [false, false], diagnostics: [], sources: [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: 0, firstUsed: false })) };
+        room = { code, epoch: randomBytes(16).toString('hex'), created: now, endedAt: null, state: createOnline(), slots: [null, null], ready: [false, false], rematch: [false, false], diagnostics: [], sources: [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: 0, firstUsed: false })), wait: null };
         this.rooms.set(code, room);
       } else {
         const code = normalizeCode(f.roomCode as string);
@@ -164,7 +168,17 @@ export class Authority {
         if (r.diagnostics.length > 600) r.diagnostics.shift();
       }
       s.seq = f.seq as number; s.pending = f;
+      const read = paddle(); target(read, f.x as number, f.y as number);
+      s.targets = s.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs); s.targets.push({ x: read.tx, y: read.ty, at: now }); if (s.targets.length > 64) s.targets.shift();
       const record = { kind: 'received', matchId: state.matchId, rallyId: state.rallyId, seq: s.seq, generation: s.generation, side: s.side, received, validated: now, assignedTick: state.tick + 1 };
+      r.diagnostics.push(record); this.onDiagnostic?.(record);
+      if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
+    }
+    if (f.type === 'contactClaim') {
+      const w = r.wait;
+      if (!w || w.claim || w.side !== s.side || f.tick !== w.tick || f.controlGeneration !== s.generation || f.controlGeneration !== w.generation || !s.enabled || !sameContext(state, f)) return;
+      w.claim = f;
+      const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick: w.tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
       if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
     }
@@ -207,7 +221,7 @@ export class Authority {
     r.slots.forEach(p => { if (p) this.snapshot(p); }); this.cache(s, f.requestId);
   }
   private begin(r: Room, side: Side) {
-    startMatch(r.state, side); r.endedAt = null; r.rematch = [false, false];
+    startMatch(r.state, side); r.endedAt = null; r.rematch = [false, false]; r.wait = null;
     r.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: r.state.tick, firstUsed: false }));
     r.slots.forEach(p => { if (p) { p.pending = null; p.seq = 0; p.tickAt = this.now(); p.healthTick = r.state.tick; p.sync.clear(); } });
   }
@@ -236,6 +250,36 @@ export class Authority {
     }
     this.closeSocket(s, reason);
   }
+  /** A Rally tick that would commit a miss/finish for an enabled defender pauses for that defender's claim instead. */
+  private beginWait(r: Room, now: number) {
+    if (r.state.phase !== 'Rally') return false;
+    const trial = structuredClone(r.state), end = step(trial).find(e => e.type === 'miss' || e.type === 'finish');
+    if (!end || end.side === null) return false;
+    const p = r.slots[end.side];
+    if (!p?.enabled || p.closing !== null) return false;
+    r.wait = { side: end.side, tick: r.state.tick + 1, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null };
+    this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait.tick, side: end.side, incomingViewBoxes: r.state.viewBoxes });
+    const record = { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side: end.side, tick: r.wait.tick, at: now };
+    r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift();
+    return true;
+  }
+  /** Install a reachable claimed hit pose; the ordinary deterministic step then decides contact. Anything else keeps the miss. */
+  private resolveWait(r: Room, now: number) {
+    const w = r.wait!, f = w.claim, p = r.slots[w.side], actor = r.state.localPaddles[w.side]; r.wait = null;
+    let accepted = false;
+    if (f && f.hit === true && p?.enabled && p.generation === w.generation && sameContext(r.state, f) && f.tick === r.state.tick + 1) {
+      const recent = p.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs);
+      const xs = [actor.x, actor.tx, ...recent.map(t => t.x)].map(x => Math.max(55, Math.min(296, x)));
+      const ys = [actor.y, actor.ty, ...recent.map(t => t.y)].map(y => Math.max(45, Math.min(206, y)));
+      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+      const x = f.x as number, y = f.y as number, dx = f.dx as number, dy = f.dy as number;
+      if (x >= x0 && x <= x1 && y >= y0 && y <= y1 && Math.abs(dx) <= (x1 - x0) / RULES.easing && Math.abs(dy) <= (y1 - y0) / RULES.easing) {
+        actor.x = actor.px = x; actor.y = actor.py = y; actor.dx = dx; actor.dy = dy; r.state.viewBoxes = boxes(r.state); accepted = true;
+      }
+    }
+    const record = { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted, timedOut: !f && now >= w.deadline, at: now };
+    r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift();
+  }
   /** Call at <=100 ms, before physics. Network callbacks only enqueue commands. */
   pump() {
     const now = this.now();
@@ -261,8 +305,19 @@ export class Authority {
       if (due > 0) this.healthy = true;
       for (let i = 0; i < due; i++) {
         for (const r of this.rooms.values()) if (ticking(r.state.phase)) {
-          const before = this.onDiagnostic ? structuredClone(r.state) : null;
-          const priorSources = this.onDiagnostic ? structuredClone(r.sources) : null;
+          let before: OnlineState | null, priorSources: Room['sources'] | null;
+          if (r.wait) {
+            // Paused before an uncommitted miss: no tick, no input consumption; unchanged snapshots keep both runtimes live.
+            const w = r.wait, defender = r.slots[w.side];
+            if (!w.claim && now < w.deadline && defender?.enabled && defender.closing === null && defender.generation === w.generation) {
+              r.slots.forEach(p => { if (p) this.snapshot(p); }); continue;
+            }
+            this.resolveWait(r, now);
+            before = this.onDiagnostic ? structuredClone(r.state) : null;
+            priorSources = this.onDiagnostic ? structuredClone(r.sources) : null;
+          } else {
+          before = this.onDiagnostic ? structuredClone(r.state) : null;
+          priorSources = this.onDiagnostic ? structuredClone(r.sources) : null;
           const ballRuns = r.state.phase === 'Rally' || r.state.phase === 'Countdown' && r.state.tick + 1 >= r.state.phaseDeadline;
           if (ballRuns) r.sources.forEach((source, side) => {
             if (source.seq > 0 && !source.firstUsed) {
@@ -278,6 +333,8 @@ export class Authority {
             const actor = r.state.localPaddles[p.side]; target(actor, f.x as number, f.y as number); actor.seq = f.seq as number; actor.generation = p.generation; actor.appliedTick = r.state.tick + 1;
             this.onDiagnostic?.({ kind: 'consumed', matchId: r.state.matchId, rallyId: r.state.rallyId, seq: actor.seq, generation: p.generation, side: p.side, tick: actor.appliedTick, consumed: this.now() });
           });
+          if (this.beginWait(r, now)) { r.slots.forEach(p => { if (p) this.snapshot(p); }); continue; }
+          }
           const beforeRally = r.state.rallyId;
           const events = step(r.state);
           if (r.state.phase === 'Rally') r.state.localPaddles.forEach((actor, side) => {
