@@ -24,6 +24,8 @@ export interface Session {
   claim: Frame | null;
   /** This client claims its presented crossings proactively (it has sent at least one claim ahead of a crossing). */
   proactive: boolean;
+  /** Until then, authoritative returns commit without waiting: set after a return wait expired with no claim from an enabled defender. */
+  noReturnWaitUntil: number;
   /** Authoritative poses this session's paddle actually occupied (per committed Rally tick), for the claim envelope. */
   poses: { x: number; y: number; at: number; matchId: number; rallyId: number }[];
 }
@@ -54,7 +56,7 @@ export class Authority {
     const s: Session = { id: randomBytes(16).toString('hex'), transport, opened: t, room: null, side: 0, credential: '', closing: null,
       serial: 0, lastSent: '', lastSnapshotSerial: 0, generation: 0, enabled: true, authorized: 0, seq: 0, pending: null, queue: [], issued: new Map(), sync: new Map(), responses: new Map(),
       events: [], latest: null, congested: null, abuse: null, inputs: new Bucket(30, 60, t), commands: new Bucket(5, 10, t),
-      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, proactive: false, poses: [] };
+      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, proactive: false, noReturnWaitUntil: 0, poses: [] };
     this.sessions.add(s); return s;
   }
   receive(s: Session, raw: string) {
@@ -208,7 +210,7 @@ export class Authority {
     if (f.type === 'controlFence') {
       const g = f.generation as number;
       if (g >= Number.MAX_SAFE_INTEGER) { this.disconnect(s, 'generation-exhausted'); return; }
-      if (g === s.generation + 1 && g < Number.MAX_SAFE_INTEGER) { s.generation = g; s.enabled = false; s.pending = null; s.claim = null; s.sync.clear(); }
+      if (g === s.generation + 1 && g < Number.MAX_SAFE_INTEGER) { s.generation = g; s.enabled = false; s.pending = null; s.sync.clear(); }
       else if (g !== s.generation) { this.error(s, f, 'generation'); return; }
       this.ack(s, f, 'fence'); this.cache(s, f.requestId); return;
     }
@@ -280,18 +282,21 @@ export class Authority {
     const trial = structuredClone(r.state), end = step(trial).find(e => (e.type === 'return' || e.type === 'miss' || e.type === 'finish') && e.side !== null);
     if (!end || end.side === null) return 'none';
     const side = end.side, p = r.slots[side], tick = r.state.tick + 1;
-    if (!p?.enabled || p.closing !== null) return 'none';
+    if (!p || p.closing !== null) return 'none';
+    // A claim was validated when it arrived (current generation, enabled): it reports a frame already presented, so a
+    // later fence does not void it.
     const claim = p.claim?.tick === tick ? p.claim : null;
     if (p.claim && (p.claim.tick as number) <= tick) p.claim = null;
     if (claim) {
-      const accepted = this.applyClaim(r, side, claim, p.generation, now); p.proactive = true;
+      const accepted = this.applyClaim(r, side, claim, claim.controlGeneration as number, now);
       this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, claimed: true, hit: claim.hit, accepted, timedOut: false, interrupted: null, early: true, authoritative: end.type, at: now });
       return 'claimed';
     }
+    if (!p.enabled) return 'none';
     // No claim yet: wait for it. For a miss always; for a return only from a proactive claimer, whose presented frame then
     // decides (a client that never claims ahead keeps the authoritative return). Its targets may still be in flight (an
     // asymmetric upstream can exceed the lead); an honest claim normally arrives first, so the wait lasts only its lateness.
-    if (end.type === 'return' && !p.proactive) return 'none';
+    if (end.type === 'return' && (!p.proactive || now < p.noReturnWaitUntil)) return 'none';
     r.wait = { side, tick, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null, authoritative: end.type };
     this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick, side, incomingViewBoxes: r.state.viewBoxes });
     this.record(r, { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
@@ -302,9 +307,10 @@ export class Authority {
   private resolveWait(r: Room, now: number, interrupted: string | null = null) {
     const w = r.wait!, f = w.claim, p = r.slots[w.side]; r.wait = null;
     const accepted = this.applyClaim(r, w.side, f, w.generation, now);
-    // A return the defender never claimed stops further return waits until it claims ahead again: a client cannot keep
-    // stalling its own returns by declaring the capability and then withholding claims.
-    if (p && f) p.proactive = true; else if (p && !interrupted && w.authoritative === 'return') p.proactive = false;
+    // The declared capability never turns off. A return wait that EXPIRED without any claim while the defender stayed
+    // enabled (a blur ends it early and does not count) suspends return waits for five seconds, so withholding claims
+    // stalls at most one return per five seconds; an honest client that briefly stopped drawing recovers by itself.
+    if (p && !f && !interrupted && now >= w.deadline && w.authoritative === 'return') p.noReturnWaitUntil = now + 5000;
     this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
       timedOut: !f && !interrupted && now >= w.deadline, interrupted, early: false, authoritative: w.authoritative, at: now });
   }
@@ -326,7 +332,8 @@ export class Authority {
   /** Install a reachable claimed pose (hit or miss); the ordinary deterministic step then decides contact and curve. */
   private applyClaim(r: Room, side: Side, f: Frame | null, generation: number, now: number) {
     const p = r.slots[side], actor = r.state.localPaddles[side];
-    if (!f || !p?.enabled || p.generation !== generation || !sameContext(r.state, f) || f.tick !== r.state.tick + 1) return false;
+    // Validity (generation, enabled) was checked on receipt; here only the context, tick and envelope.
+    if (!f || !p || f.controlGeneration !== generation || !sameContext(r.state, f) || f.tick !== r.state.tick + 1) return false;
     const { ax, ay } = this.envelope(r, p, generation, now);
     const x = f.x as number, y = f.y as number, dx = f.dx as number, dy = f.dy as number;
     // The client reaches poses through the same binary64 easing; allow its rounding, not extra reach.

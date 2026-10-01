@@ -4,11 +4,13 @@ export interface Rect { left: number; right: number; top: number; bottom: number
 export interface DrawModel { ball: Rect; own: Rect; remote: Rect; z: number; tick: number; missed: boolean; incomingEventId: number | null; sourceTicks: [number, number]; renderedAt: number; snapshotAge: number; frozen: boolean; degraded: boolean; overlayAllowed: boolean;
   bufferMs: number; estimatedServerNow: number; sourceServerTimes: [number, number]; interpolationUnderflow: boolean; predictedLocal: Paddle | null;
   /** Server time at which the ball is presented, and whether it was predicted beyond the latest snapshot (plan §5 incoming-ball amendment). */
-  ballTime: number; ballPredicted: boolean }
+  ballTime: number; ballPredicted: boolean;
+  /** Set on a claim frame when several presented claim frames of the crossing match the installed pose, so the applied one is unknown. */
+  evidenceAmbiguous?: boolean }
 const rect = (b: Bounds): Rect => ({ left: b[0] / 20, right: b[1] / 20, top: b[2] / 20, bottom: b[3] / 20 });
 const blend = (a: Rect, b: Rect, t: number): Rect => ({ left: a.left + (b.left - a.left) * t, right: a.right + (b.right - a.right) * t, top: a.top + (b.top - a.top) * t, bottom: a.bottom + (b.bottom - a.bottom) * t });
 const TICK = 1000 / 30;
-interface Claimed { hit: boolean; own: Rect; prediction: Paddle; frame: DrawModel | null; preceding: DrawModel | null }
+interface Claimed { hit: boolean; own: Rect; prediction: Paddle; frame: DrawModel | null; preceding: DrawModel | null; tick: number; matchId: number; rallyId: number }
 interface BallFrame { ball: Rect; z: number; tick: number; sourceTicks: [number, number]; missed: boolean; predicted: boolean; crossing: { tick: number; key: string; incoming: Bounds } | null }
 export class OnlineView {
   samples: { state: OnlineState; time: number }[] = []; events: { event: OnlineEvent; time: number; sampled: boolean; incomingOwn: Rect | null }[] = [];
@@ -47,9 +49,11 @@ export class OnlineView {
     this.history = this.history.filter(h => h.at >= this.now() - 2000); if (this.history.length > 60) this.history.shift();
   }
   private stopPrediction() { this.history = []; this.predicted = null; this.previous = null; this.correction = null; }
-  // A fence also drops this defender's claims: the authority discards them with the old control generation, so a resumed
-  // defender must claim (and predict) its next crossing afresh.
-  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; this.claims.clear(); }
+  // A fence drops the control claims (claim evidence stays); presented, still unresolved claims are re-sent once control
+  // returns, so the presented crossing stands whether or not the authority had applied it already.
+  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; this.claims.clear(); this.resend = true; }
+  /** After a fence, unresolved claims already presented are re-sent once control returns (see draw). */
+  private resend = false;
   private rebase(s: OnlineState) {
     if (s.phase !== 'Rally') { this.stopPrediction(); return; }
     const from = this.predicted ? rect(ownBox(this.predicted)) : null;
@@ -131,7 +135,8 @@ export class OnlineView {
       const b = structuredClone(balls[k - 1]), tick = s.tick + k, shown = k <= n, walls: OnlineEvent['type'][] = [];
       const crossed = advanceBall(b, type => walls.push(type));
       if (crossed !== null) {
-        const key = `${s.matchId}/${s.rallyId}/${tick}`, claim = crossed === this.side ? this.claims.get(key) : undefined;
+        // After a fence the control claim is gone, but a claim already sent may have been applied: keep its return.
+        const key = `${s.matchId}/${s.rallyId}/${tick}`, claim = crossed === this.side ? this.claims.get(key) ?? this.evidence.get(key)?.at(-1) : undefined;
         // An unresolved crossing holds the C−1 ball; its tick (and walls) is presented only by the authoritative event.
         if (!claim) return frame(balls[k - 1], tick - 1, crossed === this.side ? { tick, key, incoming: ballBox(balls[k - 1], this.side) } : null);
         // A claimed miss: the authority stops the ball where this tick left it, past the plane. Show that, held.
@@ -151,7 +156,9 @@ export class OnlineView {
     // and re-anchoring on each would step the predicted flight backward.
     const sameTick = (x: OnlineState) => x.matchId === latest.state.matchId && x.rallyId === latest.state.rallyId && x.tick === latest.state.tick && x.lastEventId === latest.state.lastEventId;
     const anchor = this.samples.find(x => sameTick(x.state)) ?? latest;
-    if (t > anchor.time && latest.state.phase === 'Rally' && this.predicted) return this.predictBall(anchor, t, dt);
+    // The ball's flight is deterministic whatever the paddle control state, so a fence (blur) keeps the predicted flight
+    // instead of falling back to older buffered samples, which would step a presented return back.
+    if (t > anchor.time && latest.state.phase === 'Rally') return this.predictBall(anchor, t, dt);
     const older = this.samples.filter(s => s.time <= t).at(-1) ?? this.samples[0], newer = this.samples.find(s => s.time > t) ?? older;
     const same = older.state.matchId === newer.state.matchId && older.state.rallyId === newer.state.rallyId && older.state.lastEventId === newer.state.lastEventId;
     const alpha = same && newer.time > older.time ? Math.max(0, Math.min(1, (t - older.time) / (newer.time - older.time))) : 0;
@@ -212,13 +219,26 @@ export class OnlineView {
       predictedLocal: this.predicted ? structuredClone(this.predicted) : this.heldIncomingPrediction ? structuredClone(this.heldIncomingPrediction) : null,
       overlayAllowed: !this.events.some(e => e.event.eventId > this.drawnEvent && e.event.type === 'finish'), ballTime, ballPredicted: shown.predicted };
     let claimed: Claimed | null = null;
+    // Control returned after a fence: the authority dropped claims of the old generation unless it had already applied
+    // them. Re-send each unresolved presented claim unchanged (same pose: what was shown), so either way the presented
+    // crossing stands and nothing shown is undone; an already applied crossing ignores the repeat.
+    if (this.resend && this.predicted && rally && enabled) {
+      this.resend = false;
+      const s = latest.state;
+      for (const [key, list] of this.evidence) {
+        const c = list.at(-1);
+        if (!c || c.matchId !== s.matchId || c.rallyId !== s.rallyId || c.tick <= s.tick || this.claims.has(key)) continue;
+        this.claims.set(key, c);
+        this.onClaim({ matchId: c.matchId, rallyId: c.rallyId, tick: c.tick, hit: c.hit, x: c.prediction.x, y: c.prediction.y, dx: c.prediction.dx, dy: c.prediction.dy });
+      }
+    }
     const crossing = shown.crossing;
     if (crossing && !this.claims.has(crossing.key) && this.predicted && rally && enabled && !model.frozen) {
       // The claim frame: exact predicted pose (no blend) against the C−1 ball, so the claim is exactly what was shown.
       const box = ownBox(this.predicted), prediction = structuredClone(this.predicted), hit = contact(crossing.incoming, box);
       own = rect(box);
       model = { ...model, own, tick: crossing.tick - 1, sourceTicks: [crossing.tick - 1, crossing.tick - 1], predictedLocal: structuredClone(prediction) };
-      claimed = { hit, own, prediction, frame: null, preceding: previousFrame };
+      claimed = { hit, own, prediction, frame: null, preceding: previousFrame, tick: crossing.tick, matchId: latest.state.matchId, rallyId: latest.state.rallyId };
       this.claims.set(crossing.key, claimed); if (this.claims.size > 8) this.claims.delete(this.claims.keys().next().value!);
       this.evidence.set(crossing.key, [...this.evidence.get(crossing.key) ?? [], claimed]); if (this.evidence.size > 8) this.evidence.delete(this.evidence.keys().next().value!);
       const s = latest.state;
@@ -236,7 +256,10 @@ export class OnlineView {
       const e = boundary.event, key = `${e.matchId}/${e.rallyId}/${e.tick}`, presented = e.side === this.side ? this.evidence.get(key) ?? [] : [];
       // The frame whose claimed pose the authority installed (same paddle box), else the latest presented claim frame.
       const installed = JSON.stringify(rect(e.incomingViewBoxes[this.side].own));
-      const ownClaim = presented.find(c => c.frame && JSON.stringify(c.own) === installed) ?? presented.filter(c => c.frame).at(-1);
+      const matching = presented.filter(c => c.frame && JSON.stringify(c.own) === installed);
+      const ownClaim = matching.at(-1) ?? presented.filter(c => c.frame).at(-1);
+      // Equal poses from different claims (e.g. re-claimed after a fence) cannot say which one the authority applied.
+      if (ownClaim?.frame && matching.length > 1) ownClaim.frame.evidenceAmbiguous = true;
       const contactEvent = ['return', 'miss', 'finish'].includes(e.type);
       if (contactEvent && ownClaim?.frame && !boundary.sampled) {
         // This defender's crossing was already presented ahead, at its claim frame: never redraw it. Evidence and

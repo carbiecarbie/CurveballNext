@@ -7,7 +7,7 @@ import type { Side } from '../src/multiplayer/types';
 
 // Plan §5 incoming-ball amendment: the defender presents its incoming ball ahead of the authority, so its inputs and its
 // claim reach the authority by the crossing tick and the authority does not pause.
-function network(oneWayMs: number, downMs = oneWayMs) {
+function network(oneWayMs: number, downMs = oneWayMs, declare = true) {
   const link = { up: oneWayMs, down: downMs };
   let time = 0; const authority = new Authority(() => time, () => 0), records: Record<string, unknown>[] = [];
   authority.onDiagnostic = record => records.push(record);
@@ -16,7 +16,7 @@ function network(oneWayMs: number, downMs = oneWayMs) {
   function open(operation: 'create' | 'join', code?: string) {
     const up: Player['up'] = [], down: Player['down'] = [];
     const session = authority.open({ bufferedAmount: 0, send: raw => down.push({ at: time + link.down, raw }), close: () => {}, terminate: () => {} })!;
-    const client = new OnlineClient({ readyState: 1, bufferedAmount: 0, send: raw => up.push({ at: time + link.up, raw }), close: () => {} }, () => time, operation, code, true);
+    const client = new OnlineClient({ readyState: 1, bufferedAmount: 0, send: raw => up.push({ at: time + link.up, raw }), close: () => {} }, () => time, operation, code, declare);
     const view = new OnlineView(0, () => time), player: Player = { client, session, view, up, down, frames: [] };
     client.onState = (s, e, at) => { view.side = client.side; view.accept(s, at!, e); };
     client.onInput = (x, y, seq, at) => view.input(x, y, seq, at); client.onFence = () => view.fence();
@@ -128,19 +128,50 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
 });
 
 describe('M5 incoming ball: review regressions', () => {
+  it('a blur that ends a return wait early keeps the declared protection (no withholding penalty)', () => {
+    const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0; h.a.view.onClaim = () => {};
+    let blurred = false;
+    h.advance(1800, () => { if (!blurred && r.wait) { blurred = true; h.a.client.blur(); } });
+    expect(blurred).toBe(true);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: false, timedOut: false });
+    expect(h.a.session.noReturnWaitUntil).toBe(0); expect(h.a.session.proactive).toBe(true);
+  });
+  it('a blur right after an accepted return never steps the presented ball back', () => {
+    const h = network(25), r = serveToward(h, 0, -80); h.a.frames.length = 0;
+    let blurred = false;
+    h.advance(1600, () => {
+      const m = h.a.frames.at(-1); if (m && m.z <= 12) h.link.up = 200; if (!blurred) track(h.a, 8);
+      if (!blurred && h.records.some(x => x.kind === 'contact-resolved' && x.accepted)) { blurred = true; h.a.client.blur(); h.a.client.focus(); }
+    });
+    expect(blurred).toBe(true); expect(r.state.lives).toEqual([3, 3]);
+    const crossing = h.a.client.records.find(x => x.kind === 'sent-claim')!.tick as number, f = h.a.frames.filter(x => x.tick >= crossing);
+    for (let i = 1; i < h.a.frames.length; i++) expect(h.a.frames[i].tick).toBeGreaterThanOrEqual(h.a.frames[i - 1].tick);
+    for (let i = 1; i < f.length; i++) expect(f[i].z).toBeGreaterThanOrEqual(f[i - 1].z - 1e-9);
+  });
+  it('rejected claims from a client that never declared proactive claims cannot cause return waits', () => {
+    const h = network(10, 10, false), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
+    h.a.view.onClaim = c => h.a.client.claim({ ...c, x: 296 }); // outside the envelope: rejected
+    h.advance(5200);
+    expect(h.a.session.proactive).toBe(false);
+    expect(h.records.some(x => x.kind === 'contact-pending' && x.side === 0 && (h.records.find(y => y.kind === 'contact-resolved' && y.tick === x.tick)?.authoritative === 'return'))).toBe(false);
+    expect(r.state.matchId).toBeGreaterThan(0);
+  });
   it('an older client that never declares proactive claims keeps the authoritative return without a wait', () => {
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
     h.a.session.proactive = false; h.a.view.onClaim = () => {}; // as a client built before proactive claims
     h.advance(1600);
     expect(h.records.some(x => x.kind === 'contact-pending')).toBe(false); expect(r.state.lives).toEqual([3, 3]);
   });
-  it('a declared client that withholds its claims stalls at most one return, then the authority stops waiting', () => {
+  it('a declared client that withholds its claims stalls at most one return per five seconds', () => {
+    // Centered straight flights: both paddles return without moving, so the ball comes back to this defender quickly.
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
     expect(h.a.session.proactive).toBe(true); h.a.view.onClaim = () => {};
-    h.advance(2400);
-    expect(h.records.filter(x => x.kind === 'contact-pending')).toHaveLength(1);
-    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: false, timedOut: true, authoritative: 'return' });
-    expect(h.a.session.proactive).toBe(false); expect(r.state.lives).toEqual([3, 3]);
+    h.advance(5200);
+    const pausesForA = h.records.filter(x => x.kind === 'contact-pending' && x.side === 0);
+    const returnsByA = h.a.client.events.filter(e => e.type === 'return' && e.side === 0);
+    expect(pausesForA).toHaveLength(1); expect(returnsByA.length).toBeGreaterThanOrEqual(2);
+    expect(h.records.find(x => x.kind === 'contact-resolved' && x.side === 0)).toMatchObject({ claimed: false, timedOut: true, authoritative: 'return' });
+    expect(h.a.session.proactive).toBe(true); expect(r.state.lives).toEqual([3, 3]);
   });
   it('a claim for a tick without any crossing neither enables nor keeps return waits', () => {
     const h = network(10), r = h.a.session.room!; h.a.session.proactive = false;

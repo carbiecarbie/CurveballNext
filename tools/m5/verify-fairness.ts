@@ -23,6 +23,7 @@ for (const captured of presentation) {
     const event = contact.events.find((e: any) => ['return', 'miss', 'finish'].includes(e.type));
     if (captured.matchId !== event.matchId || captured.incoming.incomingEventId !== event.eventId || captured.incoming.tick !== event.incomingBoxTick ||
       !captured.preceding || captured.preceding.renderedAt >= captured.incoming.renderedAt || !captured.metadata.visible || captured.incoming.frozen) throw new Error('Missing/occluded/uncertain incoming boundary');
+    if (captured.incoming.evidenceAmbiguous) throw new Error('Ambiguous claim frame: several presented claims match the installed pose');
     const old = contact.before, b = old.ball, p = old.localPaddles[s.defender];
     const ball = independentBox((s.defender === 0 ? 1 : -1) * b.u, b.y, s.defender === 0 ? b.z : 75 - b.z, 30, 30);
     const paddle = independentBox(p.x - 175.5, p.y, 0, 60, 40);
