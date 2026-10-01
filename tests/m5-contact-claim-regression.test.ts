@@ -42,6 +42,10 @@ function raw(h: ReturnType<typeof connected>, data: Record<string, unknown>) {
 const resolved = (h: ReturnType<typeof connected>) => h.records.find(x => x.kind === 'contact-resolved');
 
 describe('M5 contact claim review regressions (open defects run as it.fails)', () => {
+  // P1/P2 stay open pending a maintainer decision: an honest claim legitimately depends on targets the authority receives
+  // after contactPending (captured in the ~66.7 ms before the claim frame) and on coalesced targets the prediction already
+  // eased toward, so excluding them by arrival time or application would also reject the honest late returns the
+  // amendment exists to honor. The server cannot tell those from a modified client's targets without trusting it.
   it.fails('P1: a target sent after contactPending does not widen the envelope (cheat)', () => {
     const h = connected(), r = approach(h), c = h.a.client;
     h.advance(40); expect(r.wait).not.toBeNull();
@@ -62,7 +66,7 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
     h.advance(40);
     expect(resolved(h)).toMatchObject({ claimed: true, accepted: false });
   });
-  it.fails('P3: an honest one-step claim at the wall while aiming outside the court is accepted', () => {
+  it('P3: an honest one-step claim at the wall while aiming outside the court is accepted', () => {
     const h = connected(), r = approach(h), c = h.a.client;
     Object.assign(r.state.localPaddles[0], { y: 50, py: 50, ty: 50 }); r.state.viewBoxes = boxes(r.state);
     c.pointer(175.5, -250); h.flush();
@@ -73,7 +77,7 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
     h.advance(40);
     expect(resolved(h)).toMatchObject({ claimed: true, accepted: true });
   });
-  it.fails('P4: a claim processed after contactGraceMs is ignored and the miss commits', () => {
+  it('P4: a claim processed after contactGraceMs is ignored and the miss commits', () => {
     const h = connected(), r = approach(h), c = h.a.client;
     c.pointer(55, 125.5); h.flush(); h.advance(40);
     const w = r.wait!, p = structuredClone(r.state.localPaddles[0]); move(p);
@@ -89,14 +93,14 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
   });
   // P5 (maintainer decision): an interruption of the defender's own session while its claim is pending first commits the
   // original miss/finish exactly as a timeout would; an opponent interruption still aborts without winner.
-  it.fails('P5a: a defender leaving during a last-life pause loses: the finish is committed before the interruption', () => {
+  it('P5a: a defender leaving during a last-life pause loses: the finish is committed before the interruption', () => {
     const h = connected(), r = approach(h); r.state.lives = [1, 3];
     h.advance(40); expect(r.wait).not.toBeNull();
     h.a.client.leave(); h.flush();
     expect(r.state.phase).toBe('MatchEnded'); expect(r.state.result).toMatchObject({ loser: 0, winner: 1, lives: [0, 3] });
     expect(h.b.client.known).toMatchObject({ loser: 0, winner: 1 });
   });
-  it.fails('P5b: a defender hiding during an ordinary pause still loses that life before the abort', () => {
+  it('P5b: a defender hiding during an ordinary pause still loses that life before the abort', () => {
     const h = connected(), r = approach(h);
     h.advance(40); expect(r.wait).not.toBeNull();
     h.a.client.hidden(); h.flush();
@@ -109,7 +113,7 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
     expect(r.state.phase).toBe('Aborted'); expect(r.state.result).toBeNull(); expect(r.state.lives).toEqual([1, 3]);
     expect(h.a.client.known).toBeNull();
   });
-  it.fails('P6: one coalescence emits one diagnostic record', () => {
+  it('P6: one coalescence emits one diagnostic record', () => {
     const h = connected(), r = h.a.session.room!, s = h.a.session; h.advance(20);
     const input = (seq: number, x: number) => raw(h, { type: 'input', matchId: r.state.matchId, rallyId: r.state.rallyId, controlGeneration: 0,
       resumeStateSerial: s.authorized, seq, x, y: 100, processedSnapshotSerial: s.lastSnapshotSerial });
@@ -117,7 +121,7 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
     input(200, 100); input(201, 110); h.authority.pump();
     expect(h.records.filter(x => x.kind === 'coalesced').length - before).toBe(1);
   });
-  it.fails('P7: a claim whose previous pose (x - dx) lies outside the field is rejected', () => {
+  it('P7: a claim whose previous pose (x - dx) lies outside the field is rejected', () => {
     const h = connected(), r = approach(h), c = h.a.client;
     c.pointer(-350, 125.5); h.flush(); h.advance(40); expect(r.wait).not.toBeNull();
     // x at the left limit with dx +80 implies a previous pose of -25: no easing step can produce it.
@@ -125,7 +129,7 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
     h.advance(40);
     expect(resolved(h)).toMatchObject({ claimed: true, accepted: false });
   });
-  it.fails('P8: a target discarded by a blur fence does not widen the envelope after resume', () => {
+  it('P8: a target discarded by a blur fence does not widen the envelope after resume', () => {
     const h = connected(), c = h.a.client; h.advance(20);
     // The far target reaches the server in the same pump as the fence, which discards it before any tick applies it.
     c.pointer(-350, 125.5); c.pump(); c.blur(); h.flush();

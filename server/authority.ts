@@ -18,8 +18,8 @@ export interface Session {
   responses: Map<string, string>; events: string[]; latest: string | null; congested: number | null; abuse: number | null;
   inputs: Bucket; commands: Bucket; lastExcess: number; healthAt: number; tickAt: number; healthSerial: number; healthTick: number; beatSeq: number;
   nonces: Map<string, number>; heartbeatAt: number; probe: { probeId: number; c0: number; s1: number } | null;
-  /** Recently received targets (read space) bounding which claimed poses are reachable. */
-  targets: { x: number; y: number; at: number }[];
+  /** Recently received targets (read space, unclamped) bounding which claimed poses are reachable, with their control context. */
+  targets: { x: number; y: number; at: number; matchId: number; rallyId: number; generation: number }[];
 }
 export interface Room {
   code: string; epoch: string; created: number; endedAt: number | null; state: OnlineState;
@@ -162,14 +162,9 @@ export class Authority {
         r.diagnostics.push(coalesced); this.onDiagnostic?.(coalesced);
         if (r.diagnostics.length > 600) r.diagnostics.shift();
       }
-      if (s.pending) {
-        const coalesced = { kind: 'coalesced', matchId: state.matchId, rallyId: state.rallyId, side: s.side, seq: s.pending.seq, generation: s.generation, supersededBy: f.seq, at: now };
-        r.diagnostics.push(coalesced); this.onDiagnostic?.(coalesced);
-        if (r.diagnostics.length > 600) r.diagnostics.shift();
-      }
       s.seq = f.seq as number; s.pending = f;
       const read = paddle(); target(read, f.x as number, f.y as number);
-      s.targets = s.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs); s.targets.push({ x: read.tx, y: read.ty, at: now }); if (s.targets.length > 64) s.targets.shift();
+      s.targets = s.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs); s.targets.push({ x: read.tx, y: read.ty, at: now, matchId: state.matchId, rallyId: state.rallyId, generation: s.generation }); if (s.targets.length > 64) s.targets.shift();
       const record = { kind: 'received', matchId: state.matchId, rallyId: state.rallyId, seq: s.seq, generation: s.generation, side: s.side, received, validated: now, assignedTick: state.tick + 1 };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
       if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
@@ -177,6 +172,11 @@ export class Authority {
     if (f.type === 'contactClaim') {
       const w = r.wait;
       if (!w || w.claim || w.side !== s.side || f.tick !== w.tick || f.controlGeneration !== s.generation || f.controlGeneration !== w.generation || !s.enabled || !sameContext(state, f)) return;
+      if (received >= w.deadline) {
+        // The grace window is closed even if no boundary has committed the miss yet.
+        const late = { kind: 'claim-late', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick: w.tick, received, deadline: w.deadline };
+        r.diagnostics.push(late); this.onDiagnostic?.(late); if (r.diagnostics.length > 600) r.diagnostics.shift(); return;
+      }
       w.claim = f;
       const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick: w.tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
@@ -234,6 +234,12 @@ export class Authority {
     if (s.closing !== null) return;
     const r = s.room;
     if (r) {
+      // The defender's own interruption during a pending claim first commits the original miss/finish, exactly as a
+      // timeout would (plan §5 amendment); contactPending must not become an escape. Server-side causes still abort.
+      if (r.wait && r.slots[r.wait.side] === s && !['server-overrun', 'expired', 'server-shutdown'].includes(reason)) {
+        const now = this.now(); r.wait.claim = null; this.resolveWait(r, now, reason);
+        this.commit(r, now, this.onDiagnostic ? structuredClone(r.state) : null, this.onDiagnostic ? structuredClone(r.sources) : null);
+      }
       if (r.state.phase === 'Waiting') {
         r.slots[s.side] = null; r.ready = [false, false]; s.room = null;
         r.slots.forEach(p => { if (p) this.snapshot(p); });
@@ -264,23 +270,49 @@ export class Authority {
     return true;
   }
   /** Install a reachable claimed hit pose; the ordinary deterministic step then decides contact. Anything else keeps the miss. */
-  private resolveWait(r: Room, now: number) {
+  private resolveWait(r: Room, now: number, interrupted: string | null = null) {
     const w = r.wait!, f = w.claim, p = r.slots[w.side], actor = r.state.localPaddles[w.side]; r.wait = null;
     let accepted = false;
     if (f && f.hit === true && p?.enabled && p.generation === w.generation && sameContext(r.state, f) && f.tick === r.state.tick + 1) {
-      const recent = p.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs);
-      const xs = [actor.x, actor.tx, ...recent.map(t => t.x)].map(x => Math.max(55, Math.min(296, x)));
-      const ys = [actor.y, actor.ty, ...recent.map(t => t.y)].map(y => Math.max(45, Math.min(206, y)));
-      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+      // Only targets of this match/rally/control generation: a fence discards earlier targets for the claim too.
+      const recent = p.targets.filter(t => now - t.at <= RULES.claimEnvelopeMs && sameContext(r.state, t as unknown as Frame) && t.generation === w.generation);
+      // Poses: authoritative C−1, its predecessor C−2 (a fresh rebase may carry that step's displacement) and targets.
+      const raw = (axis: 'x' | 'y') => [actor[axis], actor[axis] - actor[axis === 'x' ? 'dx' : 'dy'], actor[axis === 'x' ? 'tx' : 'ty'], ...recent.map(t => t[axis])];
+      const axis = (values: number[], lo: number, hi: number) => {
+        const clamped = values.map(v => Math.max(lo, Math.min(hi, v)));
+        return { lo: Math.min(...clamped), hi: Math.max(...clamped), reach: (Math.max(...values) - Math.min(...values)) / RULES.easing };
+      };
+      const ax = axis(raw('x'), 55, 296), ay = axis(raw('y'), 45, 206);
       const x = f.x as number, y = f.y as number, dx = f.dx as number, dy = f.dy as number;
       // The client reaches poses through the same binary64 easing; allow its rounding, not extra reach.
-      const e = 1e-9;
-      if (x >= x0 - e && x <= x1 + e && y >= y0 - e && y <= y1 + e && Math.abs(dx) <= (x1 - x0) / RULES.easing + e && Math.abs(dy) <= (y1 - y0) / RULES.easing + e) {
+      const e = 1e-9, inside = (v: number, a: typeof ax) => v >= a.lo - e && v <= a.hi + e;
+      // Pose and previous pose both lie in the clamped envelope; one easing step is bounded by the UNCLAMPED target
+      // spread, because a target beyond the field still eases a full step before the paddle is clamped at the wall.
+      if (inside(x, ax) && inside(y, ay) && inside(x - dx, ax) && inside(y - dy, ay) && Math.abs(dx) <= ax.reach + e && Math.abs(dy) <= ay.reach + e) {
         actor.x = actor.px = x; actor.y = actor.py = y; actor.dx = dx; actor.dy = dy; r.state.viewBoxes = boxes(r.state); accepted = true;
       }
     }
-    const record = { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted, timedOut: !f && now >= w.deadline, at: now };
+    const record = { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
+      timedOut: !f && !interrupted && now >= w.deadline, interrupted, at: now };
     r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift();
+  }
+  /** One synchronous simulation transaction and its publication: events, then the resulting snapshot. */
+  private commit(r: Room, now: number, before: OnlineState | null, priorSources: Room['sources'] | null) {
+    const beforeRally = r.state.rallyId;
+    const events = step(r.state);
+    if (r.state.phase === 'Rally') r.state.localPaddles.forEach((actor, side) => {
+      const old = r.sources[side]; r.sources[side] = { seq: actor.seq, generation: actor.generation, publishedTick: r.state.tick,
+        firstUsed: old.seq === actor.seq && old.generation === actor.generation && old.firstUsed };
+    });
+    this.onDiagnostic?.({ kind: 'tick', nominal: this.boundary, committed: this.now(), before, after: r.state, priorSources, publishedSources: r.sources, events });
+    for (const event of events) r.slots.forEach(p => { if (p) this.send(p, 'event', { ...event, eventType: event.type, lives: [...r.state.lives], result: r.state.result, freshSnapshot: r.state }); });
+    if (r.state.phase !== 'Rally') r.slots.forEach(p => { if (p) p.pending = null; });
+    if (r.state.rallyId !== beforeRally) {
+      r.slots.forEach(p => { if (p) p.pending = null; });
+      r.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: r.state.tick, firstUsed: false }));
+    }
+    if (r.state.result !== null && r.endedAt === null) r.endedAt = now;
+    r.slots.forEach(p => { if (p) this.snapshot(p); }); this.metrics.ticks++;
   }
   /** Call at <=100 ms, before physics. Network callbacks only enqueue commands. */
   pump() {
@@ -337,21 +369,7 @@ export class Authority {
           });
           if (this.beginWait(r, now)) { r.slots.forEach(p => { if (p) this.snapshot(p); }); continue; }
           }
-          const beforeRally = r.state.rallyId;
-          const events = step(r.state);
-          if (r.state.phase === 'Rally') r.state.localPaddles.forEach((actor, side) => {
-            const old = r.sources[side]; r.sources[side] = { seq: actor.seq, generation: actor.generation, publishedTick: r.state.tick,
-              firstUsed: old.seq === actor.seq && old.generation === actor.generation && old.firstUsed };
-          });
-          this.onDiagnostic?.({ kind: 'tick', nominal: this.boundary, committed: this.now(), before, after: r.state, priorSources, publishedSources: r.sources, events });
-          for (const event of events) r.slots.forEach(p => { if (p) this.send(p, 'event', { ...event, eventType: event.type, lives: [...r.state.lives], result: r.state.result, freshSnapshot: r.state }); });
-          if (r.state.phase !== 'Rally') r.slots.forEach(p => { if (p) p.pending = null; });
-          if (r.state.rallyId !== beforeRally) {
-            r.slots.forEach(p => { if (p) p.pending = null; });
-            r.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: r.state.tick, firstUsed: false }));
-          }
-          if (r.state.result !== null && r.endedAt === null) r.endedAt = now;
-          r.slots.forEach(p => { if (p) this.snapshot(p); }); this.metrics.ticks++;
+          this.commit(r, now, before, priorSources);
         }
         this.boundary += 1000 / 30;
       }
