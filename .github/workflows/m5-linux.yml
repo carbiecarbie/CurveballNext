@@ -155,7 +155,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: node tools/m5/build-qualification.mjs
       - name: Capture shaped profile
-        run: bash tools/m5/fairness-ci.sh "${{ matrix.profile }}" "${{ github.event.inputs.fairness_limit || '5' }}"
+        run: bash tools/m5/fairness-ci.sh "${{ matrix.profile }}" "${{ github.event.inputs.fairness_limit || '12' }}"
       - name: Summarize cell
         if: always()
         run: |
@@ -173,6 +173,12 @@ jobs:
             console.log('::notice::' + r.profile + ' defender ' + side + ': captured=' + obs.length + ' n=' + done + ' accepted=' + count('apparent-contact-accepted') +
               ' rejected=' + rejected + ' noncontact=' + count('clear-noncontact') + ' borderline=' + count('borderline') + ' ambiguous=' + count('ambiguous'));
             if (!done || rejected / done > 0.01) bad = true;
+          }
+          const ms = n => n === null || n === undefined ? 'none' : n.toFixed(1);
+          for (const o of r.observations.filter(o => o.classification === 'apparent-contact-rejected')) {
+            const t = r.timing.find(t => t.id === o.id) ?? {};
+            console.log('::warning::rejected ' + o.id + ' margin=' + o.marginMs + 'ms hz=' + o.hz + ' captureToContact=[' + (t.captureToContact ?? []).map(ms) + ']' +
+              ' receiptToContact=' + ms(t.receiptToContact) + ' consumedToContact=' + ms(t.consumedToContact) + ' firstUseToContact=' + ms(t.firstUseToContact));
           }
           for (const f of r.failures.slice(0, 10)) console.log('::error::' + f);
           console.log('::notice::' + readFileSync(out + '/shape-plan.txt', 'utf8').trim());
