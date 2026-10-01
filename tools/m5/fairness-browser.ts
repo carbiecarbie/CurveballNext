@@ -83,7 +83,9 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       // Fire on the defender's actual ball clock (server time, ~1× real time near the end): the shown C−1 frame is due when
       // ballTime reaches contactNominal − one tick, so the margin is that far ahead of it. An estimate from lead() alone
       // drifts by up to a tick when the presented lead is still converging.
-      const due = fixture.contactNominal - 1000 / 30 - stimulus.marginMs;
+      // The C−1 frame appears on the first display frame after that instant, on average half a frame later, which lengthens
+      // the shown margin by that much: fire half a frame later to centre the realized margin on its stratum.
+      const due = fixture.contactNominal - 1000 / 30 - stimulus.marginMs + .5 * 1000 / stimulus.hz;
       const coarse = fixture.contactNominal - 1000 / 30 - p.view.lead(p.client.rtt) - stimulus.marginMs - p.client.offset - 50;
       await wait(Math.max(0, coarse - performance.now()));
       const timeout = performance.now() + 3000;
