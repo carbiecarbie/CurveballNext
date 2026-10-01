@@ -24,8 +24,6 @@ export interface Session {
   claim: Frame | null;
   /** This client claims its presented crossings proactively (it has sent at least one claim ahead of a crossing). */
   proactive: boolean;
-  /** Until then, authoritative returns commit without waiting: set after a return wait expired with no claim from an enabled defender. */
-  noReturnWaitUntil: number;
   /** Authoritative poses this session's paddle actually occupied (per committed Rally tick), for the claim envelope. */
   poses: { x: number; y: number; at: number; matchId: number; rallyId: number }[];
 }
@@ -56,7 +54,7 @@ export class Authority {
     const s: Session = { id: randomBytes(16).toString('hex'), transport, opened: t, room: null, side: 0, credential: '', closing: null,
       serial: 0, lastSent: '', lastSnapshotSerial: 0, generation: 0, enabled: true, authorized: 0, seq: 0, pending: null, queue: [], issued: new Map(), sync: new Map(), responses: new Map(),
       events: [], latest: null, congested: null, abuse: null, inputs: new Bucket(30, 60, t), commands: new Bucket(5, 10, t),
-      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, proactive: false, noReturnWaitUntil: 0, poses: [] };
+      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, proactive: false, poses: [] };
     this.sessions.add(s); return s;
   }
   receive(s: Session, raw: string) {
@@ -191,6 +189,8 @@ export class Authority {
       } else {
         // Proactive: the defender's presented ball runs ahead of the authority, so its claim normally precedes the crossing.
         if (state.phase !== 'Rally' || tick <= state.tick || tick > state.tick + 15) return;
+        // The first claim for a crossing stands: a later one for the same tick cannot replace what was presented first.
+        if (s.claim && s.claim.tick === f.tick) return;
         s.claim = f;
       }
       const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received, early: !w };
@@ -296,7 +296,7 @@ export class Authority {
     // No claim yet: wait for it. For a miss always; for a return only from a proactive claimer, whose presented frame then
     // decides (a client that never claims ahead keeps the authoritative return). Its targets may still be in flight (an
     // asymmetric upstream can exceed the lead); an honest claim normally arrives first, so the wait lasts only its lateness.
-    if (end.type === 'return' && (!p.proactive || now < p.noReturnWaitUntil)) return 'none';
+    if (end.type === 'return' && !p.proactive) return 'none';
     r.wait = { side, tick, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null, authoritative: end.type };
     this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick, side, incomingViewBoxes: r.state.viewBoxes });
     this.record(r, { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
@@ -305,12 +305,11 @@ export class Authority {
   private record(r: Room, record: Record<string, unknown>) { r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift(); }
   /** Commit the paused crossing with the defender's claim, if any; anything else keeps the authoritative pose. */
   private resolveWait(r: Room, now: number, interrupted: string | null = null) {
-    const w = r.wait!, f = w.claim, p = r.slots[w.side]; r.wait = null;
+    const w = r.wait!, f = w.claim; r.wait = null;
     const accepted = this.applyClaim(r, w.side, f, w.generation, now);
-    // The declared capability never turns off. A return wait that EXPIRED without any claim while the defender stayed
-    // enabled (a blur ends it early and does not count) suspends return waits for five seconds, so withholding claims
-    // stalls at most one return per five seconds; an honest client that briefly stopped drawing recovers by itself.
-    if (p && !f && !interrupted && now >= w.deadline && w.authoritative === 'return') p.noReturnWaitUntil = now + 5000;
+    // The declared capability never turns off (no suspension after a claimless wait): a suspension could let a stale
+    // authoritative return overturn an honest client's later presented miss. Withholding claims only delays the
+    // withholder's own returns by up to contactGraceMs, an accepted private-room risk (plan §5).
     this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
       timedOut: !f && !interrupted && now >= w.deadline, interrupted, early: false, authoritative: w.authoritative, at: now });
   }

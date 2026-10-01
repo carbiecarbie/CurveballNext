@@ -51,6 +51,8 @@ function serveToward(h: ReturnType<typeof network>, defender: Side, u: number, y
   r.state.viewBoxes = boxes(r.state);
   return r;
 }
+/** A defender that jerks away only once its shown ball is within `depth` of its plane. */
+const jerk = (p: { client: OnlineClient; frames: DrawModel[] }, depth: number) => { const m = p.frames.at(-1); if (m && m.z <= depth) p.client.pointer(296, 206); };
 /** Longest run, in ms, during which a Rally frame repeated the same ball rectangle (a visible freeze). */
 function longestFreeze(frames: DrawModel[]) {
   let longest = 0, start = 0;
@@ -107,8 +109,6 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
     expect(longestFreeze(h.b.frames.filter(f => !f.missed))).toBeLessThanOrEqual(1000 / 30);
     expect(h.b.client.events.some(e => e.type === 'miss' && e.side === 0)).toBe(true);
   });
-  /** A defender that jerks away only once its shown ball is within `depth` of its plane. */
-  const jerk = (p: { client: OnlineClient; frames: DrawModel[] }, depth: number) => { const m = p.frames.at(-1); if (m && m.z <= depth) p.client.pointer(296, 206); };
   it.each([[80, 'miss'], [150, 'return']] as const)('a presented miss decides even where the stale authoritative pose would return (upstream spike 10 → %i ms)', (spike, authoritative) => {
     // Centered ball meeting the centered paddle: without the claim the authority returns it. Just before the crossing the
     // upstream degrades, so the defender's jerk and its miss claim arrive after the authority's crossing tick.
@@ -134,7 +134,7 @@ describe('M5 incoming ball: review regressions', () => {
     h.advance(1800, () => { if (!blurred && r.wait) { blurred = true; h.a.client.blur(); } });
     expect(blurred).toBe(true);
     expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: false, timedOut: false });
-    expect(h.a.session.noReturnWaitUntil).toBe(0); expect(h.a.session.proactive).toBe(true);
+    expect(h.a.session.proactive).toBe(true);
   });
   it('a blur right after an accepted return never steps the presented ball back', () => {
     const h = network(25), r = serveToward(h, 0, -80); h.a.frames.length = 0;
@@ -162,16 +162,29 @@ describe('M5 incoming ball: review regressions', () => {
     h.advance(1600);
     expect(h.records.some(x => x.kind === 'contact-pending')).toBe(false); expect(r.state.lives).toEqual([3, 3]);
   });
-  it('a declared client that withholds its claims stalls at most one return per five seconds', () => {
+  it('a declared client that withholds its claims only delays its own returns, each by at most the grace (accepted risk)', () => {
     // Centered straight flights: both paddles return without moving, so the ball comes back to this defender quickly.
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
     expect(h.a.session.proactive).toBe(true); h.a.view.onClaim = () => {};
     h.advance(5200);
-    const pausesForA = h.records.filter(x => x.kind === 'contact-pending' && x.side === 0);
-    const returnsByA = h.a.client.events.filter(e => e.type === 'return' && e.side === 0);
-    expect(pausesForA).toHaveLength(1); expect(returnsByA.length).toBeGreaterThanOrEqual(2);
-    expect(h.records.find(x => x.kind === 'contact-resolved' && x.side === 0)).toMatchObject({ claimed: false, timedOut: true, authoritative: 'return' });
-    expect(h.a.session.proactive).toBe(true); expect(r.state.lives).toEqual([3, 3]);
+    const pauses = h.records.filter(x => x.kind === 'contact-pending' && x.side === 0), resolved = h.records.filter(x => x.kind === 'contact-resolved' && x.side === 0);
+    expect(pauses.length).toBeGreaterThanOrEqual(2); expect(resolved.length).toBe(pauses.length);
+    for (const [k, x] of resolved.entries()) { expect(x).toMatchObject({ claimed: false, timedOut: true, authoritative: 'return' }); expect((x.at as number) - (pauses[k].at as number)).toBeLessThanOrEqual(500 + 1000 / 30 + 1); }
+    expect(r.state.lives).toEqual([3, 3]); // no points gained or lost by withholding
+  });
+  it('after a drawing stall a later late presented miss still decides (no suspension)', () => {
+    // Codex review: a drawing stall left one claimless return wait; a later late miss claim must not be overturned.
+    const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
+    h.advance(2200, undefined, false); // no drawing past the first crossing's grace: its wait expires claimless
+    h.advance(700);
+    expect(h.records.some(x => x.kind === 'contact-resolved' && x.side === 0 && x.claimed === false)).toBe(true);
+    const before = h.records.filter(x => x.kind === 'contact-resolved' && x.side === 0).length;
+    // Second flight toward this defender: the upstream degrades and the defender jerks away late.
+    serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
+    h.advance(1600, () => { const m = h.a.frames.at(-1); if (m && m.z <= 12) h.link.up = 150; jerk(h.a, 3); });
+    const second = h.records.filter(x => x.kind === 'contact-resolved' && x.side === 0)[before];
+    expect(second).toMatchObject({ authoritative: 'return', claimed: true, hit: false, accepted: true });
+    expect(r.state.lives[0]).toBeLessThan(3);
   });
   it('a claim for a tick without any crossing neither enables nor keeps return waits', () => {
     const h = network(10), r = h.a.session.room!; h.a.session.proactive = false;
@@ -213,15 +226,18 @@ describe('M5 incoming ball: review regressions', () => {
     Object.assign(s.ball, { u: -100, y: 125.5, z: 7, vx: 0, vy: 0, vz: -2, cx: 0, cy: 0 }); s.viewBoxes = boxes(s);
     return s;
   };
-  it('a fence drops sent claims, so a resumed defender claims its crossing again', () => {
-    let time = 0; const s = near(), v = new OnlineView(0, () => time), claims: number[] = [];
-    v.onClaim = c => claims.push(c.tick);
-    v.accept(s, 0);
-    for (; time <= 200; time += 8) v.draw(time, 0, true);
-    expect(claims).toEqual([s.tick + 4]);
-    v.fence(); v.draw(time, 0, false); // blur
-    for (; time <= 400; time += 8) v.draw(time, 0, true); // resumed before the authority answered
-    expect(claims).toEqual([s.tick + 4, s.tick + 4]);
+  it('a quick blur after a claim, before the crossing, keeps the presented claim deciding (no re-send replaces it)', () => {
+    const h = network(15), r = serveToward(h, 0, -80); h.a.frames.length = 0;
+    let blurred = false;
+    h.advance(1600, () => {
+      if (!blurred) track(h.a, 8);
+      if (!blurred && h.a.client.records.some(x => x.kind === 'sent-claim') && !h.records.some(x => x.kind === 'contact-resolved')) { blurred = true; h.a.client.blur(); h.a.client.focus(); }
+    });
+    expect(blurred).toBe(true);
+    const sent = h.a.client.records.filter(x => x.kind === 'sent-claim');
+    expect(sent).toHaveLength(1); expect(sent[0].generation).toBe(0);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: true, hit: true, accepted: true });
+    expect(r.state.lives).toEqual([3, 3]);
   });
   it('repeated same-tick snapshots during a claim pause never step the presented ball backward', () => {
     let time = 0; const s = near(), v = new OnlineView(0, () => time); v.accept(s, 0);

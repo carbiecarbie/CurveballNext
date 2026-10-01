@@ -49,11 +49,9 @@ export class OnlineView {
     this.history = this.history.filter(h => h.at >= this.now() - 2000); if (this.history.length > 60) this.history.shift();
   }
   private stopPrediction() { this.history = []; this.predicted = null; this.previous = null; this.correction = null; }
-  // A fence drops the control claims (claim evidence stays); presented, still unresolved claims are re-sent once control
-  // returns, so the presented crossing stands whether or not the authority had applied it already.
-  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; this.claims.clear(); this.resend = true; }
-  /** After a fence, unresolved claims already presented are re-sent once control returns (see draw). */
-  private resend = false;
+  // A fence drops the control claims; claim evidence stays, and the authority keeps a claim it already received, so a
+  // presented crossing stands through a blur without any re-send.
+  fence() { this.stopPrediction(); this.heldIncomingOwn = null; this.heldIncomingPrediction = null; this.claims.clear(); }
   private rebase(s: OnlineState) {
     if (s.phase !== 'Rally') { this.stopPrediction(); return; }
     const from = this.predicted ? rect(ownBox(this.predicted)) : null;
@@ -219,19 +217,6 @@ export class OnlineView {
       predictedLocal: this.predicted ? structuredClone(this.predicted) : this.heldIncomingPrediction ? structuredClone(this.heldIncomingPrediction) : null,
       overlayAllowed: !this.events.some(e => e.event.eventId > this.drawnEvent && e.event.type === 'finish'), ballTime, ballPredicted: shown.predicted };
     let claimed: Claimed | null = null;
-    // Control returned after a fence: the authority dropped claims of the old generation unless it had already applied
-    // them. Re-send each unresolved presented claim unchanged (same pose: what was shown), so either way the presented
-    // crossing stands and nothing shown is undone; an already applied crossing ignores the repeat.
-    if (this.resend && this.predicted && rally && enabled) {
-      this.resend = false;
-      const s = latest.state;
-      for (const [key, list] of this.evidence) {
-        const c = list.at(-1);
-        if (!c || c.matchId !== s.matchId || c.rallyId !== s.rallyId || c.tick <= s.tick || this.claims.has(key)) continue;
-        this.claims.set(key, c);
-        this.onClaim({ matchId: c.matchId, rallyId: c.rallyId, tick: c.tick, hit: c.hit, x: c.prediction.x, y: c.prediction.y, dx: c.prediction.dx, dy: c.prediction.dy });
-      }
-    }
     const crossing = shown.crossing;
     if (crossing && !this.claims.has(crossing.key) && this.predicted && rally && enabled && !model.frozen) {
       // The claim frame: exact predicted pose (no blend) against the C−1 ball, so the claim is exactly what was shown.
