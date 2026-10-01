@@ -14,8 +14,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '24.19.0'
           cache: npm
@@ -32,8 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 150
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '24.19.0'
           cache: npm
@@ -45,7 +45,7 @@ jobs:
           { uname -a; nproc; node --version; cat /proc/cpuinfo | grep 'model name' | head -1; } | tee captures-local/m5-local/environment.txt
       - name: Run capacity measurement
         run: node dist-server/qualify-local.mjs "${{ github.event.inputs.capacity_seconds || '60' }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: m5-linux-capacity
@@ -63,7 +63,8 @@ jobs:
             ['overruns == 0', r.metrics.overruns === 0, r.metrics.overruns],
             ['liveClients == 20', r.liveClients === 20, r.liveClients],
           ];
-          for (const [name, ok, value] of checks) console.log((ok ? 'PASS ' : 'FAIL ') + name + ' (' + value + ')');
+          for (const [name, ok, value] of checks) console.log((ok ? '::notice::PASS ' : '::error::FAIL ') + name + ' (' + value + ')');
+          console.log('::notice::duration=' + r.durationSeconds + 's ticks=' + r.metrics.ticks + ' maxSnapshot=' + r.maxSnapshotBytes + 'B rss=' + r.rssBytes);
           if (checks.some(c => !c[1])) process.exit(1);
           "
 
@@ -72,7 +73,7 @@ jobs:
     # network namespaces on this runner. Prerequisite only; not a fairness cell.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Load kernel modules
         run: |
           sudo modprobe sch_netem && sudo modprobe ifb numifbs=0 || {
@@ -80,6 +81,7 @@ jobs:
             sudo modprobe sch_netem && sudo modprobe ifb numifbs=0
           }
           { uname -r; tc -V; ip -V; } | tee shaper-environment.txt
+          echo "::notice::kernel $(uname -r); $(tc -V)"
       - name: Create server/client namespaces
         run: |
           sudo ip netns add cbm5srv
@@ -102,14 +104,20 @@ jobs:
               sudo ip netns exec cbm5a curl -s -o /dev/null -w '%{time_connect}\n' http://10.55.0.1:8787/
             done | sort -n | awk '{a[NR]=$1} END {print a[int((NR+1)/2)]}'
           }
+          sudo ip netns exec cbm5a curl -sS -o /dev/null http://10.55.0.1:8787/ || { echo "::error::baseline curl between namespaces failed"; exit 1; }
           base=$(measure)
           # Downstream C3-like profile on client receiver: 40 ms base, 10 ms uniform jitter, 1% loss.
-          sudo ip netns exec cbm5a bash tools/m5/ingress-netem.sh va cbm5a 10.55.0.1 downstream 8787 40 10 1 1234 10 | tee tc-after-setup.txt
+          echo "::notice::median connect unshaped=${base}s"
+          if ! sudo ip netns exec cbm5a bash tools/m5/ingress-netem.sh va cbm5a 10.55.0.1 downstream 8787 40 10 1 1234 10 > tc-after-setup.txt 2>&1; then
+            echo "::error::ingress-netem.sh failed: $(tail -3 tc-after-setup.txt | tr '\n' ' ')"
+            exit 1
+          fi
           shaped=$(measure)
           sudo ip netns exec cbm5a tc -s qdisc show dev cbm5a | tee tc-after-traffic.txt
           echo "median connect unshaped=${base}s shaped=${shaped}s" | tee shaper-result.txt
+          echo "::notice::median connect unshaped=${base}s shaped=${shaped}s (expected 0.030..0.100)"
           awk -v s="$shaped" 'BEGIN { exit !(s >= 0.030 && s <= 0.100) }'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: m5-netem-shaper
