@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Authority, type Session } from '../server/authority';
 import { OnlineClient } from '../src/multiplayer/client';
 import { OnlineView } from '../src/multiplayer/view';
-import { boxes, contact, ownBox } from '../src/multiplayer/simulation';
+import { boxes, contact, move, ownBox, target } from '../src/multiplayer/simulation';
 import { RULES } from '../src/multiplayer/rules';
 import type { ContactClaim } from '../src/multiplayer/types';
 
@@ -69,6 +69,15 @@ describe('M5 bounded defender contact claim (authority)', () => {
     expect(r.state.ball.cx).toBe(40 / RULES.curve);
     expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: true, hit: true, accepted: true });
   });
+  it('accepts a pose reached by one binary64 easing step despite rounding at the envelope edge', () => {
+    const h = connected(), r = approach(h), c = h.a.client;
+    c.pointer(55, 174); h.flush(); h.advance(40); expect(r.wait).not.toBeNull();
+    const p = structuredClone(r.state.localPaddles[0]); target(p, 55, 174); move(p);
+    expect(Math.abs(p.dy)).toBeGreaterThan((p.ty - 125.5) / RULES.easing); // the literal rounding that rejected real claims
+    c.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, hit: true, x: p.x, y: p.y, dx: p.dx, dy: p.dy });
+    h.advance(40); expect(r.state.lives).toEqual([3, 3]);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ accepted: true });
+  });
   it('rejects a claimed pose outside the envelope of the authoritative paddle and recently sent targets', () => {
     const h = connected(), r = approach(h); h.advance(40);
     h.a.client.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, hit: true, x: 60, y: 125.5, dx: 0, dy: 0 });
@@ -116,6 +125,15 @@ describe('M5 bounded defender contact claim (presented frame)', () => {
     expect(r.state.lives).toEqual([3, 3]); expect(c.events.some(e => e.type === 'return' && e.side === 0)).toBe(true);
     const incoming = v.frames.find(f => f.incomingEventId !== null)!;
     expect(incoming.own).toEqual(claimFrame.own);
+  });
+  it('paused same-tick snapshots never pull the shown paddle back to the unmoved authoritative pose', () => {
+    const h = connected(), r = approach(h), c = h.a.client, v = new OnlineView(0, h.now);
+    c.onState = (s, e, at) => v.accept(s, at!, e); c.onInput = (x, y, seq, at) => v.input(x, y, seq, at);
+    h.authority.snapshot(h.a.session); h.flush(); v.draw(h.now(), 0, true);
+    c.pointer(55, 125.5); const shown: number[] = [];
+    h.advance(300, () => { const m = v.draw(h.now(), 0, c.enabled); if (r.wait) shown.push(m!.own.left); });
+    expect(shown.length).toBeGreaterThan(3);
+    for (let i = 1; i < shown.length; i++) expect(shown[i]).toBeLessThanOrEqual(shown[i - 1]);
   });
   it('a defender that saw a miss claims a miss', () => {
     const h = connected(), r = approach(h), c = h.a.client, v = new OnlineView(0, h.now), claims: ContactClaim[] = [];

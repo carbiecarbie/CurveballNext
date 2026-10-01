@@ -273,7 +273,9 @@ export class Authority {
       const ys = [actor.y, actor.ty, ...recent.map(t => t.y)].map(y => Math.max(45, Math.min(206, y)));
       const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
       const x = f.x as number, y = f.y as number, dx = f.dx as number, dy = f.dy as number;
-      if (x >= x0 && x <= x1 && y >= y0 && y <= y1 && Math.abs(dx) <= (x1 - x0) / RULES.easing && Math.abs(dy) <= (y1 - y0) / RULES.easing) {
+      // The client reaches poses through the same binary64 easing; allow its rounding, not extra reach.
+      const e = 1e-9;
+      if (x >= x0 - e && x <= x1 + e && y >= y0 - e && y <= y1 + e && Math.abs(dx) <= (x1 - x0) / RULES.easing + e && Math.abs(dy) <= (y1 - y0) / RULES.easing + e) {
         actor.x = actor.px = x; actor.y = actor.py = y; actor.dx = dx; actor.dy = dy; r.state.viewBoxes = boxes(r.state); accepted = true;
       }
     }

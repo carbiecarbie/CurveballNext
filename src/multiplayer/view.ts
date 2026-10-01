@@ -67,8 +67,11 @@ export class OnlineView {
     // Every event carries the FINAL state of its simulation transaction. Even a
     // preceding wall can therefore carry Hold/MatchEnded. Defer the entire tail,
     // including not-yet-delivered events identified by lastEventId.
+    // A contact-claim pause repeats the same Rally tick: there is no new authoritative motion, so rebasing would pull the
+    // shown paddle back to the unmoved pose exactly while the defender's claim frame is due. Keep predicting instead.
+    const paused = !event && !!this.predicted && old?.phase === 'Rally' && s.phase === 'Rally' && s.matchId === old.matchId && s.rallyId === old.rallyId && s.tick === old.tick;
     if (this.pending || this.events.some(e => e.event.eventId > this.drawnEvent)) this.pending = structuredClone(s);
-    else this.rebase(s);
+    else if (!paused) this.rebase(s);
     if (s.phase !== 'Rally') {
       // Freeze the actual preceding draw, never substitute corrected contact geometry.
       if (old?.phase === 'Rally' && this.pending) {
