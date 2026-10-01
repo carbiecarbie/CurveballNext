@@ -11,7 +11,9 @@ if (!Object.hasOwn(profiles, profile)) throw new Error('Unknown profile');
 const scheduled = manifest(profile), hash = createHash('sha256').update(JSON.stringify(scheduled)).digest('hex');
 const directory = `captures-local/m5-fairness/${profile}-${Date.now()}`; mkdirSync(directory, { recursive: true });
 writeFileSync(`${directory}/manifest.json`, JSON.stringify({ profile, hash, scheduled, networkQualified: false, requiredShape: profiles[profile] }, null, 2));
-const app = startServer(8787, '127.0.0.1');
+// FAIRNESS_HOST lets an isolated shaped-network harness bind a private test interface.
+const host = process.env.FAIRNESS_HOST ?? '127.0.0.1';
+const app = startServer(8787, host);
 let current = '', attempt = 0;
 app.authority.onDiagnostic = record => appendFileSync(`${directory}/authority.jsonl`, JSON.stringify({ id: current, attempt, ...record }) + '\n');
 const observer = createServer(async (req, res) => {
@@ -47,6 +49,6 @@ const observer = createServer(async (req, res) => {
     res.writeHead(404); res.end();
   } catch (e) { res.writeHead(400); res.end(e instanceof Error ? e.message : 'invalid'); }
 });
-observer.listen(9055, '127.0.0.1');
+observer.listen(9055, host);
 console.log(JSON.stringify({ event: 'test-only-fairness', directory, profile, hash, networkQualified: false }));
 process.on('SIGINT', () => { app.close(); observer.close(); });

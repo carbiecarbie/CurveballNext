@@ -59,7 +59,9 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
     };
     requestAnimationFrame(render);
     const started = performance.now();
-    for (const stimulus of scheduled) {
+    // ?limit=N captures only the first N predeclared opportunities per defender (smoke runs; cells stay incomplete).
+    const limit = Number(params.get('limit') ?? 300);
+    for (const stimulus of scheduled.filter(s => s.index < limit)) {
       if (performance.now() - started >= 7200000) throw new Error('Two-hour profile limit; incomplete cell');
       if (peers.some(p => p.client.closed)) throw new Error('Connection interrupted; retain incomplete attempt');
       const fixture = await (await get('/fixture', { id: stimulus.id, manifestHash: hash })).json();

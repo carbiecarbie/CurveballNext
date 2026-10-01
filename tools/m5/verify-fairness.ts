@@ -60,7 +60,7 @@ for (const captured of presentation) {
   records.push(entry);
 }
 const cells = [0, 1].map(side => cell(records.filter(r => r.id.startsWith(`${declared.profile}/${side}/`)), scheduled.filter(s => s.defender === side)));
-const report = { hash, profile: declared.profile, cells, failures, timing, tcpShapeVerified: review.tcpShapeVerified === true,
+const report = { hash, profile: declared.profile, cells, failures, observations: records, timing, tcpShapeVerified: review.tcpShapeVerified === true,
   stimulusApproved: review.stimulusApproved === true, physicalApproved: review.physicalApproved === true,
   completeGate: cells.every(c => c.numericalGate) && !failures.length && review.tcpShapeVerified === true && review.stimulusApproved === true && review.physicalApproved === true };
 writeFileSync(resolve(directory, 'independent-assessment.json'), JSON.stringify(report, null, 2));

@@ -9,6 +9,9 @@ on:
       capacity_seconds:
         description: Capacity run duration in seconds (10..7200)
         default: '600'
+      fairness_limit:
+        description: Fairness opportunities per defender (300 = full cell)
+        default: '300'
 
 jobs:
   validate:
@@ -130,3 +133,55 @@ jobs:
             tc-after-setup.txt
             tc-after-traffic.txt
             shaper-result.txt
+
+  fairness:
+    # Shaped controlled-capture cells (tools/m5/fairness-ci.sh). Push runs a short C3 smoke;
+    # manual dispatch runs all eight profiles. Image/cadence corroboration still needs independent review.
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '["C0","C1","C2","C3","C4a","C4b","C5a","C5b"]' || '["C3"]') }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save playwright@1.55.0
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/m5/build-qualification.mjs
+      - name: Capture shaped profile
+        run: bash tools/m5/fairness-ci.sh "${{ matrix.profile }}" "${{ github.event.inputs.fairness_limit || '5' }}"
+      - name: Summarize cell
+        if: always()
+        run: |
+          node --input-type=module -e "
+          import { readFileSync } from 'node:fs';
+          const out = 'captures-local/m5-ci/${{ matrix.profile }}';
+          const run = readFileSync(out + '/run-directory.txt', 'utf8').trim();
+          const r = JSON.parse(readFileSync(run + '/independent-assessment.json', 'utf8'));
+          let bad = r.failures.length > 0;
+          for (const side of [0, 1]) {
+            const obs = r.observations.filter(o => o.id.startsWith(r.profile + '/' + side + '/'));
+            const count = k => obs.filter(o => o.classification === k).length;
+            const done = obs.filter(o => o.completed && o.classification !== 'borderline' && o.classification !== 'ambiguous').length;
+            const rejected = count('apparent-contact-rejected');
+            console.log('::notice::' + r.profile + ' defender ' + side + ': captured=' + obs.length + ' n=' + done + ' accepted=' + count('apparent-contact-accepted') +
+              ' rejected=' + rejected + ' noncontact=' + count('clear-noncontact') + ' borderline=' + count('borderline') + ' ambiguous=' + count('ambiguous'));
+            if (!done || rejected / done > 0.01) bad = true;
+          }
+          for (const f of r.failures.slice(0, 10)) console.log('::error::' + f);
+          console.log('::notice::' + readFileSync(out + '/shape-plan.txt', 'utf8').trim());
+          if (bad) process.exit(1);
+          "
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: m5-fairness-${{ matrix.profile }}
+          path: |
+            captures-local/m5-ci/
+            captures-local/m5-fairness/

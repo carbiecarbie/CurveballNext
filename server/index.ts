@@ -1,5 +1,4 @@
 import { createServer } from 'node:http';
-import { pathToFileURL } from 'node:url';
 import { WebSocketServer } from 'ws';
 import { Authority, Bucket } from './authority';
 
@@ -66,10 +65,4 @@ export function startServer(port = Number(process.env.PORT ?? 8787), host = proc
     setTimeout(() => { authority.pump(); clearInterval(timer); wss.close(); http.close(); }, 1000);
   };
   return { http, authority, close };
-}
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const app = startServer();
-  console.log(JSON.stringify({ event: 'started', port: process.env.PORT ?? 8787, protocol: 1, rules: 'online-v1' }));
-  process.on('SIGTERM', app.close); process.on('SIGINT', app.close);
-  process.on('SIGUSR2', () => { app.authority.draining = true; });
 }
