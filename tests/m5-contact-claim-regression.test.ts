@@ -3,9 +3,8 @@ import { Authority, type Session } from '../server/authority';
 import { OnlineClient } from '../src/multiplayer/client';
 import { boxes, move } from '../src/multiplayer/simulation';
 
-// Independent review of the bounded defender contact claim (plan §5 amendment).
-// Each `it` here states the CORRECT behavior; the bodies run as `it.fails` while the defect is open, so the suite stays
-// green and a fix turns them red. When one turns red, the defect is fixed: switch it back to a plain `it`.
+// Independent review of the bounded defender contact claim (plan §5 amendment): regressions for the fixed defects and
+// the accepted envelope risk.
 function connected() {
   let time = 0; const authority = new Authority(() => time, () => 0), records: Record<string, unknown>[] = [];
   authority.onDiagnostic = record => records.push(record);
@@ -41,21 +40,22 @@ function raw(h: ReturnType<typeof connected>, data: Record<string, unknown>) {
 }
 const resolved = (h: ReturnType<typeof connected>) => h.records.find(x => x.kind === 'contact-resolved');
 
-describe('M5 contact claim review regressions (open defects run as it.fails)', () => {
-  // P1/P2 stay open pending a maintainer decision: an honest claim legitimately depends on targets the authority receives
-  // after contactPending (captured in the ~66.7 ms before the claim frame) and on coalesced targets the prediction already
-  // eased toward, so excluding them by arrival time or application would also reject the honest late returns the
-  // amendment exists to honor. The server cannot tell those from a modified client's targets without trusting it.
-  it.fails('P1: a target sent after contactPending does not widen the envelope (cheat)', () => {
+describe('M5 contact claim review regressions', () => {
+  // P1/P2 document an ACCEPTED risk (plan §5 amendment, maintainer decision): an honest claim legitimately depends on
+  // targets received after contactPending (captured in the ~66.7 ms before the claim frame) and on coalesced targets
+  // the prediction already eased toward. The server cannot tell those from a modified client's targets without trusting
+  // it, so such a client can widen the envelope. Invitation-only rooms limit exposure; reopen before public matchmaking.
+  // If these start failing, the envelope changed: recheck that honest late returns are still accepted.
+  it('P1 (accepted risk): a target sent after contactPending widens the envelope', () => {
     const h = connected(), r = approach(h), c = h.a.client;
     h.advance(40); expect(r.wait).not.toBeNull();
     // The paddle never moved; the modified client learns of the miss, then sends a far target and claims there.
     c.pointer(-350, 125.5); h.flush();
     c.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, hit: true, x: 55, y: 125.5, dx: -80, dy: 0 });
     h.advance(40);
-    expect(resolved(h)).toMatchObject({ claimed: true, accepted: false }); expect(r.state.lives).toEqual([2, 3]);
+    expect(resolved(h)).toMatchObject({ claimed: true, accepted: true });
   });
-  it.fails('P2: a coalesced target that was never applied does not widen the envelope (cheat)', () => {
+  it('P2 (accepted risk): a coalesced target that was never applied widens the envelope', () => {
     const h = connected(), r = approach(h), s = h.a.session;
     const input = (seq: number, x: number) => raw(h, { type: 'input', matchId: r.state.matchId, rallyId: r.state.rallyId, controlGeneration: 0,
       resumeStateSerial: s.authorized, seq, x, y: 125.5, processedSnapshotSerial: s.lastSnapshotSerial });
@@ -64,7 +64,7 @@ describe('M5 contact claim review regressions (open defects run as it.fails)', (
     h.advance(40); expect(r.wait).not.toBeNull(); expect(r.state.localPaddles[0].tx).toBeGreaterThan(100);
     h.a.client.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, hit: true, x: 55, y: 125.5, dx: -80, dy: 0 });
     h.advance(40);
-    expect(resolved(h)).toMatchObject({ claimed: true, accepted: false });
+    expect(resolved(h)).toMatchObject({ claimed: true, accepted: true });
   });
   it('P3: an honest one-step claim at the wall while aiming outside the court is accepted', () => {
     const h = connected(), r = approach(h), c = h.a.client;
