@@ -87,3 +87,8 @@ footer p { margin: 0; letter-spacing: .3px; }
 .mode-menu button, .online-controls button { margin: .3rem; }
 .online-controls input { max-width: 12rem; }
 .online-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: #090508c9; color: #ffda9a; font-size: 2rem; pointer-events: none; }
+.online-banner { position: absolute; top: 16%; left: 0; right: 0; text-align: center; font-size: 2.4rem; font-weight: 700; letter-spacing: .25em; pointer-events: none; animation: online-banner 1.4s ease-out both; }
+.online-banner.won { color: #ffda9a; text-shadow: 0 0 18px #ffb143; }
+.online-banner.lost { color: #ff7a7a; text-shadow: 0 0 18px #ff3d3d; }
+@keyframes online-banner { 0% { opacity: 0; transform: scale(.85); } 12% { opacity: 1; transform: scale(1.06); } 25% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.online-lobby { color: #8fe3ff; }
