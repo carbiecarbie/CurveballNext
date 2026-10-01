@@ -13,7 +13,8 @@ ip link add "$ifb" type ifb
 ip link set "$ifb" up
 if ! tc qdisc show dev "$device" | grep -q ingress; then tc qdisc add dev "$device" handle ffff: ingress; fi
 tc filter add dev "$device" parent ffff: protocol ip pref "$preference" flower ip_proto tcp src_ip "$peer" "$selector" "$port" action mirred egress redirect dev "$ifb"
-tc qdisc add dev "$ifb" root netem limit 1000 delay "${delay}ms" "${jitter}ms" distribution uniform loss random "${loss}%" rate 1mbit seed "$seed"
+# netem jitter is uniform when no distribution table is named; there is no "uniform" table.
+tc qdisc add dev "$ifb" root netem limit 1000 delay "${delay}ms" "${jitter}ms" loss random "${loss}%" rate 1mbit seed "$seed"
 tc -s qdisc show dev "$ifb"
 # Cleanup after retaining tc statistics and packet captures:
 # tc filter del dev DEVICE parent ffff: protocol ip pref FILTER_PREF
