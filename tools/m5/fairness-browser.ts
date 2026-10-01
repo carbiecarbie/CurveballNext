@@ -2,7 +2,7 @@ import { OnlineClient } from '../../src/multiplayer/client';
 import { OnlineView, type DrawModel } from '../../src/multiplayer/view';
 import { drawOnline } from '../../src/presentation/canvas';
 import type { OnlineEvent } from '../../src/multiplayer/types';
-import type { Stimulus } from './fairness';
+import { realizedMarginOk, type Stimulus } from './fairness';
 
 const status = document.querySelector('#status')!, api = 'http://127.0.0.1:9055';
 const get = async (path: string, body?: unknown) => { const r = await fetch(api + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); if (!r.ok) throw new Error(await r.text()); return r; };
@@ -69,7 +69,7 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
     const limit = Number(params.get('limit') ?? 300);
     // ?hz=144 (or 120/60) captures only that display stratum, for a run with the physical display set to that rate.
     const hz = params.get('hz') === null ? null : Number(params.get('hz'));
-    for (const stimulus of scheduled.filter(s => s.index < limit && (hz === null || s.hz === hz))) {
+    for (const stimulus of scheduled.filter(s => s.index < limit && (hz === null || s.hz === hz))) for (let repeat = 0; ; repeat++) {
       if (performance.now() - started >= 7200000) throw new Error('Two-hour profile limit; incomplete cell');
       if (peers.some(p => p.client.closed)) throw new Error('Connection interrupted; retain incomplete attempt');
       const fixture = await (await get('/fixture', { id: stimulus.id, manifestHash: hash })).json();
@@ -95,6 +95,11 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       if (!captured) throw new Error(`${stimulus.id}: missing incoming image/association`);
       await writing; if (writeFailure) throw new Error(writeFailure);
       status.textContent = `Retained ${stimulus.id}. Evidence is unqualified until packet shaping, cadence and independent image/classification review pass.`;
+      // Plan §9: an instrumentation-invalid attempt (shown margin outside its declared stratum) may be repeated with the
+      // same seed; every attempt stays in the evidence and the verifier decides. At most two repeats.
+      const shown = (capture as { incoming: DrawModel } | null)?.incoming.renderedAt ?? NaN;
+      if (realizedMarginOk(stimulus.marginMs, shown - captureTime) || repeat >= 2) break;
+      status.textContent = `${stimulus.id}: shown margin ${(shown - captureTime).toFixed(1)} ms outside its stratum; repeating the identical attempt`;
     }
     peers.forEach(p => p.client.leave()); status.textContent = 'Sequence captured. This is not a fairness PASS.';
   } catch (e) { status.textContent = `Blocked: ${e instanceof Error ? e.message : String(e)}`; }

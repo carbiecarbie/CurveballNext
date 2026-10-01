@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { cell, classify, independentBox, manifest, offsetInterval, profiles, realizedMarginOk, type Observation } from '../tools/m5/fairness';
+import { cell, classify, independentBox, manifest, offsetInterval, profiles, realizedMarginOk, resolveAttempts, type Observation } from '../tools/m5/fairness';
 
 it('fixed manifest contains 300 per defender/profile, exact groups and balanced timing strata', () => {
   for (const profile of Object.keys(profiles) as (keyof typeof profiles)[]) {
@@ -54,4 +54,19 @@ it('a stimulus counts only in the stratum nearest to the margin the defender was
   expect(realizedMarginOk(50, 84)).toBe(false); expect(realizedMarginOk(100, 84)).toBe(true); // a tick late lands in 100
   expect(realizedMarginOk(400, 335)).toBe(true); expect(realizedMarginOk(400, 290)).toBe(false); expect(realizedMarginOk(200, 290)).toBe(true);
   expect(realizedMarginOk(400, NaN)).toBe(false); expect(realizedMarginOk(50, -5)).toBe(false);
+});
+it('an instrumentation-invalid attempt may be repeated; a rejection is never replaced and a changed outcome blocks', () => {
+  const base = { completed: true, imagesCorroborated: true, investigated: true, marginMs: 50, hz: 60 } as const;
+  const ok: Observation = { ...base, id: 'C0/0/001', classification: 'apparent-contact-accepted' };
+  const invalid = (id: string, classification: Observation['classification']): Observation => ({ ...base, id, classification, instrumentationInvalid: true });
+  // Repeated after a margin fault: the valid repeat decides and both attempts are reported.
+  let r = resolveAttempts([invalid('C0/0/001', 'apparent-contact-accepted'), ok]);
+  expect(r.observations).toEqual([ok]); expect(r.errors).toEqual([]); expect(r.repeated).toEqual([{ id: 'C0/0/001', attempts: 2 }]);
+  // A rejection in a faulty attempt stays counted.
+  r = resolveAttempts([invalid('C0/0/001', 'apparent-contact-rejected'), ok]);
+  expect(r.observations[0].classification).toBe('apparent-contact-rejected');
+  // A repeat that changes the outcome is blocked; so is a repeat of a valid attempt, or a fault in every attempt.
+  expect(resolveAttempts([invalid('C0/0/001', 'clear-noncontact'), ok]).errors[0]).toMatch(/changed the outcome/);
+  expect(resolveAttempts([ok, ok]).errors[0]).toMatch(/without an instrumentation fault/);
+  expect(resolveAttempts([invalid('C0/0/001', 'apparent-contact-accepted')]).observations[0].classification).toBe('ambiguous');
 });
