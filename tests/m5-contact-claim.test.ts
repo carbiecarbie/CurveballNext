@@ -95,8 +95,12 @@ describe('M5 bounded defender contact claim (authority)', () => {
     const base = { matchId: r.state.matchId, rallyId: r.state.rallyId, hit: true, x: 175.5, y: 125.5, dx: 0, dy: 0 };
     h.a.client.claim({ ...base, tick: r.wait!.tick + 1 }); h.advance(40);
     expect(r.wait?.claim).toBeNull(); expect(r.state.lives).toEqual([3, 3]);
-    h.a.session.generation++; h.a.client.claim({ ...base, tick: r.wait!.tick }); h.advance(40);
-    expect(r.state.phase).toBe('LifeLostHold');
+    // A modified client's claim for another generation: the session itself stays current, so only the check rejects it.
+    const s = h.a.session;
+    h.authority.receive(s, JSON.stringify({ type: 'contactClaim', protocolVersion: 1, roomEpoch: r.epoch, ...base, tick: r.wait!.tick, controlGeneration: s.generation + 1 }));
+    h.advance(40); expect(r.wait?.claim).toBeNull(); expect(r.state.lives).toEqual([3, 3]);
+    h.advance(RULES.contactGraceMs); expect(r.state.phase).toBe('LifeLostHold');
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: false, timedOut: true });
   });
   it('an authoritative contact never waits', () => {
     const h = connected(), r = approach(h);
@@ -142,11 +146,21 @@ describe('M5 bounded defender contact claim (presented frame)', () => {
     h.advance(300, () => v.draw(h.now(), 0, c.enabled));
     expect(claims).toMatchObject([{ hit: false, x: 175.5, y: 125.5 }]); expect(r.state.lives).toEqual([2, 3]);
   });
-  it('a fenced defender sends no claim and the miss resolves by timeout', () => {
+  it('a defender fenced before the miss tick gets no pause: the miss commits at once', () => {
     const h = connected(), r = approach(h), c = h.a.client, v = new OnlineView(0, h.now), claims: ContactClaim[] = [];
     c.onState = (s, e, at) => v.accept(s, at!, e); c.onFence = () => v.fence();
     c.onPending = (p, at) => v.pendingContact(p, at); v.onClaim = claim => claims.push(claim);
-    c.blur(); h.advance(RULES.contactGraceMs + 80, () => v.draw(h.now(), 0, c.enabled));
+    c.blur(); h.advance(80, () => v.draw(h.now(), 0, c.enabled));
     expect(claims).toHaveLength(0); expect(r.state.lives).toEqual([2, 3]);
+    expect(h.records.some(x => x.kind === 'contact-pending')).toBe(false);
+  });
+  it('a defender that blurs during the pause sends no claim and the miss commits', () => {
+    const h = connected(), r = approach(h), c = h.a.client, v = new OnlineView(0, h.now), claims: ContactClaim[] = [];
+    c.onState = (s, e, at) => v.accept(s, at!, e); c.onFence = () => v.fence();
+    c.onPending = (p, at) => v.pendingContact(p, at); v.onClaim = claim => claims.push(claim);
+    h.advance(40); expect(r.wait).not.toBeNull(); expect(c.records.some(x => x.kind === 'contact-pending')).toBe(true);
+    c.blur(); h.advance(80, () => v.draw(h.now(), 0, c.enabled));
+    expect(claims).toHaveLength(0); expect(r.wait).toBeNull(); expect(r.state.lives).toEqual([2, 3]);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: false, accepted: false });
   });
 });
