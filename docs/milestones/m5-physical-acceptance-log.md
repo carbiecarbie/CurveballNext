@@ -57,4 +57,4 @@ Same day, on the maintainer's physical 144 Hz display (NVIDIA RTX 5080, 3840×21
 - The exact Firefox version and the computer-to-column mapping above were not recorded.
 - Steps 7–8 (final-delivery ordering across backend restart, ≥64 KiB backpressure, expiry timers) need the controlled harness/staging session, outside a two-player match.
 
-Physical matches neither replace nor populate the controlled cells (CI run 36889301190: all sixteen cells 300/300 accepted, 0 rejected, 0 false accepted). M5 still requires the deployed 60-minute soak and independent review of the incoming-ball amendment before final acceptance.
+Physical matches neither replace nor populate the controlled cells (CI run 36889301190: all sixteen cells 300/300 accepted, 0 rejected, 0 false accepted). The deployed 60-minute soak passed (see the runbook deployment record). M5 still requires the independent recheck of the incoming-ball review fixes before final acceptance.
