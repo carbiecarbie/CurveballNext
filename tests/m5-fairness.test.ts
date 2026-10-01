@@ -49,7 +49,9 @@ it('missing screenshots, repeated attempts and capture ambiguity cannot become a
 it('offset intervals preserve directional uncertainty and reject inconsistent clocks', () => {
   expect(offsetInterval(100, 180, 181, 200)).toEqual([-19, 80]); expect(() => offsetInterval(100, 80, 81, 100)).toThrow();
 });
-it('a stimulus counts in its declared margin stratum only when the shown margin matches it within one tick', () => {
-  expect(realizedMarginOk(50, 52.4)).toBe(true); expect(realizedMarginOk(50, 77.9)).toBe(true);
-  expect(realizedMarginOk(50, 10)).toBe(false); expect(realizedMarginOk(50, 84)).toBe(false); expect(realizedMarginOk(400, NaN)).toBe(false);
+it('a stimulus counts only in the stratum nearest to the margin the defender was actually shown', () => {
+  expect(realizedMarginOk(50, 52.4)).toBe(true); expect(realizedMarginOk(50, 74)).toBe(true);
+  expect(realizedMarginOk(50, 84)).toBe(false); expect(realizedMarginOk(100, 84)).toBe(true); // a tick late lands in 100
+  expect(realizedMarginOk(400, 335)).toBe(true); expect(realizedMarginOk(400, 290)).toBe(false); expect(realizedMarginOk(200, 290)).toBe(true);
+  expect(realizedMarginOk(400, NaN)).toBe(false); expect(realizedMarginOk(50, -5)).toBe(false);
 });

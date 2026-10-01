@@ -49,7 +49,7 @@ for (const captured of presentation) {
     if (!input || !sent) throw new Error('Missing actual capture/wire-send record');
     // The declared stratum must be what the defender was shown: capture to the presented incoming frame, same clock.
     const realizedMarginMs = captured.incoming.renderedAt - input.at;
-    if (!realizedMarginOk(s.marginMs, realizedMarginMs)) throw new Error(`Realized margin ${realizedMarginMs.toFixed(1)} ms outside the declared ${s.marginMs} ms stratum`);
+    if (!realizedMarginOk(s.marginMs, realizedMarginMs)) throw new Error(`Realized margin ${realizedMarginMs.toFixed(1)} ms belongs to another stratum than the declared ${s.marginMs} ms`);
     const trace = authority.filter(r => r.id === s.id && r.attempt === captured.attempt && r.seq === input.seq && r.generation === input.generation && r.side === s.defender);
     const receipt = trace.find(r => r.kind === 'received'), consumed = trace.find(r => r.kind === 'consumed'), used = trace.find(r => r.kind === 'first-use');
     timing.push({ id: s.id, realizedMarginMs, captureToContact: [contact.committed - (input.at + hi + uncertainty), contact.committed - (input.at + lo - uncertainty)],

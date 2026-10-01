@@ -45,8 +45,17 @@ export function classify(ball: Rect, paddle: Rect, hit: boolean) {
   if (x <= -1 || y <= -1) return hit ? 'apparent-noncontact-accepted' : 'clear-noncontact';
   return 'borderline';
 }
-/** The stimulus margin the defender was actually shown (capture → presented incoming frame, browser clock) must match its stratum. */
-export function realizedMarginOk(declaredMs: number, realizedMs: number) { return Number.isFinite(realizedMs) && Math.abs(realizedMs - declaredMs) <= 1000 / 30; }
+/**
+ * The stimulus margin the defender was actually shown (capture → presented incoming frame, browser clock) must belong to its
+ * declared stratum: nearer to it than to any other stratum. Exact equality is not expected: the presentation clock is still
+ * converging to its lead (up to 1.35× real time) hundreds of milliseconds before the crossing, and frames are quantized.
+ */
+export const marginStrata = [50, 100, 200, 400] as const;
+export function realizedMarginOk(declaredMs: number, realizedMs: number) {
+  if (!Number.isFinite(realizedMs) || realizedMs <= 0) return false;
+  const nearest = marginStrata.reduce((best, m) => Math.abs(realizedMs - m) < Math.abs(realizedMs - best) ? m : best, marginStrata[0] as number);
+  return nearest === declaredMs;
+}
 export function offsetInterval(c0: number, s1: number, s2: number, c3: number): [number, number] {
   const interval: [number, number] = [s2 - c3, s1 - c0]; if (interval[0] > interval[1]) throw new Error('Inconsistent clock evidence'); return interval;
 }

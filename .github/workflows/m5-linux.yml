@@ -173,6 +173,15 @@ jobs:
             console.log('::notice::' + r.profile + ' defender ' + side + ': captured=' + obs.length + ' n=' + done + ' accepted=' + count('apparent-contact-accepted') +
               ' rejected=' + rejected + ' falseAccepted=' + falseAccepted + ' noncontact=' + count('clear-noncontact') + ' borderline=' + count('borderline') + ' ambiguous=' + count('ambiguous'));
             if (!done || rejected / done > 0.01 || falseAccepted > 0) bad = true;
+            // Realized shown margins per declared stratum (capture → presented incoming frame), for transparency.
+            const realized = {};
+            for (const t of r.timing.filter(t => t.id.startsWith(r.profile + '/' + side + '/') && Number.isFinite(t.realizedMarginMs))) {
+              const o = r.observations.find(o => o.id === t.id); (realized[o.marginMs] ??= []).push(t.realizedMarginMs);
+            }
+            console.log('::notice::' + r.profile + ' defender ' + side + ' realized margins ' + Object.entries(realized).map(([m, a]) => {
+              a.sort((x, y) => x - y); const q = p => a[Math.floor(p * (a.length - 1))].toFixed(0);
+              return m + 'ms→' + q(0) + '/' + q(.5) + '/' + q(1);
+            }).join(' '));
           }
           const ms = n => n === null || n === undefined ? 'none' : n.toFixed(1);
           for (const o of r.observations.filter(o => o.classification === 'apparent-contact-rejected')) {

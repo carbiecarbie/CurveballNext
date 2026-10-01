@@ -43,7 +43,7 @@ Both testers approved.
 
 ## Real-display cadence run
 
-Same day, on the maintainer's physical 144 Hz display (NVIDIA RTX 5080, 3840×2160), local loopback (profile C0, no shaping), Chromium 154 browser in the foreground, one stratum per run with the display switched to that refresh rate (`?hz=` filter). 600 opportunities (300 per defender) captured; the independent verifier reported no failures and classified all 600 as apparent contact accepted (cells stay incomplete until independent image corroboration).
+Same day, on the maintainer's physical 144 Hz display (NVIDIA RTX 5080, 3840×2160), local loopback (profile C0, no shaping), Chromium 154 browser in the foreground, one stratum per run with the display switched to that refresh rate (`?hz=` filter). 600 opportunities (300 per defender) captured; the independent verifier reported no failures and classified all 600 as apparent contact accepted (cells stay incomplete until independent image corroboration). This capture used the earlier estimate-based stimulus scheduler; re-verified under the later nearest-stratum margin rule, 5 of 600 observations (all accepted contacts, declared 50 ms, shown 76.9–77.9 ms) fall nearer the 100 ms stratum. The cadence results are unaffected.
 
 | Stratum | Opportunities | Frame intervals | Target | Median | p5–p95 | p99 | Within ±2 ms |
 |---|---|---|---|---|---|---|---|
