@@ -20,8 +20,8 @@ export interface Session {
   nonces: Map<string, number>; heartbeatAt: number; probe: { probeId: number; c0: number; s1: number } | null;
   /** Recently received targets (read space, unclamped) bounding which claimed poses are reachable, with their control context. */
   targets: { x: number; y: number; at: number; matchId: number; rallyId: number; generation: number }[];
-  /** Proactive claim for an upcoming end-plane crossing, sent from the defender's presented frame. */
-  claim: Frame | null;
+  /** Proactive claims for upcoming end-plane crossings, by tick, sent from the defender's presented frames. */
+  claims: Map<number, Frame>;
   /** This client claims its presented crossings proactively (it has sent at least one claim ahead of a crossing). */
   proactive: boolean;
   /** Authoritative poses this session's paddle actually occupied (per committed Rally tick), for the claim envelope. */
@@ -54,7 +54,7 @@ export class Authority {
     const s: Session = { id: randomBytes(16).toString('hex'), transport, opened: t, room: null, side: 0, credential: '', closing: null,
       serial: 0, lastSent: '', lastSnapshotSerial: 0, generation: 0, enabled: true, authorized: 0, seq: 0, pending: null, queue: [], issued: new Map(), sync: new Map(), responses: new Map(),
       events: [], latest: null, congested: null, abuse: null, inputs: new Bucket(30, 60, t), commands: new Bucket(5, 10, t),
-      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claim: null, proactive: false, poses: [] };
+      lastExcess: t, healthAt: t, tickAt: t, healthSerial: 0, healthTick: 0, beatSeq: 0, nonces: new Map(), heartbeatAt: t - 1000, probe: null, targets: [], claims: new Map(), proactive: false, poses: [] };
     this.sessions.add(s); return s;
   }
   receive(s: Session, raw: string) {
@@ -189,9 +189,11 @@ export class Authority {
       } else {
         // Proactive: the defender's presented ball runs ahead of the authority, so its claim normally precedes the crossing.
         if (state.phase !== 'Rally' || tick <= state.tick || tick > state.tick + 15) return;
-        // The first claim for a crossing stands: a later one for the same tick cannot replace what was presented first.
-        if (s.claim && s.claim.tick === f.tick) return;
-        s.claim = f;
+        // The first claim for each crossing tick stands: a later one for the same tick cannot replace what was presented
+        // first, whatever claims for other ticks came in between. At most 15 ticks ahead, so this stays small.
+        if (s.claims.has(tick)) return;
+        for (const t of s.claims.keys()) if (t <= state.tick) s.claims.delete(t);
+        s.claims.set(tick, f);
       }
       const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received, early: !w };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
@@ -238,11 +240,11 @@ export class Authority {
   private begin(r: Room, side: Side) {
     startMatch(r.state, side); r.endedAt = null; r.rematch = [false, false]; r.wait = null;
     r.sources = [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: r.state.tick, firstUsed: false }));
-    r.slots.forEach(p => { if (p) { p.pending = null; p.claim = null; p.seq = 0; p.tickAt = this.now(); p.healthTick = r.state.tick; p.sync.clear(); } });
+    r.slots.forEach(p => { if (p) { p.pending = null; p.claims.clear(); p.seq = 0; p.tickAt = this.now(); p.healthTick = r.state.tick; p.sync.clear(); } });
   }
   private closeSocket(s: Session, reason: string) {
     if (s.closing !== null) return;
-    s.closing = this.now(); s.enabled = false; s.pending = null; s.claim = null; s.queue = []; s.credential = ''; s.sync.clear(); s.issued.clear(); s.responses.clear(); s.nonces.clear();
+    s.closing = this.now(); s.enabled = false; s.pending = null; s.claims.clear(); s.queue = []; s.credential = ''; s.sync.clear(); s.issued.clear(); s.responses.clear(); s.nonces.clear();
     s.events = []; s.latest = null; s.transport.close(1000, reason.slice(0, 100));
   }
   disconnect(s: Session, reason: string) {
@@ -285,8 +287,8 @@ export class Authority {
     if (!p || p.closing !== null) return 'none';
     // A claim was validated when it arrived (current generation, enabled): it reports a frame already presented, so a
     // later fence does not void it.
-    const claim = p.claim?.tick === tick ? p.claim : null;
-    if (p.claim && (p.claim.tick as number) <= tick) p.claim = null;
+    const claim = p.claims.get(tick) ?? null;
+    for (const t of p.claims.keys()) if (t <= tick) p.claims.delete(t);
     if (claim) {
       const accepted = this.applyClaim(r, side, claim, claim.controlGeneration as number, now);
       this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, claimed: true, hit: claim.hit, accepted, timedOut: false, interrupted: null, early: true, authoritative: end.type, at: now });

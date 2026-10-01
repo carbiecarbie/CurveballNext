@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Authority, type Session } from '../server/authority';
 import { OnlineClient } from '../src/multiplayer/client';
 import { OnlineView, type DrawModel } from '../src/multiplayer/view';
-import { boxes, createOnline, startMatch } from '../src/multiplayer/simulation';
+import { advanceBall, boxes, createOnline, startMatch } from '../src/multiplayer/simulation';
 import type { Side } from '../src/multiplayer/types';
 
 // Plan §5 incoming-ball amendment: the defender presents its incoming ball ahead of the authority, so its inputs and its
@@ -128,6 +128,25 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
 });
 
 describe('M5 incoming ball: review regressions', () => {
+  it('the first claim for a crossing stands even when claims for other ticks are interleaved (C, C+1, C)', () => {
+    // A modified client tries to replace its presented return at C by a miss after a claim for C+1 in between.
+    const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0; h.a.view.onClaim = () => {};
+    let sent = false;
+    h.advance(2200, () => {
+      const m = h.a.frames.at(-1), s = r.state;
+      if (!sent && m && m.z <= 8) {
+        // The authority's crossing tick, by the shared ball operation.
+        const b = structuredClone(s.ball); let crossing = s.tick; do crossing++; while (advanceBall(b) === null);
+        sent = true; const base = { matchId: s.matchId, rallyId: s.rallyId, y: 125.5, dx: 0, dy: 0 };
+        h.a.client.claim({ ...base, tick: crossing, hit: true, x: 175.5 });
+        h.a.client.claim({ ...base, tick: crossing + 1, hit: true, x: 175.5 });
+        h.a.client.claim({ ...base, tick: crossing, hit: false, x: 120 });
+      }
+    });
+    expect(h.records.filter(x => x.kind === 'claim-received' && x.side === 0).length).toBeGreaterThanOrEqual(2);
+    expect(h.records.find(x => x.kind === 'contact-resolved' && x.side === 0)).toMatchObject({ claimed: true, hit: true, accepted: true });
+    expect(r.state.lives).toEqual([3, 3]);
+  });
   it('a blur that ends a return wait early keeps the declared protection (no withholding penalty)', () => {
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0; h.a.view.onClaim = () => {};
     let blurred = false;
