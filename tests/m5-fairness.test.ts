@@ -23,6 +23,17 @@ it('clear apparent rejection uses emitted geometry, excludes true subpixel conta
   expect(classify(b, { left: 29.01, right: 89, top: 0, bottom: 40 }, false)).toBe('borderline');
   expect(classify(b, { left: 31, right: 91, top: 0, bottom: 40 }, false)).toBe('clear-noncontact');
 });
+it('an authoritative return of a clearly shown noncontact is a false acceptance that blocks the cell', () => {
+  const b = { left: 0, right: 30, top: 0, bottom: 30 };
+  expect(classify(b, { left: 31, right: 91, top: 0, bottom: 40 }, true)).toBe('apparent-noncontact-accepted');
+  expect(classify(b, { left: 29.01, right: 89, top: 0, bottom: 40 }, true)).toBe('borderline');
+  const scheduled = manifest('C2').filter(s => s.defender === 0);
+  const records: Observation[] = scheduled.map(s => ({ id: s.id, marginMs: s.marginMs, hz: s.hz, classification: 'apparent-contact-accepted', completed: true, imagesCorroborated: true, investigated: true }));
+  expect(cell(records, scheduled).numericalGate).toBe(true);
+  records[0].classification = 'apparent-noncontact-accepted';
+  const result = cell(records, scheduled);
+  expect(result.falseAccepted).toBe(1); expect(result.n).toBe(300); expect(result.rejected).toBe(0); expect(result.numericalGate).toBe(false);
+});
 it('300 denominator permits only three investigated rejections, with separate conditional fraction', () => {
   const scheduled = manifest('C2').filter(s => s.defender === 0);
   const records: Observation[] = scheduled.map(s => ({ id: s.id, marginMs: s.marginMs, hz: s.hz, classification: 'apparent-contact-accepted', completed: true, imagesCorroborated: true, investigated: true }));

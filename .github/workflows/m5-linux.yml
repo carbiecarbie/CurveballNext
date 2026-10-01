@@ -169,10 +169,10 @@ jobs:
             const obs = r.observations.filter(o => o.id.startsWith(r.profile + '/' + side + '/'));
             const count = k => obs.filter(o => o.classification === k).length;
             const done = obs.filter(o => o.completed && o.classification !== 'borderline' && o.classification !== 'ambiguous').length;
-            const rejected = count('apparent-contact-rejected');
+            const rejected = count('apparent-contact-rejected'), falseAccepted = count('apparent-noncontact-accepted');
             console.log('::notice::' + r.profile + ' defender ' + side + ': captured=' + obs.length + ' n=' + done + ' accepted=' + count('apparent-contact-accepted') +
-              ' rejected=' + rejected + ' noncontact=' + count('clear-noncontact') + ' borderline=' + count('borderline') + ' ambiguous=' + count('ambiguous'));
-            if (!done || rejected / done > 0.01) bad = true;
+              ' rejected=' + rejected + ' falseAccepted=' + falseAccepted + ' noncontact=' + count('clear-noncontact') + ' borderline=' + count('borderline') + ' ambiguous=' + count('ambiguous'));
+            if (!done || rejected / done > 0.01 || falseAccepted > 0) bad = true;
           }
           const ms = n => n === null || n === undefined ? 'none' : n.toFixed(1);
           for (const o of r.observations.filter(o => o.classification === 'apparent-contact-rejected')) {

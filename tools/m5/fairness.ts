@@ -41,7 +41,8 @@ export interface Rect { left: number; right: number; top: number; bottom: number
 export function classify(ball: Rect, paddle: Rect, hit: boolean) {
   const x = Math.min(ball.right, paddle.right) - Math.max(ball.left, paddle.left), y = Math.min(ball.bottom, paddle.bottom) - Math.max(ball.top, paddle.top);
   if (x >= 1 && y >= 1) return hit ? 'apparent-contact-accepted' : 'apparent-contact-rejected';
-  if (x <= -1 || y <= -1) return 'clear-noncontact';
+  // A return the defender's incoming frame clearly showed missing is a false acceptance (contact-claim amendment).
+  if (x <= -1 || y <= -1) return hit ? 'apparent-noncontact-accepted' : 'clear-noncontact';
   return 'borderline';
 }
 export function offsetInterval(c0: number, s1: number, s2: number, c3: number): [number, number] {
@@ -50,7 +51,7 @@ export function offsetInterval(c0: number, s1: number, s2: number, c3: number): 
 export interface Observation { id: string; classification: ReturnType<typeof classify> | 'ambiguous'; completed: boolean; imagesCorroborated: boolean; investigated: boolean; marginMs: number; hz: number }
 export function cell(observations: Observation[], scheduled: Stimulus[]) {
   const seen = new Set<string>(), errors: string[] = [], strata: Record<string, { n: number; rejected: number; noncontact: number }> = {};
-  let n = 0, rejected = 0, apparent = 0, noncontact = 0, borderline = 0, ambiguous = 0;
+  let n = 0, rejected = 0, apparent = 0, noncontact = 0, falseAccepted = 0, borderline = 0, ambiguous = 0;
   for (const s of scheduled) {
     const candidates = observations.filter(o => o.id === s.id);
     if (candidates.length !== 1) { errors.push(`${s.id}: missing or repeated attempt needs independent resolution`); continue; }
@@ -63,9 +64,10 @@ export function cell(observations: Observation[], scheduled: Stimulus[]) {
     if (o.classification.startsWith('apparent-contact')) apparent++;
     if (o.classification === 'apparent-contact-rejected') { rejected++; strata[key].rejected++; if (!o.investigated) errors.push(`${s.id}: uninvestigated rejection`); }
     if (o.classification === 'clear-noncontact') { noncontact++; strata[key].noncontact++; }
+    if (o.classification === 'apparent-noncontact-accepted') { falseAccepted++; errors.push(`${s.id}: authority returned a clearly shown noncontact`); }
   }
   if (observations.some(o => !seen.has(o.id))) errors.push('Unscheduled or unresolved attempts retained');
-  return { n, rejected, apparent, noncontact, borderline, ambiguous, strata, fraction: n ? rejected / n : null,
+  return { n, rejected, apparent, noncontact, falseAccepted, borderline, ambiguous, strata, fraction: n ? rejected / n : null,
     conditionalFraction: apparent ? rejected / apparent : null, errors,
-    numericalGate: n >= 300 && rejected / n <= .01 && !borderline && !ambiguous && !errors.length };
+    numericalGate: n >= 300 && rejected / n <= .01 && !falseAccepted && !borderline && !ambiguous && !errors.length };
 }
