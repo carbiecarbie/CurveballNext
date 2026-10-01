@@ -1,8 +1,8 @@
 import { randomBytes } from 'node:crypto';
 import { parseClient, sameContext, type Frame, type HealthState } from '../src/multiplayer/protocol';
 import { LIMITS, RULES } from '../src/multiplayer/rules';
-import { boxes, contact, createOnline, ownBox, paddle, startMatch, step, target } from '../src/multiplayer/simulation';
-import { ticking, type OnlineState, type Paddle, type Side } from '../src/multiplayer/types';
+import { boxes, createOnline, paddle, startMatch, step, target } from '../src/multiplayer/simulation';
+import { ticking, type OnlineState, type Side } from '../src/multiplayer/types';
 
 export interface Transport { bufferedAmount: number; send(raw: string): void; close(code: number, reason: string): void; terminate(): void }
 export class Bucket {
@@ -270,7 +270,7 @@ export class Authority {
   /**
    * Before a Rally tick that crosses an enabled defender's end plane: apply that defender's proactive claim (its presented
    * frame decides, within the envelope); otherwise commit an authoritative return, and pause for a late claim only when the
-   * authority would commit a miss/finish that some reachable pose could still have returned (plan §5 amendments).
+   * authority would commit a miss/finish (plan §5 amendments).
    */
   private crossing(r: Room, now: number): 'none' | 'claimed' | 'paused' {
     if (r.state.phase !== 'Rally') return 'none';
@@ -286,10 +286,8 @@ export class Authority {
       return 'claimed';
     }
     if (end.type === 'return') return 'none';
-    if (!this.hitPossible(r, side, p, now)) {
-      this.record(r, { kind: 'contact-impossible', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
-      return 'none';
-    }
+    // No claim yet for an authoritative miss: wait for it. Its targets may still be in flight (an asymmetric upstream can
+    // exceed the client's lead), so "no reachable pose" cannot be judged here; an honest claim normally arrives first.
     r.wait = { side, tick, deadline: now + RULES.contactGraceMs, generation: p.generation, claim: null };
     this.send(p, 'contactPending', { matchId: r.state.matchId, rallyId: r.state.rallyId, tick, side, incomingViewBoxes: r.state.viewBoxes });
     this.record(r, { kind: 'contact-pending', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, at: now });
@@ -330,13 +328,6 @@ export class Authority {
     // spread, because a target beyond the field still eases a full step before the paddle is clamped at the wall.
     if (!(inside(x, ax) && inside(y, ay) && inside(x - dx, ax) && inside(y - dy, ay) && Math.abs(dx) <= ax.reach + e && Math.abs(dy) <= ay.reach + e)) return false;
     actor.x = actor.px = x; actor.y = actor.py = y; actor.dx = dx; actor.dy = dy; r.state.viewBoxes = boxes(r.state); return true;
-  }
-  /** Could any envelope pose overlap the incoming C−1 ball (one-pixel allowance)? If not, a miss needs no pause. */
-  private hitPossible(r: Room, side: Side, p: Session, now: number) {
-    const { ax, ay } = this.envelope(r, p, p.generation, now), ball = r.state.viewBoxes[side].ball;
-    const nearest = (v: number, a: typeof ax) => Math.max(a.lo, Math.min(a.hi, v));
-    const own = ownBox({ x: nearest((ball[0] + ball[1]) / 40, ax), y: nearest((ball[2] + ball[3]) / 40, ay) } as Paddle);
-    return contact([ball[0] - 20, ball[1] + 20, ball[2] - 20, ball[3] + 20], own);
   }
   /** One synchronous simulation transaction and its publication: events, then the resulting snapshot. */
   private commit(r: Room, now: number, before: OnlineState | null, priorSources: Room['sources'] | null) {

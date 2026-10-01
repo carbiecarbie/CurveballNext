@@ -7,14 +7,14 @@ import type { Side } from '../src/multiplayer/types';
 
 // Plan §5 incoming-ball amendment: the defender presents its incoming ball ahead of the authority, so its inputs and its
 // claim reach the authority by the crossing tick and the authority does not pause.
-function network(oneWayMs: number) {
+function network(oneWayMs: number, downMs = oneWayMs) {
   let time = 0; const authority = new Authority(() => time, () => 0), records: Record<string, unknown>[] = [];
   authority.onDiagnostic = record => records.push(record);
   type Player = { client: OnlineClient; session: Session; view: OnlineView; up: { at: number; raw: string }[]; down: { at: number; raw: string }[]; frames: DrawModel[] };
   const players: Player[] = [];
   function open(operation: 'create' | 'join', code?: string) {
     const up: Player['up'] = [], down: Player['down'] = [];
-    const session = authority.open({ bufferedAmount: 0, send: raw => down.push({ at: time + oneWayMs, raw }), close: () => {}, terminate: () => {} })!;
+    const session = authority.open({ bufferedAmount: 0, send: raw => down.push({ at: time + downMs, raw }), close: () => {}, terminate: () => {} })!;
     const client = new OnlineClient({ readyState: 1, bufferedAmount: 0, send: raw => up.push({ at: time + oneWayMs, raw }), close: () => {} }, () => time, operation, code);
     const view = new OnlineView(0, () => time), player: Player = { client, session, view, up, down, frames: [] };
     client.onState = (s, e, at) => { view.side = client.side; view.accept(s, at!, e); };
@@ -74,6 +74,15 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
     // The defender's ball never stops. The opponent sees at most the plan's single-tick hold at the far impact
     // (never interpolate through an impact), independent of latency, instead of the former RTT-scaled pause.
     expect(longestFreeze(h.a.frames)).toBeLessThan(10); expect(longestFreeze(h.b.frames)).toBeLessThanOrEqual(1000 / 30);
+  });
+  it('an asymmetric upstream (70 ms up, 10 ms down) still returns the late defender: a short wait for the claim, no rejection', () => {
+    const h = network(70, 10), r = serveToward(h, 0, -80); h.b.frames.length = 0;
+    h.advance(1600, () => track(h.a, 8));
+    expect(r.state.lives).toEqual([3, 3]);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: true, hit: true, accepted: true });
+    // If the claim trails the crossing, the authority waits for it rather than guessing; the wait stays short.
+    const pending = h.records.find(x => x.kind === 'contact-pending'), resolved = h.records.find(x => x.kind === 'contact-resolved')!;
+    if (pending) expect((resolved.at as number) - (pending.at as number)).toBeLessThan(100);
   });
   it('the defender sees its incoming ball ahead of the authority at the crossing, and buffered while far', () => {
     const h = network(25), r = serveToward(h, 0, -80); h.a.frames.length = 0;

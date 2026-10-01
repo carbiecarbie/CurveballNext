@@ -76,8 +76,9 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       const syncDeadline = performance.now() + 5000;
       while (p.client.state?.matchId !== fixture.matchId && !p.client.closed && performance.now() < syncDeadline) await wait(5);
       if (p.client.state?.matchId !== fixture.matchId || p.client.closed) throw new Error(`${stimulus.id}: fixture state unavailable; retain incomplete attempt`);
-      // Margins are before the contact the defender is SHOWN, which leads the authority's crossing by view.lead().
-      const at = fixture.contactNominal - p.view.lead(p.client.rtt) - stimulus.marginMs - p.client.offset;
+      // Margins are before the contact frame the defender is SHOWN: the C−1 ball, one tick before the authority's
+      // crossing C, presented view.lead() ahead of the server clock.
+      const at = fixture.contactNominal - 1000 / 30 - p.view.lead(p.client.rtt) - stimulus.marginMs - p.client.offset;
       await wait(Math.max(0, at - performance.now())); captureTime = performance.now(); p.client.pointer(stimulus.target.x, stimulus.target.y);
       const until = performance.now() + 5000; while (!captured && performance.now() < until) await wait(10);
       if (!captured) throw new Error(`${stimulus.id}: missing incoming image/association`);

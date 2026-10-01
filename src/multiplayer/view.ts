@@ -27,8 +27,8 @@ export class OnlineView {
   private played = new Set<string>();
   private ballTime = -Infinity; private lastDraw = -Infinity;
   constructor(public side: Side, private now: () => number) {}
-  /** How far ahead of the estimated server clock the incoming ball is presented: upstream transit plus one tick. */
-  lead(rtt: number) { return Math.max(TICK, Math.min(150, rtt / 2 + TICK)); }
+  /** How far ahead of the estimated server clock the incoming ball is presented: upstream transit, one tick and a jitter margin. */
+  lead(rtt: number) { return Math.max(TICK, Math.min(150, rtt / 2 + TICK + 10)); }
   /** Claims are proactive now; a pause notice needs no separate state (the presented crossing claims either way). */
   pendingContact(_p: ContactPending, _serverTime: number) {}
   input(x: number, y: number, seq: number, capturedAt = this.now()) {
