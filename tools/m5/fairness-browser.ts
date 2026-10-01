@@ -17,7 +17,7 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
     const open = async (side: 0 | 1, code?: string) => {
       const ws = new WebSocket(params.get(side ? 'wsB' : 'wsA') ?? 'ws://127.0.0.1:8787/online');
       await new Promise<void>((resolve, reject) => { ws.onopen = () => resolve(); ws.onerror = () => reject(new Error('WebSocket setup')); });
-      const client = new OnlineClient(ws, () => performance.now(), side ? 'join' : 'create', code), view = new OnlineView(side, () => performance.now());
+      const client = new OnlineClient(ws, () => performance.now(), side ? 'join' : 'create', code, true), view = new OnlineView(side, () => performance.now());
       sessions.push(client);
       ws.onmessage = e => client.receive(String(e.data)); ws.onclose = () => client.transportClosed();
       client.onState = (s, e, at) => view.accept(s, at!, e); client.onInput = (x, y, seq) => view.input(x, y, seq); client.onFence = () => view.fence();

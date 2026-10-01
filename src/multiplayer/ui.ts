@@ -51,7 +51,7 @@ export function mountOnline(root: HTMLElement, back: () => void) {
         if (!current()) { ws.close(); return; }
         const focused = document.hasFocus();
         if (root.hidden || document.hidden || ws.readyState !== WebSocket.OPEN) { stopConnection(true); return; }
-        const created = new OnlineClient(ws, () => performance.now(), operation, code.value.trim());
+        const created = new OnlineClient(ws, () => performance.now(), operation, code.value.trim(), true);
         // Also cover cancellation during constructor/initial-send callbacks.
         if (!current() || root.hidden || document.hidden) { created.interrupt('Page hidden · outcome unknown'); return; }
         connecting = false; owner.client = created; client = created;

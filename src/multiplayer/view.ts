@@ -23,6 +23,13 @@ export class OnlineView {
   onClaim: (c: ContactClaim) => void = () => {};
   /** Claims made from this defender's presented frames, keyed by match/rally/crossing tick. */
   private claims = new Map<string, Claimed>();
+  /**
+   * Evidence of every claim frame presented per crossing, kept through a fence (unlike the control claims above): the event
+   * labels the frame whose pose the authority installed, so a blur between application and confirmation keeps the link.
+   */
+  private evidence = new Map<string, Claimed[]>();
+  /** Last presented predicted ball position (fractional tick) per match/rally: the presented flight never steps back. */
+  private ballPos: { key: string; pos: number } | null = null;
   /** Audio keys already played, so a predicted sound is not repeated by its authoritative event. */
   private played = new Set<string>();
   private ballTime = -Infinity; private lastDraw = -Infinity;
@@ -109,8 +116,14 @@ export class OnlineView {
    * change at a paddle). It stops at an unresolved end-plane crossing (the C−1 box), unless this defender's own claim
    * reported a hit, whose return is then exactly what the authority computes from the claimed pose.
    */
-  private predictBall(latest: { state: OnlineState; time: number }, t: number): BallFrame {
-    const s = latest.state, steps = Math.max(0, (t - latest.time) / TICK), n = Math.floor(steps), frac = steps - n;
+  private predictBall(latest: { state: OnlineState; time: number }, t: number, dt: number): BallFrame {
+    const s = latest.state, key = `${s.matchId}/${s.rallyId}`;
+    let steps = Math.max(0, (t - latest.time) / TICK);
+    // A new anchor (e.g. the first tick after a claim pause) must not pull the flight back: continue from what was
+    // shown at no less than 0.75× until the anchored prediction catches up.
+    if (this.ballPos?.key === key) steps = Math.max(steps, this.ballPos.pos + .75 * dt / TICK - s.tick);
+    this.ballPos = { key, pos: s.tick + steps };
+    const n = Math.floor(steps), frac = steps - n;
     const balls: Ball[] = [structuredClone(s.ball)];
     const frame = (b: Ball, tick: number, crossing: BallFrame['crossing']): BallFrame =>
       ({ ball: rect(ballBox(b, this.side)), z: this.side === 0 ? b.z : 75 - b.z, tick, sourceTicks: [tick, tick], missed: false, predicted: true, crossing });
@@ -132,13 +145,13 @@ export class OnlineView {
     const a = rect(ballBox(balls[n], this.side)), b = rect(ballBox(balls[n + 1], this.side));
     return { ...frame(balls[n], s.tick + n, null), ball: blend(a, b, frac), sourceTicks: [s.tick + n, s.tick + n + 1] };
   }
-  private ballFrame(t: number): BallFrame {
+  private ballFrame(t: number, dt: number): BallFrame {
     const latest = this.samples.at(-1)!;
     // Anchor prediction at the FIRST sample of the latest tick: a claim pause repeats that tick with later send times,
     // and re-anchoring on each would step the predicted flight backward.
     const sameTick = (x: OnlineState) => x.matchId === latest.state.matchId && x.rallyId === latest.state.rallyId && x.tick === latest.state.tick && x.lastEventId === latest.state.lastEventId;
     const anchor = this.samples.find(x => sameTick(x.state)) ?? latest;
-    if (t > anchor.time && latest.state.phase === 'Rally' && this.predicted) return this.predictBall(anchor, t);
+    if (t > anchor.time && latest.state.phase === 'Rally' && this.predicted) return this.predictBall(anchor, t, dt);
     const older = this.samples.filter(s => s.time <= t).at(-1) ?? this.samples[0], newer = this.samples.find(s => s.time > t) ?? older;
     const same = older.state.matchId === newer.state.matchId && older.state.rallyId === newer.state.rallyId && older.state.lastEventId === newer.state.lastEventId;
     const alpha = same && newer.time > older.time ? Math.max(0, Math.min(1, (t - older.time) / (newer.time - older.time))) : 0;
@@ -179,10 +192,10 @@ export class OnlineView {
     const dt = Number.isFinite(this.lastDraw) ? Math.max(0, now - this.lastDraw) : 0, prior = this.ballTime;
     // Within 0.75–1.35× real time, also when the buffered time itself jumps (RTT/offset changes); only a large
     // discontinuity (first frame, stall, new timeline) snaps.
-    let ballTime = !Number.isFinite(prior) || Math.abs(goal - prior) > 500 ? goal : goal >= prior ? Math.min(goal, prior + dt * 1.35) : prior + dt * .75;
+    let ballTime = !Number.isFinite(prior) || Math.abs(goal - prior) > 500 ? goal : goal >= prior ? Math.max(prior + dt * .75, Math.min(goal, prior + dt * 1.35)) : prior + dt * .75;
     if (Number.isFinite(prior)) ballTime = Math.max(ballTime, prior);
     this.ballTime = ballTime; this.lastDraw = now;
-    const shown = this.ballFrame(ballTime);
+    const shown = this.ballFrame(ballTime, dt);
     let own = rally ? rect(a.own) : this.heldIncomingOwn ?? rect(latest.state.viewBoxes[this.side].own);
     if (this.predicted && this.previous) {
       const t = Math.max(0, Math.min(1, 1 - (this.next - now) / (1000 / 30)));
@@ -205,6 +218,7 @@ export class OnlineView {
       model = { ...model, own, tick: crossing.tick - 1, sourceTicks: [crossing.tick - 1, crossing.tick - 1], predictedLocal: structuredClone(prediction) };
       claimed = { hit, own, prediction, frame: null, preceding: previousFrame };
       this.claims.set(crossing.key, claimed); if (this.claims.size > 8) this.claims.delete(this.claims.keys().next().value!);
+      this.evidence.set(crossing.key, [...this.evidence.get(crossing.key) ?? [], claimed]); if (this.evidence.size > 8) this.evidence.delete(this.evidence.keys().next().value!);
       const s = latest.state;
       this.onClaim({ matchId: s.matchId, rallyId: s.rallyId, tick: crossing.tick, hit, x: prediction.x, y: prediction.y, dx: prediction.dx, dy: prediction.dy });
     }
@@ -217,14 +231,17 @@ export class OnlineView {
     this.events = this.events.filter(e => e.event.eventId > this.drawnEvent);
     const boundary = this.events.find(e => e.time <= clock && e.event.eventId > this.drawnEvent);
     if (boundary) {
-      const e = boundary.event, key = `${e.matchId}/${e.rallyId}/${e.tick}`, ownClaim = e.side === this.side ? this.claims.get(key) : undefined;
+      const e = boundary.event, key = `${e.matchId}/${e.rallyId}/${e.tick}`, presented = e.side === this.side ? this.evidence.get(key) ?? [] : [];
+      // The frame whose claimed pose the authority installed (same paddle box), else the latest presented claim frame.
+      const installed = JSON.stringify(rect(e.incomingViewBoxes[this.side].own));
+      const ownClaim = presented.find(c => c.frame && JSON.stringify(c.own) === installed) ?? presented.filter(c => c.frame).at(-1);
       const contactEvent = ['return', 'miss', 'finish'].includes(e.type);
       if (contactEvent && ownClaim?.frame && !boundary.sampled) {
         // This defender's crossing was already presented ahead, at its claim frame: never redraw it. Evidence and
         // settlement happen now, and the ball keeps its predicted (or authoritative) flight.
         boundary.sampled = true; boundary.incomingOwn = ownClaim.own;
         ownClaim.frame.incomingEventId = e.eventId; ownClaim.frame.overlayAllowed = false;
-        this.onBoundary(e, ownClaim.preceding, ownClaim.frame); this.claims.delete(key);
+        this.onBoundary(e, ownClaim.preceding, ownClaim.frame); this.claims.delete(key); this.evidence.delete(key);
         this.settle(e, enabled, rally);
         model.overlayAllowed = !this.events.some(x => x.event.eventId > this.drawnEvent && x.event.type === 'finish');
         if (!rally) model = { ...model, own: rect(latest.state.viewBoxes[this.side].own) };

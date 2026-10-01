@@ -16,7 +16,7 @@ function network(oneWayMs: number, downMs = oneWayMs) {
   function open(operation: 'create' | 'join', code?: string) {
     const up: Player['up'] = [], down: Player['down'] = [];
     const session = authority.open({ bufferedAmount: 0, send: raw => down.push({ at: time + link.down, raw }), close: () => {}, terminate: () => {} })!;
-    const client = new OnlineClient({ readyState: 1, bufferedAmount: 0, send: raw => up.push({ at: time + link.up, raw }), close: () => {} }, () => time, operation, code);
+    const client = new OnlineClient({ readyState: 1, bufferedAmount: 0, send: raw => up.push({ at: time + link.up, raw }), close: () => {} }, () => time, operation, code, true);
     const view = new OnlineView(0, () => time), player: Player = { client, session, view, up, down, frames: [] };
     client.onState = (s, e, at) => { view.side = client.side; view.accept(s, at!, e); };
     client.onInput = (x, y, seq, at) => view.input(x, y, seq, at); client.onFence = () => view.fence();
@@ -113,7 +113,6 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
     // Centered ball meeting the centered paddle: without the claim the authority returns it. Just before the crossing the
     // upstream degrades, so the defender's jerk and its miss claim arrive after the authority's crossing tick.
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
-    h.a.session.proactive = true; // this defender already claimed ahead earlier in the session (see the first-crossing residual)
     h.advance(1600, () => { const m = h.a.frames.at(-1); if (m && m.z <= 12) h.link.up = spike; jerk(h.a, 4); });
     const resolved = h.records.find(x => x.kind === 'contact-resolved');
     // 80 ms: the claim still precedes the crossing. 150 ms: it trails it, and the authority waits instead of returning.
@@ -128,11 +127,54 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
 });
 
 describe('M5 incoming ball: review regressions', () => {
-  it('a client that never claimed ahead keeps the authoritative return instead of a wait (first-crossing residual)', () => {
+  it('an older client that never declares proactive claims keeps the authoritative return without a wait', () => {
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
-    h.a.view.onClaim = () => {}; // claims never leave this client
+    h.a.session.proactive = false; h.a.view.onClaim = () => {}; // as a client built before proactive claims
     h.advance(1600);
     expect(h.records.some(x => x.kind === 'contact-pending')).toBe(false); expect(r.state.lives).toEqual([3, 3]);
+  });
+  it('a declared client that withholds its claims stalls at most one return, then the authority stops waiting', () => {
+    const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
+    expect(h.a.session.proactive).toBe(true); h.a.view.onClaim = () => {};
+    h.advance(2400);
+    expect(h.records.filter(x => x.kind === 'contact-pending')).toHaveLength(1);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: false, timedOut: true, authoritative: 'return' });
+    expect(h.a.session.proactive).toBe(false); expect(r.state.lives).toEqual([3, 3]);
+  });
+  it('a claim for a tick without any crossing neither enables nor keeps return waits', () => {
+    const h = network(10), r = h.a.session.room!; h.a.session.proactive = false;
+    h.a.client.claim({ matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.state.tick + 1, hit: true, x: 175.5, y: 125.5, dx: 0, dy: 0 });
+    h.advance(300);
+    expect(h.a.session.proactive).toBe(false);
+  });
+  it('a pause that ends in an accepted hit never steps the presented ball back (upstream spike 25 → 200 ms)', () => {
+    const h = network(25), r = serveToward(h, 0, -80); h.a.frames.length = 0;
+    h.advance(1600, () => { const m = h.a.frames.at(-1); if (m && m.z <= 12) h.link.up = 200; track(h.a, 8); });
+    expect(h.records.some(x => x.kind === 'contact-pending')).toBe(true);
+    expect(h.records.find(x => x.kind === 'contact-resolved')).toMatchObject({ claimed: true, hit: true, accepted: true });
+    expect(r.state.lives).toEqual([3, 3]);
+    // Through the pause and the first tick after it, the presented tick never decreases and the ball never moves back
+    // toward this side after its return began.
+    const f = h.a.frames.filter(x => x.ballPredicted);
+    for (let i = 1; i < f.length; i++) expect(f[i].tick).toBeGreaterThanOrEqual(f[i - 1].tick);
+    const crossing = h.a.client.records.find(x => x.kind === 'sent-claim')!.tick as number, after = f.filter(x => x.tick >= crossing);
+    expect(after.length).toBeGreaterThan(10);
+    for (let i = 1; i < after.length; i++) expect(after[i].z).toBeGreaterThanOrEqual(after[i - 1].z - 1e-9);
+  });
+  it('a blur after the authority applied the claim keeps the original claim frame as the incoming evidence', () => {
+    const h = network(25), r = serveToward(h, 0, -80); h.a.frames.length = 0;
+    const boundaries: DrawModel[] = []; h.a.view.onBoundary = (_e, _p, incoming) => boundaries.push(incoming);
+    let blurred = false;
+    h.advance(1600, () => {
+      track(h.a, 8);
+      const resolved = h.records.find(x => x.kind === 'contact-resolved');
+      if (resolved && !blurred) { blurred = true; h.a.client.blur(); h.a.client.focus(); } // event still in transit
+    });
+    expect(blurred).toBe(true); expect(r.state.lives).toEqual([3, 3]);
+    const sent = h.a.client.records.find(x => x.kind === 'sent-claim')!;
+    expect(boundaries).toHaveLength(1);
+    expect(boundaries[0].tick).toBe((sent.tick as number) - 1); expect(boundaries[0].incomingEventId).not.toBeNull();
+    expect(boundaries[0].predictedLocal).toMatchObject({ x: sent.x, y: sent.y });
   });
   const near = () => {
     const s = createOnline(); startMatch(s, 0); s.phase = 'Rally';
@@ -154,6 +196,13 @@ describe('M5 incoming ball: review regressions', () => {
     const shown: DrawModel[] = [];
     for (let k = 1; k <= 40; k++) { time = k * 8; if (k % 4 === 0) v.accept(structuredClone(s), time); shown.push(v.draw(time, 0, true)!); }
     for (let i = 1; i < shown.length; i++) { expect(shown[i].tick).toBeGreaterThanOrEqual(shown[i - 1].tick); expect(shown[i].z).toBeLessThanOrEqual(shown[i - 1].z + 1e-9); }
+  });
+  it('the ball clock keeps at least 0.75× real time when an offset correction pulls the server estimate back', () => {
+    let time = 1000; const s = createOnline(); startMatch(s, 0); s.phase = 'Rally'; s.ball.z = 70; s.ball.vz = -2; s.viewBoxes = boxes(s);
+    const v = new OnlineView(0, () => time); v.accept(s, 1000);
+    let prior = v.draw(1050, 100, true)!.ballTime;
+    time += 16; const t = v.draw(1048, 90, true)!.ballTime; // serverNow steps back 2 ms while RTT drops
+    expect(t - prior).toBeGreaterThanOrEqual(.75 * 16 - 1e-9); prior = t;
   });
   it('the ball clock stays within 0.75–1.35× real time when the buffered time jumps (RTT drop)', () => {
     let time = 1000; const s = createOnline(); startMatch(s, 0); s.phase = 'Rally'; s.ball.z = 70; s.ball.vz = -2; s.viewBoxes = boxes(s);

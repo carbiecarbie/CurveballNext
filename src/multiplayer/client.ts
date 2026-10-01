@@ -25,10 +25,11 @@ export class OnlineClient {
   private smoothedOffset: number | null = null;
   private inputSnapshotContext = '';
   private rallyActivatedAt = Infinity; private enabledAt = Infinity;
-  constructor(public socket: ClientSocket, private now: () => number, operation: 'create' | 'join', roomCode?: string) {
+  /** proactiveClaims: this runtime presents crossings through OnlineView and wires its claims (declared on create/join). */
+  constructor(public socket: ClientSocket, private now: () => number, operation: 'create' | 'join', roomCode?: string, proactiveClaims = false) {
     this.deadline = now() + 5000;
     const c0 = now(); this.pendingProbe.set(0, c0);
-    this.send(operation, { requestId: this.id(), probeId: 0, c0, ...(operation === 'join' ? { roomCode } : {}) });
+    this.send(operation, { requestId: this.id(), probeId: 0, c0, ...(operation === 'join' ? { roomCode } : {}), ...(proactiveClaims ? { proactiveClaims: true } : {}) });
   }
   private id() { return String(++this.request); }
   private record(data: Record<string, unknown>) {

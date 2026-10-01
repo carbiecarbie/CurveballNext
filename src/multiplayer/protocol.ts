@@ -26,7 +26,9 @@ export function parseClient(raw: string, bound: boolean): Frame {
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('schema');
   const f = v as Frame, schema = fields[f.type];
   if (!schema || f.protocolVersion !== RULES.protocolVersion) throw new Error('protocol-update');
-  const expected: Record<string, Validator> = { type: string, protocolVersion: v => v === 1, ...schema, ...(bound ? { roomEpoch: string } : {}) };
+  // A client may declare on create/join that it claims its presented crossings proactively (older clients omit it).
+  const optional: Record<string, Validator> = (f.type === 'create' || f.type === 'join') && Object.hasOwn(f, 'proactiveClaims') ? { proactiveClaims: v => v === true } : {};
+  const expected: Record<string, Validator> = { type: string, protocolVersion: v => v === 1, ...schema, ...optional, ...(bound ? { roomEpoch: string } : {}) };
   if (Object.keys(f).length !== Object.keys(expected).length || Object.entries(expected).some(([k, check]) => !check(f[k]))) throw new Error('schema');
   if (bound === (f.type === 'create' || f.type === 'join')) throw new Error('binding');
   return f;

@@ -149,7 +149,7 @@ export class Authority {
         if (!room) { this.error(s, f, 'room-unavailable'); this.closeSocket(s, 'room-unavailable'); return; }
         if (room.state.phase !== 'Waiting' || room.slots.every(Boolean)) { this.error(s, f, 'full'); this.closeSocket(s, 'full'); return; }
       }
-      s.room = room; s.side = room.slots[0] ? 1 : 0; room.slots[s.side] = s; s.credential = randomBytes(32).toString('hex'); s.healthAt = now;
+      s.room = room; s.side = room.slots[0] ? 1 : 0; room.slots[s.side] = s; s.proactive = f.proactiveClaims === true; s.credential = randomBytes(32).toString('hex'); s.healthAt = now;
       s.authorized = s.serial + 1;
       this.send(s, 'joined', { requestId: f.requestId, roomId: room.code, slot: s.side, playerSessionCredential: s.credential, rulesVersion: RULES.version,
         probeId: f.probeId, echoC0: f.c0, s1: received, s2: now, controlGeneration: 0, enabled: true, initialStateSerial: s.authorized, freshSnapshot: room.state }, true);
@@ -189,7 +189,7 @@ export class Authority {
       } else {
         // Proactive: the defender's presented ball runs ahead of the authority, so its claim normally precedes the crossing.
         if (state.phase !== 'Rally' || tick <= state.tick || tick > state.tick + 15) return;
-        s.claim = f; s.proactive = true;
+        s.claim = f;
       }
       const record = { kind: 'claim-received', matchId: state.matchId, rallyId: state.rallyId, side: s.side, tick, hit: f.hit, x: f.x, y: f.y, dx: f.dx, dy: f.dy, received, early: !w };
       r.diagnostics.push(record); this.onDiagnostic?.(record);
@@ -250,7 +250,8 @@ export class Authority {
       // The defender's own interruption during a pending claim first commits the original miss/finish, exactly as a
       // timeout would (plan §5 amendment); contactPending must not become an escape. Server-side causes still abort.
       if (r.wait && r.slots[r.wait.side] === s && !['server-overrun', 'expired', 'server-shutdown'].includes(reason)) {
-        const now = this.now(); r.wait.claim = null; this.resolveWait(r, now, reason);
+        // A claim that already arrived still decides: leaving cannot swap a presented miss for the stale return.
+        const now = this.now(); this.resolveWait(r, now, reason);
         this.commit(r, now, this.onDiagnostic ? structuredClone(r.state) : null, this.onDiagnostic ? structuredClone(r.sources) : null);
       }
       if (r.state.phase === 'Waiting') {
@@ -283,7 +284,7 @@ export class Authority {
     const claim = p.claim?.tick === tick ? p.claim : null;
     if (p.claim && (p.claim.tick as number) <= tick) p.claim = null;
     if (claim) {
-      const accepted = this.applyClaim(r, side, claim, p.generation, now);
+      const accepted = this.applyClaim(r, side, claim, p.generation, now); p.proactive = true;
       this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side, tick, claimed: true, hit: claim.hit, accepted, timedOut: false, interrupted: null, early: true, authoritative: end.type, at: now });
       return 'claimed';
     }
@@ -299,8 +300,11 @@ export class Authority {
   private record(r: Room, record: Record<string, unknown>) { r.diagnostics.push(record); this.onDiagnostic?.(record); if (r.diagnostics.length > 600) r.diagnostics.shift(); }
   /** Commit the paused crossing with the defender's claim, if any; anything else keeps the authoritative pose. */
   private resolveWait(r: Room, now: number, interrupted: string | null = null) {
-    const w = r.wait!, f = w.claim; r.wait = null;
+    const w = r.wait!, f = w.claim, p = r.slots[w.side]; r.wait = null;
     const accepted = this.applyClaim(r, w.side, f, w.generation, now);
+    // A return the defender never claimed stops further return waits until it claims ahead again: a client cannot keep
+    // stalling its own returns by declaring the capability and then withholding claims.
+    if (p && f) p.proactive = true; else if (p && !interrupted && w.authoritative === 'return') p.proactive = false;
     this.record(r, { kind: 'contact-resolved', matchId: r.state.matchId, rallyId: r.state.rallyId, side: w.side, tick: w.tick, claimed: !!f, hit: f?.hit ?? null, accepted,
       timedOut: !f && !interrupted && now >= w.deadline, interrupted, early: false, authoritative: w.authoritative, at: now });
   }

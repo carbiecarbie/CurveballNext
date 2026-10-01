@@ -109,6 +109,16 @@ describe('M5 contact claim review regressions', () => {
     h.a.client.hidden(); h.flush();
     expect(r.state.phase).toBe('Aborted'); expect(r.state.result).toBeNull(); expect(r.state.lives).toEqual([2, 3]);
   });
+  it('P5d: leaving after a valid miss claim during a pause that would return still loses the last life', () => {
+    // Paddle on the ball: the authority alone would return it. The proactive defender's presented miss claim arrives
+    // during the pause; leaving before the next boundary must not swap it for the stale return.
+    const h = connected(), r = approach(h); r.state.lives = [1, 3]; h.a.session.proactive = true;
+    Object.assign(r.state.localPaddles[0], { x: 60, px: 60, tx: 60, dx: 0 }); r.state.viewBoxes = boxes(r.state);
+    h.advance(40); expect(r.wait).toMatchObject({ authoritative: 'return' });
+    raw(h, { type: 'contactClaim', matchId: r.state.matchId, rallyId: r.state.rallyId, tick: r.wait!.tick, controlGeneration: 0, hit: false, x: 120, y: 125.5, dx: 0, dy: 0 });
+    h.a.client.leave(); h.flush();
+    expect(r.state.phase).toBe('MatchEnded'); expect(r.state.result).toMatchObject({ loser: 0, winner: 1, lives: [0, 3] });
+  });
   it('P5c: an opponent leaving during the pause aborts without winner and commits nothing', () => {
     const h = connected(), r = approach(h); r.state.lives = [1, 3];
     h.advance(40); expect(r.wait).not.toBeNull();
