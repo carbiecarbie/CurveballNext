@@ -186,7 +186,9 @@ export class OnlineView {
     // defender, so the defender's inputs and its claim reach the authority by the crossing tick. Rate-limited, monotonic.
     let goal = time;
     if (this.predicted && rally) {
-      const depth = this.side === 0 ? latest.state.ball.z : 75 - latest.state.ball.z, u = Math.max(0, Math.min(1, 1 - depth / 75));
+      // The latest snapshot lags the presented ball, so the full lead is reached once it is within 20% of the court of
+      // this side (15 of 75 depth units), not only at the plane: claims then leave with the planned margin.
+      const depth = this.side === 0 ? latest.state.ball.z : 75 - latest.state.ball.z, u = Math.max(0, Math.min(1, (1 - depth / 75) / .8));
       goal = time + u * u * (3 - 2 * u) * Math.max(0, serverNow + this.lead(rtt) - time);
     }
     const dt = Number.isFinite(this.lastDraw) ? Math.max(0, now - this.lastDraw) : 0, prior = this.ballTime;

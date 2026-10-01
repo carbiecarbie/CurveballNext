@@ -80,8 +80,15 @@ document.querySelector<HTMLButtonElement>('#start')!.onclick = async () => {
       if (p.client.state?.matchId !== fixture.matchId || p.client.closed) throw new Error(`${stimulus.id}: fixture state unavailable; retain incomplete attempt`);
       // Margins are before the contact frame the defender is SHOWN: the C−1 ball, one tick before the authority's
       // crossing C, presented view.lead() ahead of the server clock.
-      const at = fixture.contactNominal - 1000 / 30 - p.view.lead(p.client.rtt) - stimulus.marginMs - p.client.offset;
-      await wait(Math.max(0, at - performance.now())); captureTime = performance.now(); p.client.pointer(stimulus.target.x, stimulus.target.y);
+      // Fire on the defender's actual ball clock (server time, ~1× real time near the end): the shown C−1 frame is due when
+      // ballTime reaches contactNominal − one tick, so the margin is that far ahead of it. An estimate from lead() alone
+      // drifts by up to a tick when the presented lead is still converging.
+      const due = fixture.contactNominal - 1000 / 30 - stimulus.marginMs;
+      const coarse = fixture.contactNominal - 1000 / 30 - p.view.lead(p.client.rtt) - stimulus.marginMs - p.client.offset - 50;
+      await wait(Math.max(0, coarse - performance.now()));
+      const timeout = performance.now() + 3000;
+      while ((p.view.frames.at(-1)?.ballTime ?? -Infinity) + (performance.now() - (p.view.frames.at(-1)?.renderedAt ?? performance.now())) < due && performance.now() < timeout) await wait(1);
+      captureTime = performance.now(); p.client.pointer(stimulus.target.x, stimulus.target.y);
       const until = performance.now() + 5000; while (!captured && performance.now() < until) await wait(10);
       if (!captured) throw new Error(`${stimulus.id}: missing incoming image/association`);
       await writing; if (writeFailure) throw new Error(writeFailure);

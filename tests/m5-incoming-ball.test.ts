@@ -109,14 +109,15 @@ describe('M5 incoming ball presented ahead (plan §5 amendment)', () => {
   });
   /** A defender that jerks away only once its shown ball is within `depth` of its plane. */
   const jerk = (p: { client: OnlineClient; frames: DrawModel[] }, depth: number) => { const m = p.frames.at(-1); if (m && m.z <= depth) p.client.pointer(296, 206); };
-  it.each([80, 150])('a presented miss decides even where the stale authoritative pose would return (upstream spike 10 → %i ms)', spike => {
+  it.each([[80, 'miss'], [150, 'return']] as const)('a presented miss decides even where the stale authoritative pose would return (upstream spike 10 → %i ms)', (spike, authoritative) => {
     // Centered ball meeting the centered paddle: without the claim the authority returns it. Just before the crossing the
     // upstream degrades, so the defender's jerk and its miss claim arrive after the authority's crossing tick.
     const h = network(10), r = serveToward(h, 0, 0, 125.5); h.a.frames.length = 0;
-    h.advance(1600, () => { const m = h.a.frames.at(-1); if (m && m.z <= 12) h.link.up = spike; jerk(h.a, 4); });
+    h.advance(1600, () => { const m = h.a.frames.at(-1); if (m && m.z <= 12) h.link.up = spike; jerk(h.a, 3); });
     const resolved = h.records.find(x => x.kind === 'contact-resolved');
-    // 80 ms: the claim still precedes the crossing. 150 ms: it trails it, and the authority waits instead of returning.
-    expect(resolved).toMatchObject({ authoritative: 'return', claimed: true, hit: false, accepted: true, early: spike === 80 });
+    // 80 ms: the full lead still delivers the jerk and the claim before the crossing, so both sides agree on the miss.
+    // 150 ms: both trail it; the stale pose would return, the authority waits, and the presented miss decides.
+    expect(resolved).toMatchObject({ authoritative, claimed: true, hit: false, accepted: true, early: spike === 80 });
     expect(h.records.some(x => x.kind === 'contact-pending')).toBe(spike !== 80);
     expect(r.state.lives).toEqual([2, 3]); expect(h.a.client.events.some(e => e.type === 'return' && e.side === 0)).toBe(false);
     // What the defender was shown never comes back: after its claim frame the ball never moves away from its plane.
