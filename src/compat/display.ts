@@ -11,6 +11,13 @@ export function roundEven(value: number): number {
   return remainder === .5 ? floor % 2 === 0 ? floor : floor + 1 : Math.round(value);
 }
 const twips = (pixels: number) => Math.max(-2147483648, Math.min(2147483647, Math.trunc(pixels * 20)));
+/** Raw bounds before pixel division; online contact must retain these integers. */
+export function installTwips(pose: Pose): [number, number, number, number] {
+  const tx = twips(pose.x), ty = twips(pose.y);
+  const half = (size: number, source: number) => roundEven(Math.fround(Math.fround(size / source) * Math.fround(source * 10)));
+  const hx = half(pose.width, pose.sourceWidth ?? pose.width), hy = half(pose.height, pose.sourceHeight ?? pose.height);
+  return [tx - hx, tx + hx, ty - hy, ty + hy];
+}
 export const display: DisplayAdapter = Object.freeze({
   install(pose: Pose, stamp: Stamp) {
     const tx = twips(pose.x), ty = twips(pose.y);

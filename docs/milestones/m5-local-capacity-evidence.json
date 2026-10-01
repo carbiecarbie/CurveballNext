@@ -1,0 +1,32 @@
+{
+  "schema": "curveball-online-local-capacity-1",
+  "date": "2026-10-01",
+  "baseline": "13a50260a840957b8ddfdd538446dc5899f8afd4",
+  "runtime": "Node 24.19.0, Windows, real monotonic clock",
+  "command": "node dist-server/qualify-local.mjs 60",
+  "durationSeconds": 60.0014749,
+  "transport": "in-process serialized JSON; not TCP or Fly shared CPU",
+  "roomsAtEnd": 10,
+  "socketsAtEnd": 20,
+  "liveClients": 20,
+  "metrics": {
+    "ticks": 18000,
+    "skipped": 0,
+    "maxPayload": 1266,
+    "overruns": 0,
+    "snapshotCount": 36154,
+    "snapshotBytes": 37423211,
+    "deliveredBytes": 38329482
+  },
+  "latenessP99Ms": 15.461233333333325,
+  "batchP99Ms": 0.9455999999991036,
+  "rssBytes": 102289408,
+  "cpuUserMs": 1781,
+  "cpuSystemMs": 329,
+  "maxSnapshotBytes": 1266,
+  "schedulerTargetPassed": false,
+  "productionCapacityAccepted": false,
+  "fairnessAccepted": false,
+  "previousObservedLatenessP99Ms": [15.7526, 15.5393, 15.52717, 15.474533333603176, 15.597900000027948, 15.478033333805797],
+  "retentionNote": "Early runner used one overwritten capacity.json; the observed failed values are retained here. Later runner preserves timestamped reports under ignored captures-local/m5-local. No attempt establishes a pass."
+}

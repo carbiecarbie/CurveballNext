@@ -1,0 +1,13 @@
+**
+!Dockerfile
+!package.json
+!package-lock.json
+!tsconfig.json
+!tsconfig.server.json
+!src/
+!src/**
+!server/
+!server/**
+!tools/
+!tools/m5/
+!tools/m5/build-server.mjs

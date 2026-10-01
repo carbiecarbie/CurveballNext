@@ -1,0 +1,217 @@
+name: M5 Linux qualification
+
+on:
+  push:
+    branches: [main, m5-candidate, m5-fairness-full]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      capacity_seconds:
+        description: Capacity run duration in seconds (10..7200)
+        default: '600'
+      fairness_limit:
+        description: Fairness opportunities per defender (300 = full cell)
+        default: '300'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run server:build
+
+  capacity:
+    # In-process scheduler lateness/executed-batch evidence on Linux. Not Fly
+    # shared-CPU quota, TCP or fairness evidence.
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - run: node tools/m5/build-qualification.mjs
+      - name: Record environment
+        run: |
+          mkdir -p captures-local/m5-local
+          { uname -a; nproc; node --version; cat /proc/cpuinfo | grep 'model name' | head -1; } | tee captures-local/m5-local/environment.txt
+      - name: Run capacity measurement
+        run: node dist-server/qualify-local.mjs "${{ github.event.inputs.capacity_seconds || '60' }}"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: m5-linux-capacity
+          path: captures-local/m5-local/
+      - name: Check gates (lateness p99 <= 10 ms, batch p99 < 20 ms, no overruns)
+        run: |
+          node --input-type=module -e "
+          import { readdirSync, readFileSync } from 'node:fs';
+          const dir = 'captures-local/m5-local';
+          const file = readdirSync(dir).filter(f => f.startsWith('capacity-')).sort().at(-1);
+          const r = JSON.parse(readFileSync(dir + '/' + file, 'utf8'));
+          const checks = [
+            ['latenessP99Ms <= 10', r.latenessP99Ms !== null && r.latenessP99Ms <= 10, r.latenessP99Ms],
+            ['executedBatchP99Ms < 20', r.executedBatchP99Ms !== null && r.executedBatchP99Ms < 20, r.executedBatchP99Ms],
+            ['overruns == 0', r.metrics.overruns === 0, r.metrics.overruns],
+            ['liveClients == 20', r.liveClients === 20, r.liveClients],
+          ];
+          for (const [name, ok, value] of checks) console.log((ok ? '::notice::PASS ' : '::error::FAIL ') + name + ' (' + value + ')');
+          console.log('::notice::duration=' + r.durationSeconds + 's ticks=' + r.metrics.ticks + ' maxSnapshot=' + r.maxSnapshotBytes + 'B rss=' + r.rssBytes);
+          if (checks.some(c => !c[1])) process.exit(1);
+          "
+
+  netem-shaper:
+    # Verifies tools/m5/ingress-netem.sh actually shapes TCP between isolated
+    # network namespaces on this runner. Prerequisite only; not a fairness cell.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Load kernel modules
+        run: |
+          sudo modprobe sch_netem && sudo modprobe ifb numifbs=0 || {
+            sudo apt-get update && sudo apt-get install -y "linux-modules-extra-$(uname -r)"
+            sudo modprobe sch_netem && sudo modprobe ifb numifbs=0
+          }
+          { uname -r; tc -V; ip -V; } | tee shaper-environment.txt
+          echo "::notice::kernel $(uname -r); $(tc -V)"
+      - name: Create server/client namespaces
+        run: |
+          sudo ip netns add cbm5srv
+          sudo ip netns add cbm5a
+          sudo ip link add vsrv type veth peer name va
+          sudo ip link set vsrv netns cbm5srv
+          sudo ip link set va netns cbm5a
+          sudo ip -n cbm5srv addr add 10.55.0.1/24 dev vsrv
+          sudo ip -n cbm5a addr add 10.55.0.2/24 dev va
+          sudo ip -n cbm5srv link set vsrv up
+          sudo ip -n cbm5a link set va up
+          sudo ip -n cbm5srv link set lo up
+          sudo ip -n cbm5a link set lo up
+      - name: Measure unshaped and shaped TCP connect time
+        run: |
+          sudo ip netns exec cbm5srv python3 -m http.server 8787 --bind 10.55.0.1 >/dev/null 2>&1 &
+          sleep 1
+          measure() {
+            for i in $(seq 1 40); do
+              sudo ip netns exec cbm5a curl -s -o /dev/null -w '%{time_connect}\n' http://10.55.0.1:8787/
+            done | sort -n | awk '{a[NR]=$1} END {print a[int((NR+1)/2)]}'
+          }
+          sudo ip netns exec cbm5a curl -sS -o /dev/null http://10.55.0.1:8787/ || { echo "::error::baseline curl between namespaces failed"; exit 1; }
+          base=$(measure)
+          # Downstream C3-like profile on client receiver: 40 ms base, 10 ms uniform jitter, 1% loss.
+          echo "::notice::median connect unshaped=${base}s"
+          # Runner iproute2 6.1 lacks netem "seed"; use a newer iproute2 from a
+          # privileged container against the same host network namespaces.
+          if ! docker run --rm --privileged --network host -v /var/run/netns:/var/run/netns -v "$PWD:/w" -w /w debian:trixie bash -c \
+              'apt-get update -qq >/dev/null && apt-get install -y -qq iproute2 >/dev/null && tc -V && ip netns exec cbm5a bash tools/m5/ingress-netem.sh va cbm5a 10.55.0.1 downstream 8787 40 10 1 1234 10' > tc-after-setup.txt 2>&1; then
+            echo "::error::ingress-netem.sh failed: $(tail -3 tc-after-setup.txt | tr '\n' ' ')"
+            exit 1
+          fi
+          echo "::notice::shaper $(grep -m1 "tc utility" tc-after-setup.txt)"
+          shaped=$(measure)
+          sudo ip netns exec cbm5a tc -s qdisc show dev cbm5a | tee tc-after-traffic.txt
+          echo "median connect unshaped=${base}s shaped=${shaped}s" | tee shaper-result.txt
+          echo "::notice::median connect unshaped=${base}s shaped=${shaped}s (expected 0.030..0.100)"
+          awk -v s="$shaped" 'BEGIN { exit !(s >= 0.030 && s <= 0.100) }'
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: m5-netem-shaper
+          path: |
+            shaper-environment.txt
+            tc-after-setup.txt
+            tc-after-traffic.txt
+            shaper-result.txt
+
+  fairness:
+    # Shaped controlled-capture cells (tools/m5/fairness-ci.sh). Push runs a short C3 smoke;
+    # manual dispatch runs all eight profiles. Image/cadence corroboration still needs independent review.
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: ${{ fromJSON((github.event_name == 'workflow_dispatch' || github.ref_name == 'm5-fairness-full') && '["C0","C1","C2","C3","C4a","C4b","C5a","C5b"]' || '["C3"]') }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save playwright@1.55.0
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/m5/build-qualification.mjs
+      - name: Capture shaped profile
+        run: bash tools/m5/fairness-ci.sh "${{ matrix.profile }}" "${{ github.event.inputs.fairness_limit || (github.ref_name == 'm5-fairness-full' && '300') || '12' }}"
+      - name: Summarize cell
+        if: always()
+        run: |
+          node --input-type=module -e "
+          import { readFileSync } from 'node:fs';
+          const out = 'captures-local/m5-ci/${{ matrix.profile }}';
+          const run = readFileSync(out + '/run-directory.txt', 'utf8').trim();
+          const r = JSON.parse(readFileSync(run + '/independent-assessment.json', 'utf8'));
+          let bad = r.failures.length > 0;
+          for (const side of [0, 1]) {
+            const obs = r.observations.filter(o => o.id.startsWith(r.profile + '/' + side + '/'));
+            const count = k => obs.filter(o => o.classification === k).length;
+            const done = obs.filter(o => o.completed && o.classification !== 'borderline' && o.classification !== 'ambiguous').length;
+            const rejected = count('apparent-contact-rejected'), falseAccepted = count('apparent-noncontact-accepted');
+            console.log('::notice::' + r.profile + ' defender ' + side + ': captured=' + obs.length + ' n=' + done + ' accepted=' + count('apparent-contact-accepted') +
+              ' rejected=' + rejected + ' falseAccepted=' + falseAccepted + ' noncontact=' + count('clear-noncontact') + ' borderline=' + count('borderline') + ' ambiguous=' + count('ambiguous'));
+            if (!done || rejected / done > 0.01 || falseAccepted > 0) bad = true;
+            // Realized shown margins per declared stratum (capture → presented incoming frame), for transparency.
+            const realized = {};
+            for (const t of r.timing.filter(t => t.id.startsWith(r.profile + '/' + side + '/') && Number.isFinite(t.realizedMarginMs))) {
+              const o = r.observations.find(o => o.id === t.id); (realized[o.marginMs] ??= []).push(t.realizedMarginMs);
+            }
+            console.log('::notice::' + r.profile + ' defender ' + side + ' realized margins ' + Object.entries(realized).map(([m, a]) => {
+              a.sort((x, y) => x - y); const q = p => a[Math.floor(p * (a.length - 1))].toFixed(0);
+              return m + 'ms→' + q(0) + '/' + q(.5) + '/' + q(1);
+            }).join(' '));
+          }
+          const ms = n => n === null || n === undefined ? 'none' : n.toFixed(1);
+          for (const o of r.observations.filter(o => o.classification === 'apparent-contact-rejected')) {
+            const t = r.timing.find(t => t.id === o.id) ?? {};
+            console.log('::warning::rejected ' + o.id + ' margin=' + o.marginMs + 'ms hz=' + o.hz + ' captureToContact=[' + (t.captureToContact ?? []).map(ms) + ']' +
+              ' receiptToContact=' + ms(t.receiptToContact) + ' consumedToContact=' + ms(t.consumedToContact) + ' firstUseToContact=' + ms(t.firstUseToContact));
+          }
+          // Contact-claim trace for each rejection: authority pending/claim/resolution and the defender's own records.
+          const jsonl = name => readFileSync(run + '/' + name, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l));
+          const authority = jsonl('authority.jsonl').filter(x => /^(contact-|claim-)/.test(x.kind)), presentation = jsonl('presentation.jsonl');
+          const outcome = {};
+          for (const o of r.observations.filter(o => o.classification === 'apparent-contact-rejected')) {
+            const a = authority.filter(x => x.id === o.id), p = presentation.find(x => x.id === o.id);
+            const pending = a.find(x => x.kind === 'contact-pending'), resolved = a.find(x => x.kind === 'contact-resolved');
+            const sent = (p?.inputRecords ?? []).find(x => x.kind === 'sent-claim'), seen = (p?.inputRecords ?? []).find(x => x.kind === 'contact-pending');
+            // Claims are proactive (sent from the presented crossing); a pause happens only when none arrived in time.
+            const key = !sent ? (pending ? (seen ? 'pending-seen-no-claim' : 'pending-not-seen') : 'no-claim-no-pause') : !resolved?.claimed ? (pending ? 'claim-late' : 'claim-after-crossing')
+              : !resolved.accepted ? (sent.hit ? 'claim-hit-outside-envelope' : 'claim-miss-outside-envelope') : sent.hit ? 'claim-hit-accepted?' : 'claim-miss';
+            outcome[key] = (outcome[key] ?? 0) + 1;
+            if (outcome[key] <= 2) console.log('::warning::trace ' + o.id + ' ' + key + ' pending=' + JSON.stringify(pending ?? null) + ' sent=' + JSON.stringify(sent ?? null) + ' resolved=' + JSON.stringify(resolved ?? null));
+          }
+          console.log('::notice::' + r.profile + ' rejection causes ' + JSON.stringify(outcome));
+          for (const f of r.failures.slice(0, 10)) console.log('::error::' + f);
+          console.log('::notice::' + readFileSync(out + '/shape-plan.txt', 'utf8').trim());
+          if (bad) process.exit(1);
+          "
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: m5-fairness-${{ matrix.profile }}
+          path: |
+            captures-local/m5-ci/
+            captures-local/m5-fairness/

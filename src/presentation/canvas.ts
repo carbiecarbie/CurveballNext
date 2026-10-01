@@ -16,7 +16,7 @@ function segment(ctx: CanvasRenderingContext2D, x: number, y: number, endX: numb
   ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(endX, endY); ctx.stroke();
 }
 
-function court(ctx: CanvasRenderingContext2D, ball: Box, state: State, activity: ReturnType<typeof orbActivity>, wallPulse: number) {
+function court(ctx: CanvasRenderingContext2D, ball: Box, state: { ball: { z: number } }, activity: ReturnType<typeof orbActivity>, wallPulse: number) {
   const f = field();
   const background = ctx.createRadialGradient(175.5, 120, 12, 175.5, 125.5, 200);
   background.addColorStop(0, '#190a0c'); background.addColorStop(0.55, '#0d0608'); background.addColorStop(1, '#030304');
@@ -78,6 +78,19 @@ function court(ctx: CanvasRenderingContext2D, ball: Box, state: State, activity:
   ctx.restore();
   ctx.font = '4px Segoe UI, sans-serif'; ctx.fillStyle = '#a86c62';
   ctx.fillText('NEAR', 25, 239); ctx.textAlign = 'right'; ctx.fillText('FAR', 326, 239); ctx.textAlign = 'left';
+}
+
+/** Read-only online draw adapter. It never emulates the solo simulation State. */
+export function drawOnline(canvas: HTMLCanvasElement, model: import('../multiplayer/view').DrawModel) {
+  const rect = canvas.getBoundingClientRect(), size = backingSize(rect.width, rect.height, window.devicePixelRatio || 1);
+  if (canvas.width !== size.width || canvas.height !== size.height) { canvas.width = size.width; canvas.height = size.height; }
+  const ctx = canvas.getContext('2d'); if (!ctx) return;
+  ctx.setTransform(canvas.width / 350, 0, 0, canvas.height / 250, 0, 0);
+  const box = (r: import('../multiplayer/view').Rect): Box => ({ ...r, x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2,
+    width: r.right - r.left, height: r.bottom - r.top, tick: model.tick, generation: 0 });
+  const activity = { speed: .2, spin: 0, bias: 0, impact: 0 }, ball = box(model.ball);
+  court(ctx, ball, { ball: { z: model.z } }, activity, 0);
+  paddle(ctx, box(model.remote), true, 0); orb(ctx, ball, activity, model.tick, model.missed); paddle(ctx, box(model.own), false, 0);
 }
 
 function paddle(ctx: CanvasRenderingContext2D, box: Box, enemy: boolean, hit: number) {

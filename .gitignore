@@ -1,6 +1,7 @@
 reference-local/
 node_modules/
 dist/
+dist-server/
 coverage/
 test-results/
 captures-local/
