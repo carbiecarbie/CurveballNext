@@ -26,13 +26,15 @@ export function startServer(port = Number(process.env.PORT ?? 8787), host = proc
     const now = performance.now();
     const reject = (status: number) => { socket.end(`HTTP/1.1 ${status} Rejected\r\nConnection: close\r\n\r\n`); setTimeout(() => socket.destroy(), 1000).unref(); };
     const route = parseUpgradeUrl(req.url);
-    if (!route || !origins.has(req.headers.origin ?? '') || authority.draining) { reject(403); return; }
+    if (!route || !origins.has(req.headers.origin ?? '')) { reject(403); return; }
     // The room code only arrives after the upgrade, so a joiner names the owning region in the URL. A Machine that is
     // not that region must not upgrade: it answers with fly-replay and the ingress retries on the owner (one hop only).
     if (route.region && region && route.region !== region) {
       if (req.headers['fly-replay-src']) { reject(421); return; }
       socket.end(`HTTP/1.1 409 Replay\r\nfly-replay: region=${route.region}\r\nConnection: close\r\n\r\n`); setTimeout(() => socket.destroy(), 1000).unref(); return;
     }
+    // A draining Machine still forwards other regions' joiners above; it only refuses its own.
+    if (authority.draining) { reject(403); return; }
     // Only Fly's established header is trusted, and only on the explicitly configured Fly ingress.
     const header = process.env.TRUST_FLY_PROXY === '1' ? req.headers['fly-client-ip'] : undefined;
     if (production && process.env.TRUST_FLY_PROXY === '1' && typeof header !== 'string') { reject(403); return; }

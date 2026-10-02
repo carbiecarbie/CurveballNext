@@ -10,7 +10,7 @@ export function mountOnline(root: HTMLElement, back: () => void) {
   root.innerHTML = `<header><strong class="wordmark">CURVEBALL<span>NEXT</span></strong><button id="online-back">Modes</button></header>
     <section class="online-controls"><h1>Private 1×1</h1><p>Three lives each. If you leave this tab, the match ends with no winner.</p><p class="online-fineprint">Matches can't be resumed after a disconnect.</p>
     <button id="room-create">Create room</button><label>Room code <input id="room-code" maxlength="14" autocomplete="off"></label><button id="room-join">Join</button>
-    <p id="room-invite"></p><button id="room-copy" disabled>Copy invitation</button><button id="room-ready" disabled>Ready</button><button id="room-rematch" disabled>Rematch</button><button id="room-leave" disabled>Leave</button></section>
+    <p id="room-invite"></p><p id="room-region" class="online-fineprint"></p><button id="room-copy" disabled>Copy invitation</button><button id="room-ready" disabled>Ready</button><button id="room-rematch" disabled>Rematch</button><button id="room-leave" disabled>Leave</button></section>
     <p id="online-status" role="status">Choose Create or Join.</p><p id="online-lobby" class="online-lobby" hidden></p><p id="online-lives">You ●●● · Opponent ●●●</p>
     <div class="canvas-wrap"><canvas id="online-court" width="1050" height="750" tabindex="0" aria-label="Online court. Move your mouse to control the near cyan paddle."></canvas><div id="online-banner" class="online-banner" role="status" hidden></div><div id="online-overlay" class="online-overlay" hidden></div></div>
     <p id="online-phase"></p><button id="online-sound">Sound on</button><button id="online-export">Export diagnostics</button>`;
@@ -126,7 +126,8 @@ export function mountOnline(root: HTMLElement, back: () => void) {
         ? client.occupied[other] ? `Opponent connected · Ready: you ${mark(client.ready[client.side])} · opponent ${mark(client.ready[other])}` : 'Waiting for an opponent to join — share the invitation'
         : `Rematch: you ${mark(client.rematch[client.side])} · opponent ${mark(client.rematch[other])}`;
       const region = regionOfCode(client.code);
-      el('room-invite').textContent = client.code && !client.closed ? `${location.origin}${location.pathname}#room=${client.code.match(/.{4}/g)?.join('-')}${region ? ` · Server: ${REGION_LABELS[region]}` : ''}` : '';
+      el('room-invite').textContent = client.code && !client.closed ? `${location.origin}${location.pathname}#room=${client.code.match(/.{4}/g)?.join('-')}` : '';
+      el('room-region').textContent = region && !client.closed ? `Server: ${REGION_LABELS[region]}` : '';
       for (const id of ['room-create', 'room-join']) el<HTMLButtonElement>(id).disabled = !client.closed;
       el<HTMLButtonElement>('room-copy').disabled = !client.code || client.closed;
       el<HTMLButtonElement>('room-ready').disabled = client.closed || s?.phase !== 'Waiting'; el('room-ready').textContent = client.ready[client.side] ? 'Withdraw Ready' : 'Ready';

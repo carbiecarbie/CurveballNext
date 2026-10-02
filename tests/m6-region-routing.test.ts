@@ -48,6 +48,10 @@ it('replays a join upgrade for another region, refuses a loop, and upgrades its 
     expect((await attempt('?r=ams')).status).toBe(403);
     expect((await attempt('?r=gru')).status).toBe(101);
     expect((await attempt('')).status).toBe(101);
+    app.authority.draining = true;
+    expect((await attempt('?r=iad')).status).toBe(409);
+    expect((await attempt('?r=gru')).status).toBe(403);
+    app.authority.draining = false;
     expect(app.authority.rooms.size).toBe(0);
   } finally { app.close(); await new Promise(resolve => setTimeout(resolve, 1100)); }
 });
