@@ -53,3 +53,13 @@ Closure changed only README and this milestone document. The complete tracked di
 ## Remaining uncertainty
 
 Native U01–U05, original scoring runtime verification, original post-level-10 behavior and exact original audiovisual timing remain unverified. The previously recorded cross-engine transcendental precision limitation also remains. Maintainer presentation acceptance does not resolve these historical questions. M3 does not reopen SWF investigation, close M0.5, freeze Simulation Contract v1 or claim native Flash parity. The completion wording continues to identify the CurveballNext containment policy.
+
+## Visual refresh (2026-10-02)
+
+The maintainer chose a refreshed look after comparing options in a side-by-side prototype. These choices replace the orb, paddle, palette and "no trail/particles/path history" rules above. Simulation, scoring and online state are unchanged.
+
+- **Orb:** solid hot core with additive bloom. The bright rim sits exactly on the ball's box, so the drawn edge still matches the hitbox. A single arc rotates with spin.
+- **Trail:** short (0.12 s), narrower than the ball and drawn under it. It is built only from the drawn ball's recent path, kept per canvas, and cleared on any discontinuity.
+- **Impact sparks:** small squares thrown at sharp reversals of the drawn ball's motion (walls and paddles). They are drawn under the ball, scattered deterministically from the impact time, and never cover it.
+- **Paddles:** the original glass body and metal side rails, with a neon outline and bright corners. The enemy is magenta instead of green (HUD enemy lives match).
+- **Court:** neon glow on every court line, breathing on a 2.6 s cycle. Viewers who ask for reduced motion get the glow at rest.

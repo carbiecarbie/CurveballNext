@@ -7,7 +7,7 @@ import { captureTime } from './input-time';
 
 export function mountOnline(root: HTMLElement, back: () => void) {
   root.innerHTML = `<header><strong class="wordmark">CURVEBALL<span>NEXT</span></strong><button id="online-back">Modes</button></header>
-    <section class="online-controls"><h1>Private 1×1</h1><p>Three lives each. Visible blur keeps play running. Hiding, leaving or disconnecting ends an unfinished match without a winner. You cannot rejoin.</p>
+    <section class="online-controls"><h1>Private 1×1</h1><p>Three lives each. If you leave this tab, the match ends with no winner.</p><p class="online-fineprint">Matches can't be resumed after a disconnect.</p>
     <button id="room-create">Create room</button><label>Room code <input id="room-code" maxlength="14" autocomplete="off"></label><button id="room-join">Join</button>
     <p id="room-invite"></p><button id="room-copy" disabled>Copy invitation</button><button id="room-ready" disabled>Ready</button><button id="room-rematch" disabled>Rematch</button><button id="room-leave" disabled>Leave</button></section>
     <p id="online-status" role="status">Choose Create or Join.</p><p id="online-lobby" class="online-lobby" hidden></p><p id="online-lives">You ●●● · Opponent ●●●</p>
