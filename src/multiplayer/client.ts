@@ -1,4 +1,5 @@
 import { validServer, validState, type Frame } from './protocol';
+import { ERROR_TEXT } from './regions';
 import { LIMITS } from './rules';
 import { ticking, type ContactClaim, type ContactPending, type OnlineEvent, type OnlineState, type Result, type Side } from './types';
 
@@ -108,7 +109,7 @@ export class OnlineClient {
       this.enabledAt = this.enabled ? this.now() : Infinity;
       this.snapshotSerial = f.serverSerial as number; this.snapshotTick = this.state!.tick;
       if (!this.focused) this.blur();
-    } else if (!this.epoch) { if (f.type === 'error') this.interrupt(String(f.code)); return; }
+    } else if (!this.epoch) { if (f.type === 'error') this.interrupt(ERROR_TEXT[String(f.code)] ?? String(f.code)); return; }
     else if (f.type === 'snapshot' || f.type === 'event') {
       const event = f.type === 'event' ? { ...f, type: f.eventType } as unknown as OnlineEvent : undefined;
       const oldTick = this.state?.tick ?? 0;

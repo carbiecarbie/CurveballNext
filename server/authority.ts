@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { parseClient, sameContext, type Frame, type HealthState } from '../src/multiplayer/protocol';
+import { REGIONS } from '../src/multiplayer/regions';
 import { LIMITS, RULES } from '../src/multiplayer/rules';
 import { boxes, createOnline, paddle, startMatch, step, target } from '../src/multiplayer/simulation';
 import { ticking, type OnlineState, type Side } from '../src/multiplayer/types';
@@ -35,6 +36,7 @@ export interface Room {
   wait: { side: Side; tick: number; deadline: number; generation: number; claim: Frame | null; authoritative: string } | null;
 }
 const codeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const plainAlphabet = [...codeAlphabet].filter(c => !(c in REGIONS)).join('');
 export function normalizeCode(v: string) { return v.toUpperCase().replaceAll('-', ''); }
 export class Authority {
   rooms = new Map<string, Room>(); sessions = new Set<Session>(); draining = false; healthy = true;
@@ -47,7 +49,12 @@ export class Authority {
   }
   onDiagnostic: ((record: Record<string, unknown>) => void) | null = null;
   get nextBoundary() { return this.boundary; }
-  constructor(now: () => number, bit: () => Side = () => (randomBytes(1)[0] & 1) as Side) { this.now = now; this.bit = bit; this.boundary = now() + 1000 / 30; }
+  /** `prefix` is this Machine's region symbol; without one, codes start with a symbol that names no region. */
+  constructor(now: () => number, bit: () => Side = () => (randomBytes(1)[0] & 1) as Side, private prefix?: string) { this.now = now; this.bit = bit; this.boundary = now() + 1000 / 30; }
+  newCode() {
+    const bytes = randomBytes(12);
+    return [this.prefix ?? plainAlphabet[bytes[0] % plainAlphabet.length], ...[...bytes.subarray(1)].map(n => codeAlphabet[n & 31])].join('');
+  }
   open(transport: Transport): Session | null {
     if (this.sessions.size >= LIMITS.sockets) { transport.close(1013, 'capacity'); transport.terminate(); return null; }
     const t = this.now();
@@ -139,7 +146,7 @@ export class Authority {
       if (f.type === 'create') {
         if (this.rooms.size >= 10) { this.error(s, f, 'capacity'); this.closeSocket(s, 'capacity'); return; }
         let code: string;
-        do { code = [...randomBytes(12)].map(n => codeAlphabet[n & 31]).join(''); } while (this.rooms.has(code));
+        do { code = this.newCode(); } while (this.rooms.has(code));
         room = { code, epoch: randomBytes(16).toString('hex'), created: now, endedAt: null, state: createOnline(), slots: [null, null], ready: [false, false], rematch: [false, false], diagnostics: [], sources: [0, 1].map(() => ({ seq: 0, generation: 0, publishedTick: 0, firstUsed: false })), wait: null };
         this.rooms.set(code, room);
       } else {

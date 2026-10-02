@@ -4,12 +4,13 @@ import { stagePoint } from '../runtime/viewport';
 import { OnlineClient } from './client';
 import { OnlineView } from './view';
 import { captureTime } from './input-time';
+import { REGION_LABELS, onlineEndpoint, regionOfCode } from './regions';
 
 export function mountOnline(root: HTMLElement, back: () => void) {
   root.innerHTML = `<header><strong class="wordmark">CURVEBALL<span>NEXT</span></strong><button id="online-back">Modes</button></header>
     <section class="online-controls"><h1>Private 1×1</h1><p>Three lives each. If you leave this tab, the match ends with no winner.</p><p class="online-fineprint">Matches can't be resumed after a disconnect.</p>
     <button id="room-create">Create room</button><label>Room code <input id="room-code" maxlength="14" autocomplete="off"></label><button id="room-join">Join</button>
-    <p id="room-invite"></p><button id="room-copy" disabled>Copy invitation</button><button id="room-ready" disabled>Ready</button><button id="room-rematch" disabled>Rematch</button><button id="room-leave" disabled>Leave</button></section>
+    <p id="room-invite"></p><p id="room-region" class="online-fineprint"></p><button id="room-copy" disabled>Copy invitation</button><button id="room-ready" disabled>Ready</button><button id="room-rematch" disabled>Rematch</button><button id="room-leave" disabled>Leave</button></section>
     <p id="online-status" role="status">Choose Create or Join.</p><p id="online-lobby" class="online-lobby" hidden></p><p id="online-lives">You ●●● · Opponent ●●●</p>
     <div class="canvas-wrap"><canvas id="online-court" width="1050" height="750" tabindex="0" aria-label="Online court. Move your mouse to control the near cyan paddle."></canvas><div id="online-banner" class="online-banner" role="status" hidden></div><div id="online-overlay" class="online-overlay" hidden></div></div>
     <p id="online-phase"></p><button id="online-sound">Sound on</button><button id="online-export">Export diagnostics</button>`;
@@ -43,7 +44,7 @@ export function mountOnline(root: HTMLElement, back: () => void) {
     try {
       const url = new URL(endpoint);
       if (url.pathname !== '/online' || url.username || url.password || url.hash || url.search || !(url.protocol === 'wss:' || import.meta.env.DEV && url.protocol === 'ws:' && ['127.0.0.1', 'localhost'].includes(url.hostname))) throw new Error('Configure a compatible public WSS endpoint');
-      connecting = true; const ws = new WebSocket(endpoint), owner = { socket: ws, client: null as OnlineClient | null };
+      connecting = true; const ws = new WebSocket(onlineEndpoint(endpoint, operation, code.value.trim())), owner = { socket: ws, client: null as OnlineClient | null };
       connection = owner;
       const current = () => !disposed && connection === owner;
       el('online-status').textContent = 'Connecting…';
@@ -124,7 +125,9 @@ export function mountOnline(root: HTMLElement, back: () => void) {
       if (!lobby.hidden) lobby.textContent = s!.phase === 'Waiting'
         ? client.occupied[other] ? `Opponent connected · Ready: you ${mark(client.ready[client.side])} · opponent ${mark(client.ready[other])}` : 'Waiting for an opponent to join — share the invitation'
         : `Rematch: you ${mark(client.rematch[client.side])} · opponent ${mark(client.rematch[other])}`;
+      const region = regionOfCode(client.code);
       el('room-invite').textContent = client.code && !client.closed ? `${location.origin}${location.pathname}#room=${client.code.match(/.{4}/g)?.join('-')}` : '';
+      el('room-region').textContent = region && !client.closed ? `Server: ${REGION_LABELS[region]}` : '';
       for (const id of ['room-create', 'room-join']) el<HTMLButtonElement>(id).disabled = !client.closed;
       el<HTMLButtonElement>('room-copy').disabled = !client.code || client.closed;
       el<HTMLButtonElement>('room-ready').disabled = client.closed || s?.phase !== 'Waiting'; el('room-ready').textContent = client.ready[client.side] ? 'Withdraw Ready' : 'Ready';
