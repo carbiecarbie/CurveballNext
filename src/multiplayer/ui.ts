@@ -4,6 +4,7 @@ import { stagePoint } from '../runtime/viewport';
 import { OnlineClient } from './client';
 import { OnlineView } from './view';
 import { captureTime } from './input-time';
+import { REGION_LABELS, onlineEndpoint, regionOfCode } from './regions';
 
 export function mountOnline(root: HTMLElement, back: () => void) {
   root.innerHTML = `<header><strong class="wordmark">CURVEBALL<span>NEXT</span></strong><button id="online-back">Modes</button></header>
@@ -43,7 +44,7 @@ export function mountOnline(root: HTMLElement, back: () => void) {
     try {
       const url = new URL(endpoint);
       if (url.pathname !== '/online' || url.username || url.password || url.hash || url.search || !(url.protocol === 'wss:' || import.meta.env.DEV && url.protocol === 'ws:' && ['127.0.0.1', 'localhost'].includes(url.hostname))) throw new Error('Configure a compatible public WSS endpoint');
-      connecting = true; const ws = new WebSocket(endpoint), owner = { socket: ws, client: null as OnlineClient | null };
+      connecting = true; const ws = new WebSocket(onlineEndpoint(endpoint, operation, code.value.trim())), owner = { socket: ws, client: null as OnlineClient | null };
       connection = owner;
       const current = () => !disposed && connection === owner;
       el('online-status').textContent = 'Connecting…';
@@ -124,7 +125,8 @@ export function mountOnline(root: HTMLElement, back: () => void) {
       if (!lobby.hidden) lobby.textContent = s!.phase === 'Waiting'
         ? client.occupied[other] ? `Opponent connected · Ready: you ${mark(client.ready[client.side])} · opponent ${mark(client.ready[other])}` : 'Waiting for an opponent to join — share the invitation'
         : `Rematch: you ${mark(client.rematch[client.side])} · opponent ${mark(client.rematch[other])}`;
-      el('room-invite').textContent = client.code && !client.closed ? `${location.origin}${location.pathname}#room=${client.code.match(/.{4}/g)?.join('-')}` : '';
+      const region = regionOfCode(client.code);
+      el('room-invite').textContent = client.code && !client.closed ? `${location.origin}${location.pathname}#room=${client.code.match(/.{4}/g)?.join('-')}${region ? ` · Server: ${REGION_LABELS[region]}` : ''}` : '';
       for (const id of ['room-create', 'room-join']) el<HTMLButtonElement>(id).disabled = !client.closed;
       el<HTMLButtonElement>('room-copy').disabled = !client.code || client.closed;
       el<HTMLButtonElement>('room-ready').disabled = client.closed || s?.phase !== 'Waiting'; el('room-ready').textContent = client.ready[client.side] ? 'Withdraw Ready' : 'Ready';

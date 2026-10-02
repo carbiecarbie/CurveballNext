@@ -1,12 +1,20 @@
 import { createServer } from 'node:http';
 import { WebSocketServer } from 'ws';
 import { Authority, Bucket } from './authority';
+import { REGIONS, prefixOfRegion } from '../src/multiplayer/regions';
 
-export function startServer(port = Number(process.env.PORT ?? 8787), host = process.env.HOST ?? '127.0.0.1') {
+/** Only `/online`, optionally with a single `r=<known region>` parameter, is a valid upgrade target. */
+export function parseUpgradeUrl(raw: string | undefined): { region?: string } | null {
+  if (raw === '/online') return {};
+  const match = /^\/online\?r=([a-z]{3})$/.exec(raw ?? '');
+  return match && Object.values(REGIONS).includes(match[1]) ? { region: match[1] } : null;
+}
+
+export function startServer(port = Number(process.env.PORT ?? 8787), host = process.env.HOST ?? '127.0.0.1', region = process.env.FLY_REGION) {
   const production = process.env.NODE_ENV === 'production';
   const origins = new Set((process.env.ALLOWED_ORIGINS ?? (production ? '' : 'http://127.0.0.1:5173,http://localhost:5173')).split(',').filter(Boolean));
   if (!origins.size || production && [...origins].some(o => new URL(o).protocol !== 'https:')) throw new Error('Configure exact HTTPS ALLOWED_ORIGINS');
-  const authority = new Authority(() => performance.now());
+  const authority = new Authority(() => performance.now(), undefined, prefixOfRegion(region));
   const limiter = new Map<string, { at: number; upgrades: Bucket; create: Bucket; join: Bucket; unbound: number }>();
   const http = createServer((req, res) => {
     if (req.url !== '/healthz') { res.writeHead(404); res.end(); return; }
@@ -17,7 +25,14 @@ export function startServer(port = Number(process.env.PORT ?? 8787), host = proc
   http.on('upgrade', (req, socket, head) => {
     const now = performance.now();
     const reject = (status: number) => { socket.end(`HTTP/1.1 ${status} Rejected\r\nConnection: close\r\n\r\n`); setTimeout(() => socket.destroy(), 1000).unref(); };
-    if (req.url !== '/online' || !origins.has(req.headers.origin ?? '') || authority.draining) { reject(403); return; }
+    const route = parseUpgradeUrl(req.url);
+    if (!route || !origins.has(req.headers.origin ?? '') || authority.draining) { reject(403); return; }
+    // The room code only arrives after the upgrade, so a joiner names the owning region in the URL. A Machine that is
+    // not that region must not upgrade: it answers with fly-replay and the ingress retries on the owner (one hop only).
+    if (route.region && region && route.region !== region) {
+      if (req.headers['fly-replay-src']) { reject(421); return; }
+      socket.end(`HTTP/1.1 409 Replay\r\nfly-replay: region=${route.region}\r\nConnection: close\r\n\r\n`); setTimeout(() => socket.destroy(), 1000).unref(); return;
+    }
     // Only Fly's established header is trusted, and only on the explicitly configured Fly ingress.
     const header = process.env.TRUST_FLY_PROXY === '1' ? req.headers['fly-client-ip'] : undefined;
     if (production && process.env.TRUST_FLY_PROXY === '1' && typeof header !== 'string') { reject(403); return; }
