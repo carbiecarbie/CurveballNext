@@ -1,6 +1,6 @@
 # M5 candidate setup and release runbook
 
-Status: implementation candidate; **not accepted, provisioned or deployed**. The accepted M5 plan is unchanged. Independent implementation review, controlled network/fairness evidence, deployed capacity and physical acceptance remain release gates. Original M3/M4 acceptance and its historical Flash/evidence limitations remain unchanged.
+Status: **live.** M5 was accepted and launched on 1 October 2026 (frontend on Cloudflare Pages, authority on one Fly Machine in `gru`). This runbook still describes local setup and the release procedure; the "future authorization" steps below were carried out by the maintainer. Original M3/M4 limits are unchanged.
 
 ## Local startup
 
@@ -15,7 +15,7 @@ npm run server:build
 npm run server:start
 ```
 
-In another terminal run `npm run dev`. Open `http://127.0.0.1:5173/`. Development defaults to `ws://127.0.0.1:8787/online`; a public endpoint override is `VITE_ONLINE_URL`. `/healthz` on port 8787 returns room/socket counts and compatibility versions. Create a room, copy its invitation, open it in a second **visible window**, Join, then Ready on both. A hidden tab closes its session by design. Each browser owns its near cyan paddle; the green far paddle is the opponent. Countdown is automatic. There are exactly three lives per side. Both must request a rematch within 60 seconds. No rejoin or result persistence across refresh exists.
+In another terminal run `npm run dev`. Open `http://127.0.0.1:5173/`. Development defaults to `ws://127.0.0.1:8787/online`; a public endpoint override is `VITE_ONLINE_URL`. `/healthz` on port 8787 returns room/socket counts and compatibility versions. Create a room, copy its invitation, open it in a second **visible window**, Join, then Ready on both. A hidden tab closes its session by design. Each browser owns its near cyan paddle; the magenta far paddle is the opponent. Countdown is automatic. There are exactly three lives per side. Both must request a rematch within 60 seconds. No rejoin or result persistence across refresh exists.
 
 Where npm is absent from PATH, equivalent validation is `node node_modules/vitest/vitest.mjs run`, `node node_modules/typescript/bin/tsc --noEmit`, `node node_modules/typescript/bin/tsc -p tsconfig.server.json`, `node node_modules/vite/bin/vite.js build`, and `node tools/m5/build-server.mjs`. `node dist-server/server.mjs` starts the backend. Do not use Vite preview as a production authority.
 
