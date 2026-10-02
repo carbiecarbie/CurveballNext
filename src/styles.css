@@ -34,7 +34,7 @@ canvas { display: block; width: 100%; aspect-ratio: 7/5; cursor: crosshair; outl
 .life-cell b { font-size: 11px; font-weight: 500; color: #b9e8f4; }
 .life-bars { display: flex; gap: 4px; }
 .life-bars i { width: 12px; height: 5px; background: #3fd3ff; box-shadow: 0 0 6px #3fd3ff30; transform: skewX(-20deg); }
-.enemy .life-bars i { background: #6ff469; box-shadow: 0 0 6px #6ff46930; }
+.enemy .life-bars i { background: #ff40aa; box-shadow: 0 0 6px #ff40aa30; }
 .life-bars i.empty { background: #20373d; box-shadow: none; }
 .phase { font-size: 9px; color: #779fa8; letter-spacing: 1.4px; text-transform: uppercase; text-align: center; }
 .rally-status { min-height: 28px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; }
@@ -92,3 +92,4 @@ footer p { margin: 0; letter-spacing: .3px; }
 .online-banner.lost { color: #ff7a7a; text-shadow: 0 0 18px #ff3d3d; }
 @keyframes online-banner { 0% { opacity: 0; transform: scale(.85); } 12% { opacity: 1; transform: scale(1.06); } 25% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
 .online-lobby { color: #8fe3ff; }
+.online-fineprint { font-size: .8em; color: #7fa3ad; }
