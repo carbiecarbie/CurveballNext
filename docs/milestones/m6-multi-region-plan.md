@@ -1,6 +1,6 @@
 # M6 — multi-region room routing (plan)
 
-Status: **code merged (PR #4) and deployed to two Machines, `gru` and `iad` (2 October 2026; see the deployment record in [the runbook](../m5-runbook.md)).** Replay from `gru` to `iad` is verified; per-region qualification and a real (non-VPN) US-player latency figure are still open (gate 5 below); cross-region play in both directions was reported working by the maintainer.
+Status: **code merged (PR #4) and deployed to two Machines, `gru` and `iad` (2 October 2026; see the deployment record in [the runbook](../m5-runbook.md)).** Replay from `gru` to `iad` is verified; the 66-minute `iad` soak passed on 3 October 2026 (runbook record); fairness cells on `iad` and a real (non-VPN) US-player latency figure are still open (gate 5 below); cross-region play in both directions was reported working by the maintainer.
 
 ## Goal
 Players far from São Paulo get a nearby authority. One Fly app runs one independent Machine per approved region (initially `gru` and `iad`). A room is created on the Machine nearest its creator and lives there; anyone joining it is routed to that Machine. No state is shared between regions. This follows the maintainer direction recorded in the [M5 plan](m5-private-online-multiplayer-plan.md) (1 October 2026).
