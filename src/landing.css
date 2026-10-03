@@ -47,6 +47,10 @@ html { scroll-behavior: smooth; }
 #landing .lp-links a:hover { color: var(--lp-text); border-color: var(--lp-cyan); }
 #landing .lp-links svg { width: 13px; height: 13px; margin-right: 6px; vertical-align: -2px; }
 
+#landing .lp-support { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 10px 16px; border: 1px solid var(--lp-line); border-radius: 4px; font-size: 14px; font-weight: 600; text-decoration: none; color: var(--lp-text); transition: border-color .15s, background .15s; }
+#landing .lp-support svg { width: 18px; height: 18px; fill: none; stroke: var(--lp-ball); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#landing .lp-support:hover { border-color: var(--lp-ember); background: var(--lp-panel); }
+
 /* the clip */
 #landing .lp-monitor { position: relative; margin: 0; padding: 8px; border: 1px solid #3a2a2e; border-radius: 6px; background: #000; box-shadow: 0 30px 80px #000c, 0 0 90px #ff6a2b14; }
 #landing .lp-monitor video { display: block; width: 100%; height: auto; border-radius: 2px; background: #050506; }
