@@ -1,0 +1,100 @@
+/* Landing page. Every rule is scoped under #landing because styles.css sets bare element rules (h1, header, footer, button, kbd) for the game screens. */
+#landing {
+  --lp-line: #2b2024; --lp-panel: #0e0b0d; --lp-text: #eee4dc; --lp-muted: #a39490;
+  --lp-ember: #ff6a2b; --lp-ball: #ffb143; --lp-cyan: #4fdcff;
+  --lp-mono: ui-monospace, 'Cascadia Mono', Consolas, 'SF Mono', monospace;
+  width: auto; max-width: none; margin: 0; padding: 0; color: var(--lp-text); line-height: 1.6; font-size: 16px;
+}
+#landing::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60rem 28rem at 50% -6rem, #ff6a2b22, transparent 70%), radial-gradient(40rem 30rem at 100% 40%, #4fdcff0c, transparent 70%); }
+html { scroll-behavior: smooth; }
+#landing a { color: inherit; }
+#landing .lp-wrap { width: min(100%, 1180px); margin-inline: auto; padding-inline: 16px; }
+@media (min-width: 700px) { #landing .lp-wrap { padding-inline: 40px; } }
+
+/* top bar */
+#landing .lp-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 22px; font: 500 12px/1 var(--lp-mono); letter-spacing: .12em; text-transform: uppercase; }
+#landing .lp-mark { font: 800 15px/1 'Segoe UI', system-ui, sans-serif; letter-spacing: .1em; text-decoration: none; }
+#landing .lp-mark b { color: var(--lp-cyan); font-weight: 600; margin-left: .5em; font-size: .72em; letter-spacing: .3em; }
+#landing .lp-bar nav { display: flex; gap: 22px; }
+#landing .lp-bar nav a { color: var(--lp-muted); text-decoration: none; }
+#landing .lp-bar nav a:hover { color: var(--lp-text); }
+#landing .lp-bar nav .lp-gh { display: inline-flex; align-items: center; gap: 8px; color: var(--lp-text); }
+#landing svg { width: 16px; height: 16px; fill: currentColor; }
+@media (max-width: 560px) { #landing .lp-bar nav a:not(.lp-gh) { display: none; } }
+
+/* hero: oversized wordmark across the full width */
+#landing .lp-hero { display: block; margin: 0; padding-top: clamp(20px, 5vw, 56px); container-type: inline-size; }
+#landing .lp-kicker { margin: 0 0 clamp(14px, 2.4vw, 26px); font: 500 12px/1.4 var(--lp-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--lp-ember); }
+#landing h1 { margin: 0; font-size: clamp(34px, 12.4cqw, 150px); font-weight: 800; line-height: .92; letter-spacing: -.02em; text-transform: uppercase; text-wrap: balance; text-shadow: 0 0 80px #ff6a2b30; }
+#landing h1 .lp-next { display: flex; align-items: center; gap: .4em; margin: .22em 0 0; padding: 0; font-size: .3em; font-weight: 600; letter-spacing: .62em; color: var(--lp-cyan); text-shadow: 0 0 24px #4fdcff44; }
+#landing h1 .lp-next::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, #4fdcff88, transparent); }
+#landing .lp-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: clamp(28px, 5vw, 64px); align-items: center; margin-top: clamp(32px, 6vw, 72px); }
+@media (max-width: 860px) { #landing .lp-hero-grid { grid-template-columns: minmax(0, 1fr); } }
+#landing .lp-lede { margin: 0 0 12px; font-size: clamp(24px, 2.8vw, 34px); font-weight: 700; line-height: 1.2; letter-spacing: -.01em; text-wrap: balance; }
+#landing .lp-sub { margin: 0 0 28px; max-width: 46ch; color: var(--lp-muted); }
+#landing .lp-modes { display: grid; gap: 12px; max-width: 460px; }
+#landing .lp-mode { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 16px; min-width: 0; padding: 16px 20px; border: 1px solid var(--lp-line); border-radius: 4px; background: var(--lp-panel); color: var(--lp-text); text-align: left; font: inherit; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+#landing .lp-mode strong { font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: .01em; }
+#landing .lp-mode small { grid-column: 1; color: var(--lp-muted); font-size: 13px; }
+#landing .lp-arrow { grid-row: 1 / span 2; grid-column: 2; float: none; font-size: 20px; }
+#landing .lp-mode:hover { background: var(--lp-panel); border-color: var(--lp-cyan); transform: translateY(-1px); }
+#landing .lp-mode-main { background: var(--lp-ember); border-color: var(--lp-ember); color: #1a0903; }
+#landing .lp-mode-main small { color: #3d1a0c; }
+#landing .lp-mode-main:hover { background: var(--lp-ball); border-color: var(--lp-ball); }
+#landing .lp-links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 26px 0 0; padding: 0; list-style: none; font: 500 12px/1.4 var(--lp-mono); letter-spacing: .08em; text-transform: uppercase; }
+#landing .lp-links a { color: var(--lp-muted); text-decoration: none; border-bottom: 1px solid var(--lp-line); padding-bottom: 3px; }
+#landing .lp-links a:hover { color: var(--lp-text); border-color: var(--lp-cyan); }
+#landing .lp-links svg { width: 13px; height: 13px; margin-right: 6px; vertical-align: -2px; }
+
+#landing .lp-support { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 10px 16px; border: 1px solid var(--lp-line); border-radius: 4px; font-size: 14px; font-weight: 600; text-decoration: none; color: var(--lp-text); transition: border-color .15s, background .15s; }
+#landing .lp-support svg { width: 18px; height: 18px; fill: none; stroke: var(--lp-ball); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#landing .lp-support:hover { border-color: var(--lp-ember); background: var(--lp-panel); }
+
+/* the clip */
+#landing .lp-monitor { position: relative; margin: 0; padding: 8px; border: 1px solid #3a2a2e; border-radius: 6px; background: #000; box-shadow: 0 30px 80px #000c, 0 0 90px #ff6a2b14; }
+#landing .lp-monitor video { display: block; width: 100%; height: auto; border-radius: 2px; background: #050506; }
+#landing .lp-monitor figcaption { display: flex; justify-content: space-between; gap: 12px; padding: 10px 4px 2px; font: 400 11px/1.4 var(--lp-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--lp-muted); }
+#landing .lp-monitor figcaption i { font-style: normal; color: var(--lp-cyan); }
+
+/* information */
+#landing .lp-block { margin-top: clamp(64px, 10vw, 120px); }
+#landing .lp-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; }
+#landing .lp-head h2 { margin: 0; font-size: clamp(20px, 2.6vw, 28px); font-weight: 800; line-height: 1.1; letter-spacing: -.01em; text-transform: uppercase; }
+#landing .lp-head::after { content: ''; flex: 1; height: 1px; background: var(--lp-line); order: 3; }
+#landing .lp-head span { order: 2; font: 500 11px/1 var(--lp-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--lp-muted); }
+#landing .lp-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--lp-line); border-radius: 4px; background: var(--lp-panel); }
+#landing .lp-cols > div { min-width: 0; padding: 26px 26px 28px; }
+#landing .lp-cols > div + div { border-left: 1px solid var(--lp-line); }
+@media (max-width: 860px) { #landing .lp-cols { grid-template-columns: minmax(0, 1fr); } #landing .lp-cols > div + div { border-left: 0; border-top: 1px solid var(--lp-line); } }
+#landing .lp-cols h3 { margin: 0 0 12px; font-size: 17px; font-weight: 700; line-height: 1.3; }
+#landing .lp-tag { margin: 0 0 8px; font: 500 11px/1 var(--lp-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--lp-ember); }
+#landing .lp-cols p:not(.lp-tag) { margin: 0 0 12px; color: var(--lp-muted); font-size: 15px; }
+#landing .lp-cols ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; font-size: 15px; }
+#landing .lp-cols li { display: flex; gap: 12px; }
+#landing .lp-cols li::before { content: ''; flex: none; width: 6px; height: 6px; margin-top: .6em; border-radius: 50%; background: var(--lp-ball); box-shadow: 0 0 8px var(--lp-ball); }
+
+#landing .lp-how { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { #landing .lp-how { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+#landing .lp-how > div { padding-top: 14px; border-top: 2px solid var(--lp-cyan); }
+#landing .lp-how b { display: block; margin-bottom: 4px; font-size: 16px; font-weight: 700; }
+#landing .lp-how span { color: var(--lp-muted); font-size: 14px; }
+#landing kbd { margin: 0; padding: 1px 6px; border: 1px solid #3b4a50; border-radius: 3px; font: 500 12px var(--lp-mono); color: var(--lp-cyan); }
+
+#landing .lp-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); }
+@media (max-width: 860px) { #landing .lp-split { grid-template-columns: minmax(0, 1fr); } }
+#landing .lp-split p { margin: 0 0 14px; max-width: 58ch; color: var(--lp-muted); }
+#landing .lp-split p b { color: var(--lp-text); font-weight: 600; }
+#landing .lp-split a { text-decoration-color: var(--lp-line); text-underline-offset: 3px; }
+#landing .lp-split a:hover { color: var(--lp-text); text-decoration-color: var(--lp-cyan); }
+#landing .lp-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
+#landing .lp-stats > div { padding: 16px 18px; border: 1px solid var(--lp-line); border-radius: 4px; background: var(--lp-panel); }
+#landing .lp-stats strong { display: block; font-size: 28px; font-weight: 800; line-height: 1.1; color: var(--lp-ball); font-variant-numeric: tabular-nums; }
+#landing .lp-stats span { font-size: 13px; color: var(--lp-muted); }
+
+#landing .lp-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px 32px; margin: clamp(64px, 10vw, 120px) 0 0; padding-block: 28px 44px; border-top: 1px solid var(--lp-line); font-size: 13px; letter-spacing: 0; line-height: 1.6; color: var(--lp-muted); }
+#landing .lp-foot p { max-width: 62ch; margin: 0; letter-spacing: 0; }
+#landing .lp-foot nav { display: flex; flex-wrap: wrap; gap: 8px 20px; font: 500 12px/1.4 var(--lp-mono); letter-spacing: .08em; text-transform: uppercase; }
+#landing .lp-foot a { text-decoration: none; }
+#landing .lp-foot a:hover { color: var(--lp-text); text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } #landing .lp-mode { transition: none; } #landing .lp-mode:hover { transform: none; } }
