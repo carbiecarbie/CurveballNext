@@ -1,0 +1,54 @@
+name: M6 deployed soak
+
+# Manual only. Runs real protocol clients from a GitHub-hosted (US) runner against the deployed server for the
+# given time: nine playing rooms, one Waiting room, two unbound sockets every 15 s. It loads production, so start it
+# only when no real players are expected. Server-side timing (scheduler lateness, batch time, RSS) is not exposed over
+# HTTP; capture it separately with `fly logs --app curveballnext -i MACHINE_ID` while this runs.
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: Soak duration in minutes (1..240)
+        default: '66'
+      instance:
+        description: Fly Machine id to force (empty = nearest Machine to the runner)
+        default: '817651f9725368'
+      url:
+        description: Server WSS URL
+        default: 'wss://curveballnext.fly.dev/online'
+      origin:
+        description: Allowed Origin header
+        default: 'https://curveballnext.pages.dev'
+
+jobs:
+  soak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 270
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - run: node tools/m5/build-qualification.mjs
+      - name: Record environment
+        run: |
+          mkdir -p captures-local/m5-soak
+          { date -u; uname -a; node --version; curl -s https://ipinfo.io/json | head -c 400; } | tee captures-local/m5-soak/environment.txt
+      - name: Run soak
+        env:
+          SOAK_MINUTES: ${{ github.event.inputs.minutes }}
+          SOAK_INSTANCE: ${{ github.event.inputs.instance }}
+          SOAK_URL: ${{ github.event.inputs.url }}
+          SOAK_ORIGIN: ${{ github.event.inputs.origin }}
+        run: node dist-server/soak.mjs
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: m6-soak
+          path: captures-local/m5-soak/
+      - name: Summary
+        if: always()
+        run: |
+          { echo '### Soak summary'; echo '```json'; cat captures-local/m5-soak/summary.json 2>/dev/null || echo 'no summary'; echo '```'; echo; echo 'Last report line:'; echo '```json'; grep '"kind":"report"' captures-local/m5-soak/soak.jsonl | tail -1; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
