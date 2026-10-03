@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { Authority, type Session } from '../server/authority';
 import { OnlineClient } from '../src/multiplayer/client';
 import { boxes, startMatch } from '../src/multiplayer/simulation';
-import { mountOnline } from '../src/multiplayer/ui';
+import { CONNECT_TIMEOUT_MS, mountOnline } from '../src/multiplayer/ui';
 
 vi.mock('../src/presentation/audio', () => ({ Sound: class { enabled = true; unlock() {} play() {} toggle() {} } }));
 vi.mock('../src/presentation/canvas', () => ({ drawOnline: vi.fn() }));
@@ -19,13 +19,14 @@ function harness() {
   };
   Object.defineProperties(doc, { hidden: { get: () => hidden }, hasFocus: { value: () => focused }, createElement: { value: () => element('anchor') } });
   const root = { hidden: false, innerHTML: '', querySelector: (id: string) => element(id.slice(1)) } as unknown as HTMLElement;
-  const timers = new Map<number, () => void>(), frames = new Map<number, () => void>(); let serial = 0;
+  const timers = new Map<number, () => void>(), frames = new Map<number, () => void>(), timeouts = new Map<number, { fn: () => void; ms: number }>(); let serial = 0;
   vi.stubGlobal('window', win); vi.stubGlobal('document', doc);
   vi.stubGlobal('location', { hash: '', origin: 'http://localhost', pathname: '/' });
   vi.stubGlobal('performance', { now: () => time, timeOrigin: 1_700_000_000_000 });
   vi.stubGlobal('setInterval', (fn: () => void) => { const id = ++serial; timers.set(id, fn); return id; });
   vi.stubGlobal('clearInterval', (id: number) => timers.delete(id));
-  vi.stubGlobal('setTimeout', () => ++serial);
+  vi.stubGlobal('setTimeout', (fn: () => void, ms: number) => { const id = ++serial; timeouts.set(id, { fn, ms }); return id; });
+  vi.stubGlobal('clearTimeout', (id: number) => timeouts.delete(id));
   vi.stubGlobal('requestAnimationFrame', (fn: () => void) => { const id = ++serial; frames.set(id, fn); return id; });
   vi.stubGlobal('cancelAnimationFrame', (id: number) => frames.delete(id));
   const authority = new Authority(() => time, () => 0);
@@ -80,7 +81,7 @@ function harness() {
     authority.snapshot(p.ws.session!); flush(); return p;
   }
   return { authority, root, sockets, elements, connect, pair, rally, mouse, focus, visible, flush, advance, diagnostics,
-    at: () => time, setTime: (n: number) => { time = n; }, win, doc, timers, frames, element };
+    at: () => time, setTime: (n: number) => { time = n; }, win, doc, timers, timeouts, frames, element };
 }
 
 it('actual UI rejects Countdown capture 150 delivered after Rally processing 200 without sequence, target or prediction', async () => {
@@ -184,4 +185,20 @@ it.each(['online-back', 'pagehide'])('%s cancels pending ownership and delayed c
   if (action === 'pagehide') h.win.dispatchEvent(new Event('pagehide')); else h.element(action).onclick();
   ws.open(); h.flush(); expect(ws.closes).toBe(1); expect(ws.sent).toHaveLength(0);
   if (action === 'pagehide') { expect(h.timers.size).toBe(0); expect(h.frames.size).toBe(0); }
+});
+
+it('a connection that never opens gives up after the connect timeout with a clear message and allows a retry', () => {
+  const h = harness(); h.element('room-create').onclick();
+  const ws = h.sockets.at(-1)!; expect(h.element('online-status').textContent).toBe('Connecting…');
+  const pending = [...h.timeouts.values()].filter(t => t.ms === CONNECT_TIMEOUT_MS); expect(pending).toHaveLength(1);
+  expect(CONNECT_TIMEOUT_MS).toBe(10_000);
+  pending[0].fn();
+  expect(ws.closes).toBe(1); expect(h.element('online-status').textContent).toMatch(/Could not reach the server in time/);
+  h.element('room-create').onclick(); expect(h.sockets).toHaveLength(2);
+});
+
+it('an opened connection cancels the connect timeout', () => {
+  const h = harness(); h.connect();
+  expect([...h.timeouts.values()].filter(t => t.ms === CONNECT_TIMEOUT_MS)).toHaveLength(0);
+  expect(h.element('online-status').textContent).not.toMatch(/Could not reach/);
 });

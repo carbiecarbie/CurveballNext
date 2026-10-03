@@ -6,6 +6,8 @@ import { OnlineView } from './view';
 import { captureTime } from './input-time';
 import { REGION_LABELS, onlineEndpoint, regionOfCode } from './regions';
 
+export const CONNECT_TIMEOUT_MS = 10_000;
+
 export function mountOnline(root: HTMLElement, back: () => void) {
   root.innerHTML = `<header><strong class="wordmark">CURVEBALL<span>NEXT</span></strong><button id="online-back">Modes</button></header>
     <section class="online-controls"><h1>Private 1×1</h1><p>Three lives each. If you leave this tab, the match ends with no winner.</p><p class="online-fineprint">Matches can't be resumed after a disconnect.</p>
@@ -48,7 +50,14 @@ export function mountOnline(root: HTMLElement, back: () => void) {
       connection = owner;
       const current = () => !disposed && connection === owner;
       el('online-status').textContent = 'Connecting…';
+      // A region whose Machine is down can leave the upgrade pending for ~40 s; give up sooner with a clear message.
+      const connectTimer = setTimeout(() => {
+        if (!current() || owner.client) return;
+        stopConnection(false);
+        el('online-status').textContent = 'Could not reach the server in time. That region may be unavailable. Try again, or create a new room.';
+      }, CONNECT_TIMEOUT_MS);
       ws.onopen = () => {
+        clearTimeout(connectTimer);
         if (!current()) { ws.close(); return; }
         const focused = document.hasFocus();
         if (root.hidden || document.hidden || ws.readyState !== WebSocket.OPEN) { stopConnection(true); return; }
