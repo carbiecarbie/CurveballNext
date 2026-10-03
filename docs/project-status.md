@@ -11,6 +11,8 @@ CurveballNext was built in milestones. Each was accepted only after its listed c
 | M4 | Parity with the pinned Ruffle v0.6.0 runtime | Accepted after independent review, 30 Sep 2026 |
 | M5 | Private online multiplayer (1×1 rooms) | Accepted and **live**, 1 Oct 2026 |
 | Visual refresh | New court, orb and paddle look (magenta opponent) | Merged, 2 Oct 2026 |
+| M6 | Multi-region rooms: one authority Machine in `gru` and one in `iad`, room code names its region | Deployed 2 Oct 2026; `iad` 66-minute soak passed 3 Oct; fairness cells on `iad` and real US-player latency still open ([plan](milestones/m6-multi-region-plan.md)) |
+| Landing page | Full landing page replaces the mode picker (hero clip, GitHub and Ko-fi links, link-preview image) | Merged, 3 Oct 2026 |
 
 ## What is verified
 
@@ -30,7 +32,19 @@ Local score table, online ranking, reconnect after refresh, accounts, music.
 
 ## Hosting
 
-Frontend on Cloudflare Pages (auto-deploys `main`); a single Fly.io Machine in São Paulo runs the online authority. Rooms live in memory and disappear on restart. See the [runbook](m5-runbook.md).
+Frontend on Cloudflare Pages (auto-deploys `main`; other branches get preview URLs). The online authority is one Fly.io app, `curveballnext`, with one always-on Machine in São Paulo (`gru`, room codes start with `G`) and one in Virginia (`iad`, codes start with `V`). Each Machine is an independent authority; a join is routed to the room's Machine with `?r=<region>` and `fly-replay`. Rooms live in memory and disappear on restart. See the [runbook](m5-runbook.md) and the [M6 plan](milestones/m6-multi-region-plan.md).
+
+The landing page is static markup in `index.html` with styles in `src/landing.css` (scoped under `#landing`); link-preview tags point to `public/og.jpg`. Site copy is in English. `.github/FUNDING.yml` and the hero links point to the maintainer's Ko-fi.
+
+## Working rules and decisions
+
+Agent-facing rules (authorization, deploy, verification) are in [AGENTS.md](../AGENTS.md). Decisions already taken, so they are not reopened by accident:
+
+- **Modified-client late-return window (accepted).** Online fairness uses a bounded defender contact claim ([M5 plan §5 amendment](milestones/m5-private-online-multiplayer-plan.md)). A tampered client can inflate its own late-return window; closing that would reject honest late returns. Accepted for private invite-code rooms, to be reopened before any public matchmaking or ranking.
+- **Defender interruption during the claim pause** commits the original miss first; opponent interruption still aborts.
+- **Isolated instrumentation outliers** (about 1 in thousands of controlled cells) are not chased; the maintainer accepted the single margin outlier in the final runs.
+- **Level 10 ends the campaign** by deliberate choice (the original has no verified ending).
+- **Known small follow-up:** a socket the server closes without an `interrupted` frame (refused create, Waiting expiry) shows the client watchdog's "Server runtime timeout" instead of a specific reason.
 
 ## Document map
 
