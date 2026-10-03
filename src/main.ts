@@ -1,17 +1,18 @@
 import './styles.css';
+import './landing.css';
 import { mountOnline } from './multiplayer/ui';
-const classic = document.querySelector('main')!;
-classic.id = 'classic'; classic.hidden = true;
-const menu = document.createElement('main');
-menu.innerHTML = '<header><strong class="wordmark">CURVEBALL<span>NEXT</span></strong></header><section class="mode-menu"><h1>Choose your game</h1><button id="classic-entry">Classic</button><button id="online-entry">Online · Private 1×1</button><p>Online is two friends, three lives each. No accounts or rejoining after interruption.</p></section>';
-document.body.prepend(menu);
+const classic = document.querySelector<HTMLElement>('#classic')!;
+const menu = document.querySelector<HTMLElement>('#landing')!;
 const online = document.createElement('main'); online.hidden = true; document.body.append(online);
+// The hero clip is decoration: respect a reduced-motion preference by leaving it on its poster frame.
+const clip = document.querySelector<HTMLVideoElement>('#lp-video');
+if (clip && matchMedia('(prefers-reduced-motion: reduce)').matches) { clip.removeAttribute('autoplay'); clip.pause(); }
 let mounted = false;
 document.querySelector('#classic-entry')!.addEventListener('click', () => {
-  menu.hidden = true; classic.hidden = false; void import('./classic');
+  menu.hidden = true; classic.hidden = false; window.scrollTo(0, 0); void import('./classic');
 });
 document.querySelector('#online-entry')!.addEventListener('click', () => {
-  menu.hidden = true; online.hidden = false;
+  menu.hidden = true; online.hidden = false; window.scrollTo(0, 0);
   if (!mounted) { mounted = true; mountOnline(online, () => { online.hidden = true; menu.hidden = false; }); }
 });
 if (location.hash.startsWith('#room=')) (document.querySelector('#online-entry') as HTMLButtonElement).click();

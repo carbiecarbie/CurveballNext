@@ -6,9 +6,128 @@
     <meta name="theme-color" content="#050506">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23190a0c' stroke='%23ffb143' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23fff0cc'/%3E%3C/svg%3E">
     <title>CurveballNext · Classic and private online</title>
+    <meta name="description" content="CurveballNext is a free browser rebuild of the 2002 Flash game Curveball. Bend the ball with your paddle in a ten-level campaign, or play a friend in a private online room.">
+    <link rel="canonical" href="https://curveballnext.pages.dev/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CurveballNext">
+    <meta property="og:title" content="CurveballNext · Meet the ball. Bend the rally.">
+    <meta property="og:description" content="A free browser rebuild of the 2002 Flash game Curveball. Single-player campaign or a private online match with a friend. Open source, no account.">
+    <meta property="og:url" content="https://curveballnext.pages.dev/">
+    <meta property="og:image" content="https://curveballnext.pages.dev/og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="A glowing orange ball in a red wireframe court with the player's cyan paddle, next to the CurveballNext wordmark.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CurveballNext · Meet the ball. Bend the rally.">
+    <meta name="twitter:description" content="A free browser rebuild of the 2002 Flash game Curveball. Open source, no account.">
+    <meta name="twitter:image" content="https://curveballnext.pages.dev/og.jpg">
   </head>
   <body>
-    <main>
+    <main id="landing">
+      <div class="lp-wrap">
+        <div class="lp-bar">
+          <a class="lp-mark" href="#top">CURVEBALL<b>NEXT</b></a>
+          <nav aria-label="Page sections">
+            <a href="#lp-modes">Modes</a>
+            <a href="#lp-how">How to play</a>
+            <a href="#lp-about">About</a>
+            <a class="lp-gh" href="https://github.com/carbiecarbie/CurveballNext"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+          </nav>
+        </div>
+
+        <header class="lp-hero" id="top">
+          <p class="lp-kicker">A 2002 Flash classic, rebuilt for the browser</p>
+          <h1>Curveball<span class="lp-next">NEXT</span></h1>
+
+          <div class="lp-hero-grid">
+            <div>
+              <p class="lp-lede">Meet the ball. Bend the rally.</p>
+              <p class="lp-sub">3D pong where the spin you put on the ball with your paddle decides where it curves. Play the ten-level campaign alone, or send a link to a friend.</p>
+              <div class="lp-modes">
+                <button id="classic-entry" class="lp-mode lp-mode-main" type="button"><strong>Classic</strong><small>Single player · 10 levels</small><span class="lp-arrow" aria-hidden="true">↗</span></button>
+                <button id="online-entry" class="lp-mode" type="button"><strong>Online · Private 1×1</strong><small>Invite a friend with a link · no account</small><span class="lp-arrow" aria-hidden="true">↗</span></button>
+              </div>
+              <ul class="lp-links">
+                <li><a href="https://github.com/carbiecarbie/CurveballNext"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Source on GitHub</a></li>
+                <li><a href="https://github.com/carbiecarbie/CurveballNext/blob/main/docs/project-status.md">How it was verified</a></li>
+                <li><a href="https://github.com/carbiecarbie/CurveballNext/issues">Report a bug</a></li>
+              </ul>
+            </div>
+            <figure class="lp-monitor">
+              <video id="lp-video" src="./src/assets/curveball.mp4" poster="./src/assets/curveball-poster.jpg" width="480" height="418" autoplay muted loop playsinline disablepictureinpicture aria-label="Gameplay: a glowing orange ball in a red wireframe court, with the player's cyan paddle and score bars around it."></video>
+              <figcaption><span>Classic · Level 01</span><i>Real gameplay</i></figcaption>
+            </figure>
+          </div>
+        </header>
+
+        <section class="lp-block" id="lp-modes" aria-labelledby="lp-h-modes">
+          <div class="lp-head"><h2 id="lp-h-modes">Two ways to play</h2><span>Mouse only</span></div>
+          <div class="lp-cols">
+            <div>
+              <p class="lp-tag">Solo</p>
+              <h3>Classic</h3>
+              <ul>
+                <li>Ten levels with an opponent that gets harder</li>
+                <li>Five lives, a score, and a level bonus that ticks down</li>
+                <li>Runs entirely in your browser, no server or account</li>
+              </ul>
+            </div>
+            <div>
+              <p class="lp-tag">With a friend</p>
+              <h3>Online · Private 1×1</h3>
+              <ul>
+                <li>Create a room and send the invite link</li>
+                <li>Three lives each, with rematches</li>
+                <li>Lag compensation, so a defender is not punished for network delay</li>
+              </ul>
+            </div>
+            <div>
+              <p class="lp-tag">Servers</p>
+              <h3>São Paulo and Virginia</h3>
+              <p>A room is created on the server nearest to whoever creates it, and the invite link takes your friend to the same one.</p>
+              <p>No accounts. If someone leaves mid-match, the match ends with no winner and cannot be resumed.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="lp-block" id="lp-how" aria-labelledby="lp-h-how">
+          <div class="lp-head"><h2 id="lp-h-how">How to play</h2><span>Four things to know</span></div>
+          <div class="lp-how">
+            <div><b>Move</b><span>Steer your paddle, the near cyan one, with the mouse.</span></div>
+            <div><b>Click</b><span>Press while the ball is on your paddle to serve.</span></div>
+            <div><b>Sweep</b><span>Move the paddle as it hits. The ball bends the way you were moving.</span></div>
+            <div><b>Pause</b><span><kbd>Esc</kbd> pauses. The Sound button mutes effects.</span></div>
+          </div>
+        </section>
+
+        <section class="lp-block" id="lp-about" aria-labelledby="lp-h-about">
+          <div class="lp-head"><h2 id="lp-h-about">About this project</h2><span>Independent reconstruction</span></div>
+          <div class="lp-split">
+            <div>
+              <p>CurveballNext is a from-scratch reimplementation of <b>Curveball</b>, the 2002 Flash game. The original was studied to recover its rules: collisions, curve physics, timing and the difficulty tables. The game logic was then written independently from that specification.</p>
+              <p>The simulation is deterministic at 30 Hz and was checked frame by frame against the original running in <a href="https://ruffle.rs">Ruffle</a>. Equivalence with Adobe Flash Player itself is not proven, and the docs say where behavior is uncertain.</p>
+              <p>Everything is drawn with Canvas and the sound is synthesized with Web Audio. No original artwork, sound or code is used or distributed.</p>
+            </div>
+            <div class="lp-stats">
+              <div><strong>30 Hz</strong><span>deterministic simulation</span></div>
+              <div><strong>10</strong><span>levels in the campaign</span></div>
+              <div><strong>2</strong><span>server regions</span></div>
+              <div><strong>MIT</strong><span>licensed, source on GitHub</span></div>
+            </div>
+          </div>
+        </section>
+
+        <footer class="lp-foot">
+          <p>An independent fan project, not affiliated with the original authors. New visuals and synthesized sound. Code released under the MIT License.</p>
+          <nav aria-label="Project links">
+            <a href="https://github.com/carbiecarbie/CurveballNext">GitHub</a>
+            <a href="https://github.com/carbiecarbie/CurveballNext/tree/main/docs">Docs</a>
+            <a href="https://github.com/carbiecarbie/CurveballNext/blob/main/LICENSE">License</a>
+          </nav>
+        </footer>
+      </div>
+    </main>
+    <main id="classic" hidden>
       <header>
         <a class="wordmark" href="#" aria-label="CurveballNext">CURVEBALL<span>NEXT</span></a>
         <span class="edition">OFFLINE ARCADE <i></i> SINGLE PLAYER</span>
