@@ -13,7 +13,7 @@ CurveballNext was built in milestones. Each was accepted only after its listed c
 | Visual refresh | New court, orb and paddle look (magenta opponent) | Merged, 2 Oct 2026 |
 | M6 | Multi-region rooms: one authority Machine in `gru` and one in `iad`, room code names its region | Deployed 2 Oct 2026; `iad` 66-minute soak passed 3 Oct; retired 15 Oct 2026 with the rest of online ([plan](milestones/m6-multi-region-plan.md)) |
 | Landing page | Full landing page replaces the mode picker (hero clip, GitHub and Ko-fi links, link-preview image) | Merged, 3 Oct 2026 |
-| Online retired | Maintainer decision to close the project as single-player only: the Online mode, server, Fly files, online tests and fairness CI were removed; the Fly app is to be destroyed so nothing keeps billing | Code removed 15 Oct 2026; Fly shutdown pending (see [runbook](m5-runbook.md#shutdown-15-october-2026)) |
+| Online retired | Maintainer decision to close the project as single-player only: the Online mode, server, Fly files, online tests and fairness CI were removed; the Fly app was destroyed so nothing keeps billing | Done 15 Oct 2026 (see [runbook](m5-runbook.md#shutdown-15-october-2026)) |
 
 ## What is verified
 
@@ -32,7 +32,7 @@ Local score table, accounts, music. Online play was implemented (M5/M6) and then
 
 ## Hosting
 
-Frontend on Cloudflare Pages (auto-deploys `main`; other branches get preview URLs). The site is static and single-player only; it has no backend. Until 15 October 2026 an online authority ran on the Fly.io app `curveballnext` (one Machine in `gru`, one in `iad`); its shutdown is recorded in the [runbook](m5-runbook.md#shutdown-15-october-2026). The last commit that still contains the online client, server and tooling is `562a4b1` on `main`.
+Frontend on Cloudflare Pages (auto-deploys `main`; other branches get preview URLs). The site is static and single-player only; it has no backend. Until 15 October 2026 an online authority ran on the Fly.io app `curveballnext` (one Machine in `gru`, one in `iad`); the app was destroyed that day, as recorded in the [runbook](m5-runbook.md#shutdown-15-october-2026). The last commit that still contains the online client, server and tooling is `562a4b1` on `main`.
 
 The landing page is static markup in `index.html` with styles in `src/landing.css` (scoped under `#landing`); link-preview tags point to `public/og.jpg`. Site copy is in English. `.github/FUNDING.yml` and the hero links point to the maintainer's Ko-fi.
 
