@@ -1,6 +1,6 @@
 # M5 candidate setup and release runbook
 
-Status: **live.** M5 was accepted and launched on 1 October 2026 (frontend on Cloudflare Pages, authority on one Fly Machine in `gru`). This runbook still describes local setup and the release procedure; the "future authorization" steps below were carried out by the maintainer. Original M3/M4 limits are unchanged.
+Status: **retired.** M5 was accepted and launched on 1 October 2026 and the online mode was retired on 15 October 2026 (see [Shutdown](#shutdown-15-october-2026) at the end). The client, server, Dockerfile, `fly.m5.toml` and `tools/m5` were removed from the tree; the commands and file paths below refer to commit `562a4b1` and earlier. This document is kept as a historical record.
 
 ## Local startup
 
@@ -76,3 +76,10 @@ After authorization, the rules become: **one Machine per approved region, each a
 5. Drain and replace each Machine independently with `kill -USR2 1` as in M5. While a region drains, its joiners get `maintenance` and creates there are refused; the other region is unaffected.
 6. Rollback: scale back to one Machine (`fly scale count 1 --app APP --region gru`), then remove the extra region. Codes naming a removed region return `room-unavailable`; `gru` codes keep working.
 7. Budget: each region adds one always-on shared-cpu-1x/512 MB. Requote current Fly pricing and update the spending plan before authorizing.
+
+## Shutdown, 15 October 2026
+
+Maintainer decision: close the project as single-player only and stop all hosting charges for the online server.
+
+- **Frontend.** Pull request `remove-online` removes the Online entry, the multiplayer client and its styles; the production bundle opens no WebSocket. Cloudflare Pages publishes it when merged to `main`. The `VITE_ONLINE_URL` variable in the Pages project is no longer read and can be deleted in the Cloudflare dashboard.
+- **Backend.** State before shutdown (read with `fly machines list`, `fly volumes list`, `fly ips list`): app `curveballnext`, personal organization, Machines `811d35db9e7028` (`gru`) and `817651f9725368` (`iad`), both `shared-cpu-1x:512MB` and started; no volumes; a shared IPv4 and a dedicated IPv6. Destroying the app (`fly apps destroy curveballnext`) removes Machines, images and IPs together. **Pending maintainer authorization.**

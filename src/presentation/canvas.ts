@@ -134,23 +134,6 @@ function court(ctx: CanvasRenderingContext2D, ball: Box, state: { ball: { z: num
   ctx.fillText('NEAR', 25, 239); ctx.textAlign = 'right'; ctx.fillText('FAR', 326, 239); ctx.textAlign = 'left';
 }
 
-/** Read-only online draw adapter. It never emulates the solo simulation State. */
-export function drawOnline(canvas: HTMLCanvasElement, model: import('../multiplayer/view').DrawModel) {
-  const rect = canvas.getBoundingClientRect(), size = backingSize(rect.width, rect.height, window.devicePixelRatio || 1);
-  if (canvas.width !== size.width || canvas.height !== size.height) { canvas.width = size.width; canvas.height = size.height; }
-  const ctx = canvas.getContext('2d'); if (!ctx) return;
-  ctx.setTransform(canvas.width / 350, 0, 0, canvas.height / 250, 0, 0);
-  const box = (r: import('../multiplayer/view').Rect): Box => ({ ...r, x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2,
-    width: r.right - r.left, height: r.bottom - r.top, tick: model.tick, generation: 0 });
-  const activity = { speed: .2, spin: 0, bias: 0, impact: 0 }, ball = box(model.ball);
-  const time = Number.isFinite(model.ballTime) ? model.ballTime * HZ / 1000 : model.tick, fx = fxFor(canvas);
-  track(fx, ball, model.z, time, !model.missed && !model.frozen);
-  court(ctx, ball, { ball: { z: model.z } }, activity, 0, time);
-  paddle(ctx, box(model.remote), true, 0);
-  effectsLayer(ctx, fx, time); orb(ctx, ball, activity, time, model.missed);
-  paddle(ctx, box(model.own), false, 0);
-}
-
 /** The original glass body and metal side rails, with a neon outline and bright corners on top. */
 function paddle(ctx: CanvasRenderingContext2D, box: Box, enemy: boolean, hit: number) {
   const x = box.x - box.width / 2, y = box.y - box.height / 2;
