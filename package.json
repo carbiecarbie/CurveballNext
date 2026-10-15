@@ -9,10 +9,7 @@
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.server.json",
-    "server:build": "tsc -p tsconfig.server.json && node tools/m5/build-server.mjs",
-    "server:start": "node dist-server/server.mjs",
-    "server:dev": "npm run server:build && npm run server:start",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "npm run typecheck && vite build",
@@ -20,13 +17,8 @@
   },
   "devDependencies": {
     "@types/node": "26.6.3",
-    "@types/ws": "8.18.1",
-    "esbuild": "0.28.2",
     "typescript": "7.0.2",
     "vite": "8.3.1",
     "vitest": "5.0.2"
-  },
-  "dependencies": {
-    "ws": "8.22.0"
   }
 }
